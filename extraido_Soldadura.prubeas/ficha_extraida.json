@@ -1,0 +1,89 @@
+{
+  "archivo_origen": "Soldadura.prubeas .docx",
+  "fecha_extraccion": "2026-07-10",
+  "estado": "extraido_pendiente_ia",
+  "producto": {
+    "nombre_propuesto": null,
+    "modelo": "TIG-250",
+    "sku": null,
+    "categoria_propuesta": null,
+    "garantia": "1 año"
+  },
+  "precios": {
+    "precio": 260000,
+    "moneda": "COP"
+  },
+  "descripcion_principal": "Su tecnología inverter garantiza un arco estable, menor consumo de energía y un excelente desempeño tanto en procesos TIG como MMA (electrodo revestido). Ideal para talleres metalmecánicos, mantenimiento industrial, fabricación de estructuras, cerrajería y trabajos de reparación, ofreciendo un equipo liviano, fácil de transportar y preparado para largas jornadas de trabajo.",
+  "caracteristicas": [
+    "Diseño compacto y fácil de transportar",
+    "Bajo consumo de energía",
+    "Sistema de protección contra sobrecalentamiento y sobrecarga",
+    "Ideal para uso profesional e industrial"
+  ],
+  "ficha_tecnica": {
+    "Modelo": "TIG-250",
+    "Tipo de equipo": "Inversor de soldadura TIG / MMA",
+    "Tecnología": "Inverter IGBT",
+    "Procesos de soldadura": "TIG (Lift TIG) y MMA (Electrodo revestido)",
+    "Voltaje de alimentación": "110V / 220V (según versión)",
+    "Frecuencia": "50/60 Hz",
+    "Rango de corriente TIG": "20 – 250 A",
+    "Rango de corriente MMA": "20 – 250 A",
+    "Corriente máxima": "250 A",
+    "Ciclo de trabajo": "60% @ 250 A",
+    "Pantalla": "Display digital LED",
+    "Regulación de corriente": "Electrónica de precisión",
+    "Tipo de enfriamiento": "Ventilación forzada",
+    "Protección": "Sobrecalentamiento, sobrecorriente y sobrevoltaje",
+    "Encendido del arco TIG": "Lift TIG",
+    "Electrodos compatibles": "1.6 mm – 5.0 mm",
+    "Materiales recomendados": "Acero al carbono, acero inoxidable, hierro y otros metales ferrosos",
+    "Factor de potencia": "≥ 0.93",
+    "Eficiencia": "≥ 85%",
+    "Clase de aislamiento": "F",
+    "Grado de protección": "IP21S",
+    "Peso aproximado": "7 – 9 kg",
+    "Uso recomendado": "Profesional, industrial y talleres de mantenimiento"
+  },
+  "multimedia": {
+    "imagenes": [
+      {
+        "archivo": "image1.png",
+        "tamano_kb": 883.3
+      },
+      {
+        "archivo": "image2.png",
+        "tamano_kb": 992.5
+      },
+      {
+        "archivo": "image3.png",
+        "tamano_kb": 1030.8
+      },
+      {
+        "archivo": "image4.png",
+        "tamano_kb": 1093.9
+      },
+      {
+        "archivo": "image5.png",
+        "tamano_kb": 342.6
+      },
+      {
+        "archivo": "image6.png",
+        "tamano_kb": 604.4
+      },
+      {
+        "archivo": "image7.png",
+        "tamano_kb": 400.9
+      },
+      {
+        "archivo": "image8.png",
+        "tamano_kb": 682.9
+      },
+      {
+        "archivo": "image9.png",
+        "tamano_kb": 518.8
+      }
+    ],
+    "video_youtube": "https://www.youtube.com/watch?v=qE9btHLrwrI"
+  }
+}

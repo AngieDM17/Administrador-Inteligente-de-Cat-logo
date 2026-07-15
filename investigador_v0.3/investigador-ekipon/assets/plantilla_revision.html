@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revisión de ficha — Ekipon</title>
+<style>
+  :root{--rojo:#c62828;--verde:#2e7d32;--azul:#1565c0;--ambar:#b26a00;--gris:#616161;--fondo:#f6f6f4;--borde:#ddd}
+  *{box-sizing:border-box}
+  body{font-family:'Segoe UI',system-ui,sans-serif;margin:0;background:var(--fondo);color:#222}
+  header{background:#1a1a1a;color:#fff;padding:18px 28px;position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+  header h1{font-size:18px;margin:0;font-weight:600}
+  header .estado{font-size:13px;opacity:.85}
+  main{max-width:960px;margin:24px auto;padding:0 16px}
+  section{background:#fff;border:1px solid var(--borde);border-radius:10px;padding:20px 24px;margin-bottom:18px}
+  h2{font-size:15px;text-transform:uppercase;letter-spacing:.06em;color:#444;margin:0 0 14px;border-bottom:2px solid #eee;padding-bottom:8px}
+  label{display:block;font-size:12px;font-weight:600;color:#555;margin:12px 0 4px}
+  input[type=text],textarea{width:100%;padding:9px 11px;border:1px solid var(--borde);border-radius:6px;font-size:14px;font-family:inherit;background:#fcfcfc}
+  textarea{min-height:70px;resize:vertical}
+  input:focus,textarea:focus{outline:2px solid #1a73e8;background:#fff}
+  .badge{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:8px;vertical-align:middle;text-transform:uppercase;letter-spacing:.03em}
+  .b-verificado,.b-confirmado_por_angie{background:#e3f2e6;color:var(--verde)}
+  .b-encontrado_web{background:#e5effa;color:var(--azul)}
+  .b-generado_ia{background:#fdf1de;color:var(--ambar)}
+  .b-generado_ia_sin_verificar{background:#fde5e5;color:var(--rojo)}
+  .b-pendiente_angie,.b-pendiente{background:#ececec;color:var(--gris)}
+  .aviso{background:#fff8e1;border:1px solid #f0dfa0;border-radius:8px;padding:12px 14px;font-size:13.5px;margin-bottom:14px}
+  .kv-row{display:grid;grid-template-columns:220px 1fr 34px;gap:8px;margin-bottom:8px;align-items:center}
+  .kv-row input:first-child{font-weight:600;text-transform:uppercase;font-size:12.5px}
+  .del{background:none;border:none;color:#b71c1c;font-size:16px;cursor:pointer}
+  .add{background:#eef;border:1px dashed #99b;border-radius:6px;padding:7px 12px;font-size:13px;cursor:pointer;margin-top:6px}
+  ul.fuentes{font-size:12.5px;color:#555;padding-left:18px}
+  ul.fuentes li{margin-bottom:4px;word-break:break-all}
+  .galeria{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .galeria figure{margin:0;border:1px solid var(--borde);border-radius:8px;overflow:hidden;background:#fafafa}
+  .galeria img{width:100%;aspect-ratio:1;object-fit:contain;background:#fff}
+  .galeria figcaption{font-size:11px;padding:6px 8px;color:#666}
+  .pendiente-item{display:flex;gap:10px;align-items:flex-start;background:#fdecea;border-radius:6px;padding:10px 12px;margin-bottom:8px;font-size:13.5px}
+  .footer-bar{position:sticky;bottom:0;background:#fff;border-top:2px solid #1a1a1a;padding:14px 28px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+  .btn-descargar{background:var(--verde);color:#fff;border:none;border-radius:8px;padding:12px 26px;font-size:15px;font-weight:600;cursor:pointer}
+  .btn-descargar:hover{background:#1b5e20}
+  .nota-footer{font-size:12px;color:#666;max-width:520px}
+  .brief{border:1px solid var(--borde);border-radius:8px;padding:10px 14px;margin-bottom:10px;background:#fafaff;font-size:13.5px}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1 id="h-nombre">Revisión de ficha</h1>
+    <div class="estado" id="h-meta"></div>
+  </div>
+  <div class="estado">Ekipon · Administrador Inteligente de Catálogo</div>
+</header>
+<main id="app"></main>
+<div class="footer-bar">
+  <div class="nota-footer">Al descargar, la ficha queda en estado <b>revisada</b> con fecha de hoy. Los campos que corrijas quedan marcados <b>confirmado_por_angie</b>. Guarda el archivo descargado en la carpeta del proyecto reemplazando el anterior.</div>
+  <button class="btn-descargar" onclick="descargar()">⬇ Descargar ficha corregida</button>
+</div>
+
+<script>
+const FICHA = __FICHA_JSON__;
+const ORIG = JSON.parse(JSON.stringify(FICHA));
+
+function badge(origen){
+  if(!origen) return '';
+  const clave = String(origen).toLowerCase().split(/[ (—-]/)[0].trim();
+  const conocidas = ['verificado','encontrado_web','generado_ia','generado_ia_sin_verificar','confirmado_por_angie','pendiente_angie'];
+  const cls = conocidas.includes(clave) ? 'b-'+clave : 'b-pendiente';
+  return `<span class="badge ${cls}" title="${String(origen).replace(/"/g,'&quot;')}">${clave.replace(/_/g,' ')}</span>`;
+}
+function esc(v){return v==null?'':String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
+
+function campo(id,etiqueta,valor,origen,multilinea){
+  return `<label>${etiqueta}${badge(origen)}</label>` + (multilinea
+    ? `<textarea id="${id}">${esc(valor)}</textarea>`
+    : `<input type="text" id="${id}" value="${esc(valor)}">`);
+}
+
+function render(){
+  const f = FICHA, app = document.getElementById('app');
+  document.getElementById('h-nombre').textContent = (f.producto&&f.producto.nombre_propuesto)||'Revisión de ficha';
+  document.getElementById('h-meta').textContent =
+    `Estado: ${f.estado||'—'} · Investigada: ${f.fecha_investigacion||'—'} · Ficha v${f._version_ficha||'?'}`;
+
+  let html = '';
+
+  const idp = f.identificacion_del_producto||{};
+  html += `<section><h2>Identificación</h2>
+    <div class="aviso"><b>${esc(idp.resultado||'')}</b> — ${esc(idp.detalle||'')}<br>
+    <small>Fuente principal: ${esc(idp.fuente_principal||'—')} · ${esc(idp.estado_en_proveedor||'')}</small></div>
+    ${(idp.advertencias||[]).map(a=>`<div class="pendiente-item">⚠️ ${esc(a)}</div>`).join('')}
+  </section>`;
+
+  const p = f.producto||{};
+  html += `<section><h2>Producto</h2>
+    ${campo('producto.nombre_propuesto','Nombre propuesto',p.nombre_propuesto,p.nombre_origen)}
+    ${campo('producto.modelo','Modelo',p.modelo)}
+    ${campo('producto.categoria_propuesta','Categoría propuesta',p.categoria_propuesta,p.categoria_confianza)}
+    ${campo('producto.etiquetas_propuestas','Etiquetas (separadas por coma)',(p.etiquetas_propuestas||[]).join(', '))}
+    <label>Garantía (regla fija)</label><input type="text" value="${esc(p.garantia)}" disabled>
+  </section>`;
+
+  const pr = f.precios||{};
+  html += `<section><h2>Precio ${badge(pr.precio_origen)}</h2>
+    <div class="aviso">El precio lo defines <b>tú, siempre</b>. Referencias encontradas:
+    <ul class="fuentes">${(pr.referencias_mercado&&pr.referencias_mercado.length?pr.referencias_mercado:[pr.referencia_encontrada||'sin referencias']).map(r=>`<li>${esc(typeof r==='object'?JSON.stringify(r):r)}</li>`).join('')}</ul></div>
+    ${campo('precios.precio','Precio final Ekipon (COP, solo números)',pr.precio)}
+  </section>`;
+
+  html += `<section><h2>Descripción principal ${badge(f.descripcion_origen)}</h2>
+    ${campo('descripcion_principal','',f.descripcion_principal,null,true)}
+  </section>`;
+
+  html += `<section><h2>Características ${badge(f.caracteristicas_origen)}</h2>
+    <label>Una por línea</label>
+    <textarea id="caracteristicas" style="min-height:130px">${esc((f.caracteristicas||[]).join('\n'))}</textarea>
+  </section>`;
+
+  const ft = f.ficha_tecnica||{};
+  html += `<section><h2>Ficha técnica ${badge(ft._origen_global)}</h2><div id="ft-rows">`;
+  Object.entries(ft).filter(([k])=>!k.startsWith('_')).forEach(([k,v],i)=>{
+    html += `<div class="kv-row"><input type="text" class="ft-k" value="${esc(k)}"><input type="text" class="ft-v" value="${esc(v)}"><button class="del" onclick="this.parentElement.remove()">✕</button></div>`;
+  });
+  html += `</div><button class="add" onclick="agregarFila()">+ Agregar dato técnico</button></section>`;
+
+  const cv = f.criterio_verificacion_visual||{};
+  html += `<section><h2>Criterio de verificación visual</h2>
+    ${campo('criterio_verificacion_visual.SI_es','SÍ es el producto cuando…',cv.SI_es,null,true)}
+    ${campo('criterio_verificacion_visual.NO_es','NO es (parecidos que se rechazan)…',cv.NO_es,null,true)}
+    ${campo('criterio_verificacion_visual.rasgo_decisivo','Rasgo decisivo',cv.rasgo_decisivo)}
+  </section>`;
+
+  const mm = f.multimedia||{};
+  html += `<section><h2>Imágenes confirmadas (${(mm.imagenes_galeria_confirmadas||[]).length})</h2>
+    <div class="galeria">${(mm.imagenes_galeria_confirmadas||[]).map(im=>{
+      const u = typeof im==='object'?im.url:im, n = typeof im==='object'?(im.nota||''):'';
+      return `<figure><img src="${esc(u)}" loading="lazy" onerror="this.style.opacity=.2"><figcaption>${esc(n)}</figcaption></figure>`;
+    }).join('')||'<i>Sin imágenes confirmadas</i>'}</div>
+    ${(mm.briefs_generacion_ia||[]).length?`<h2 style="margin-top:20px">Briefs de generación IA (pendientes de tu aprobación)</h2>`+
+      mm.briefs_generacion_ia.map(b=>`<div class="brief"><b>Toma ${esc(b.toma)}:</b> ${esc(b.brief)}</div>`).join(''):''}
+  </section>`;
+
+  const seo = f.seo||{};
+  html += `<section><h2>SEO ${badge(seo.origen)}</h2>
+    ${campo('seo.meta_titulo','Meta título',seo.meta_titulo)}
+    ${campo('seo.meta_descripcion','Meta descripción',seo.meta_descripcion,null,true)}
+    ${campo('seo.palabras_clave','Palabras clave (separadas por coma)',(seo.palabras_clave||[]).join(', '))}
+    ${campo('seo.texto_alt_base','Texto ALT base',seo.texto_alt_base)}
+  </section>`;
+
+  html += `<section><h2>Campos por confirmar</h2>
+    ${(f.campos_por_confirmar||[]).map(c=>`<div class="pendiente-item">🔲 ${esc(c)}</div>`).join('')||'<i>Nada pendiente</i>'}
+  </section>`;
+
+  html += `<section><h2>Fuentes consultadas</h2>
+    <ul class="fuentes">${(f.fuentes_consultadas||[]).map(s=>`<li>${esc(s)}</li>`).join('')}</ul>
+  </section>`;
+
+  app.innerHTML = html;
+}
+
+function agregarFila(){
+  const div = document.createElement('div');
+  div.className = 'kv-row';
+  div.innerHTML = '<input type="text" class="ft-k" placeholder="DATO"><input type="text" class="ft-v" placeholder="valor"><button class="del" onclick="this.parentElement.remove()">✕</button>';
+  document.getElementById('ft-rows').appendChild(div);
+}
+
+function poner(obj, ruta, valor){
+  const partes = ruta.split('.'); let o = obj;
+  for(let i=0;i<partes.length-1;i++){ if(!o[partes[i]]) o[partes[i]]={}; o=o[partes[i]]; }
+  o[partes[partes.length-1]] = valor;
+}
+function leer(obj, ruta){
+  return ruta.split('.').reduce((o,k)=>o&&o[k], obj);
+}
+
+function descargar(){
+  const f = JSON.parse(JSON.stringify(FICHA));
+  const hoy = new Date().toISOString().slice(0,10);
+
+  document.querySelectorAll('input[id],textarea[id]').forEach(el=>{
+    const id = el.id;
+    if(id==='caracteristicas'){
+      const nuevas = el.value.split('\n').map(s=>s.trim()).filter(Boolean);
+      if(JSON.stringify(nuevas)!==JSON.stringify(ORIG.caracteristicas||[])) f.caracteristicas_origen = 'confirmado_por_angie ('+hoy+')';
+      f.caracteristicas = nuevas; return;
+    }
+    let val = el.value;
+    if(id==='producto.etiquetas_propuestas'||id==='seo.palabras_clave'){
+      val = val.split(',').map(s=>s.trim()).filter(Boolean);
+    }
+    if(id==='precios.precio'){
+      val = val===''?null:Number(String(val).replace(/[^\d.]/g,''))||null;
+      if(val!==null){ f.precios.precio_origen = 'confirmado_por_angie ('+hoy+')'; }
+    }
+    const anterior = leer(ORIG,id);
+    poner(f,id,val);
+    if(JSON.stringify(val)!==JSON.stringify(anterior)){
+      const raiz = id.split('.')[0];
+      if(raiz==='descripcion_principal') f.descripcion_origen='confirmado_por_angie ('+hoy+')';
+      if(id==='producto.nombre_propuesto') f.producto.nombre_origen='confirmado_por_angie ('+hoy+')';
+      if(id==='producto.categoria_propuesta') f.producto.categoria_confianza='confirmado_por_angie ('+hoy+')';
+      if(raiz==='seo') f.seo.origen='revisado_por_angie ('+hoy+')';
+    }
+  });
+
+  const nuevaFt = {};
+  Object.entries(FICHA.ficha_tecnica||{}).filter(([k])=>k.startsWith('_')).forEach(([k,v])=>nuevaFt[k]=v);
+  document.querySelectorAll('#ft-rows .kv-row').forEach(row=>{
+    const k = row.querySelector('.ft-k').value.trim();
+    const v = row.querySelector('.ft-v').value.trim();
+    if(k) nuevaFt[k]=v;
+  });
+  f.ficha_tecnica = nuevaFt;
+
+  f.estado = 'revisada';
+  f.fecha_revision = hoy;
+  f.revisada_por = 'Angie';
+
+  const nombre = 'ficha_revisada_' + ((f.entrada_original&&f.entrada_original.codigo_proveedor)||'producto').replace(/[^\w-]/g,'') + '.json';
+  const blob = new Blob([JSON.stringify(f,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = nombre; a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+render();
+</script>
+</body>
+</html>

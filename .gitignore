@@ -1,0 +1,23 @@
+# === Secrets — NEVER commit ===
+.env
+.env.*
+!.env.example
+claves_pruebas.txt
+
+# === Python ===
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# === OS / editor junk ===
+Thumbs.db
+Desktop.ini
+~$*
+
+# === Temp working files ===
+_tmp/
+
+# === Tooling caches ===
+.atl/.skill-registry.cache.json

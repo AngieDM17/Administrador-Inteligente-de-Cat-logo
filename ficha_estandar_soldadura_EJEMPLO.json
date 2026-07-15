@@ -1,0 +1,94 @@
+{
+  "_comentario": "FICHA ESTÁNDAR v1.1 — Formato único al que el extractor convierte cualquier documento de producto. Ajustada con reglas de negocio de Angie (09-jul-2026) y estructura real de ekipon.co (ej: MEZCLADORA 205 LITROS).",
+
+  "_reglas_de_negocio": {
+    "marca": "NO se maneja. Campo eliminado.",
+    "garantia": "SIEMPRE 1 año (política de la tienda, no se pregunta).",
+    "precio_oferta": "NO se maneja. Precio fijo único.",
+    "descripcion_corta": "La descripción principal de la ficha va al campo 'descripción corta' de WooCommerce (texto junto al precio). La pestaña Descripción lleva ficha técnica + plantilla Elementor (banner, texto, video).",
+    "categoria": "Claude la asigna automáticamente dentro del árbol de categorías existente de ekipon.co. NUNCA inventa categorías. Solo pregunta si no encuentra dónde ubicar el producto o tiene baja confianza.",
+    "sku": "El sistema lo genera automáticamente al crear cada producto (formato EKP-XXXXX). Es solo interno, NO se muestra en la página pública.",
+    "nombres": "MAYÚSCULAS, formato 'PRODUCTO CARACTERÍSTICA – DETALLE' (ej: MEZCLADORA 205 LITROS – TRABAJO LIVIANO)."
+  },
+
+  "archivo_origen": "Soldadura.prubeas .docx",
+  "fecha_extraccion": "2026-07-09",
+  "estado": "pendiente_revision",
+
+  "producto": {
+    "nombre_propuesto": "SOLDADOR INVERSOR TIG/MMA 250A – TECNOLOGÍA IGBT",
+    "modelo": "TIG-250",
+    "sku": "EKP-00001 (generado automáticamente, uso interno)",
+    "categoria_propuesta": "Industria",
+    "categoria_confianza": "confirmada por Angie (producto de ejemplo interno)",
+    "etiquetas_propuestas": ["soldadura", "inversor", "TIG", "MMA", "taller"],
+    "garantia": "1 año",
+    "tiene_variantes_posibles": "Sí — voltaje 110V/220V según versión (se manejará en fase de productos variables)"
+  },
+
+  "precios": {
+    "precio": 260000,
+    "moneda": "COP"
+  },
+
+  "descripcion_principal": "Su tecnología inverter garantiza un arco estable, menor consumo de energía y un excelente desempeño tanto en procesos TIG como MMA (electrodo revestido). Ideal para talleres metalmecánicos, mantenimiento industrial, fabricación de estructuras, cerrajería y trabajos de reparación, ofreciendo un equipo liviano, fácil de transportar y preparado para largas jornadas de trabajo.",
+
+  "caracteristicas": [
+    "Diseño compacto y fácil de transportar",
+    "Bajo consumo de energía",
+    "Sistema de protección contra sobrecalentamiento y sobrecarga",
+    "Ideal para uso profesional e industrial"
+  ],
+
+  "ficha_tecnica": {
+    "MODELO": "TIG-250",
+    "TIPO DE EQUIPO": "Inversor de soldadura TIG / MMA",
+    "TECNOLOGÍA": "Inverter IGBT",
+    "PROCESOS DE SOLDADURA": "TIG (Lift TIG) y MMA (Electrodo revestido)",
+    "VOLTAJE DE ALIMENTACIÓN": "110V / 220V (según versión)",
+    "FRECUENCIA": "50/60 Hz",
+    "RANGO DE CORRIENTE TIG": "20 – 250 A",
+    "RANGO DE CORRIENTE MMA": "20 – 250 A",
+    "CORRIENTE MÁXIMA": "250 A",
+    "CICLO DE TRABAJO": "60% @ 250 A",
+    "PANTALLA": "Display digital LED",
+    "REGULACIÓN DE CORRIENTE": "Electrónica de precisión",
+    "TIPO DE ENFRIAMIENTO": "Ventilación forzada",
+    "PROTECCIÓN": "Sobrecalentamiento, sobrecorriente y sobrevoltaje",
+    "ENCENDIDO DEL ARCO TIG": "Lift TIG",
+    "ELECTRODOS COMPATIBLES": "1.6 mm – 5.0 mm",
+    "MATERIALES RECOMENDADOS": "Acero al carbono, acero inoxidable, hierro y otros metales ferrosos",
+    "FACTOR DE POTENCIA": "≥ 0.93",
+    "EFICIENCIA": "≥ 85%",
+    "CLASE DE AISLAMIENTO": "F",
+    "GRADO DE PROTECCIÓN": "IP21S",
+    "PESO APROXIMADO": "7 – 9 kg",
+    "USO RECOMENDADO": "Profesional, industrial y talleres de mantenimiento"
+  },
+
+  "multimedia": {
+    "imagenes_galeria": [
+      "imagen_1_conectores.jpg",
+      "imagen_2_lateral.jpg",
+      "imagen_3_panel_frontal.jpg",
+      "imagen_4_panel_detalle.jpg",
+      "imagen_5_partes_señaladas.jpg",
+      "imagen_6_vista_general.jpg",
+      "imagen_7_vista_posterior.jpg",
+      "imagen_8_asa_transporte.jpg"
+    ],
+    "formato_destino": "WebP 700x700 (estándar de la tienda)",
+    "banners": ["banner_marketing_inversor_tig_250.jpg"],
+    "video_youtube": "https://www.youtube.com/watch?v=qE9btHLrwrI"
+  },
+
+  "arbol_categorias_ekipon": {
+    "Construcción": ["Mezcladoras de Concreto (Trabajo liviano / Trabajo pesado)", "Apisonadores - Canguros", "Vibrocompactadoras - Ranas", "Plumas grúa", "Cortadoras de piso y ladrillo", "Kits y Vibradores de concreto", "Encofrados nuevos y usados", "Bloqueras", "Reglas vibratorias y allanadoras", "Rodillos", "Taladros Demoledores"],
+    "Agricola": ["Peletizadoras", "Molinos", "Picadoras y trituradoras", "Desgranadoras", "Piladoras de arroz", "Picapastos", "Chipeadoras", "Mezcladoras para alimentos", "Línea de producción de pellets"],
+    "Industria": ["Diferenciales", "Estibadoras", "Motores", "Motobombas"],
+    "Movilidad Eléctrica": ["Triciclos", "Bici-moto", "Kargueros", "Scooters"],
+    "Sillas y Escritorios": ["Sillas de barra", "Sillas de escritorio", "Escritorios", "Mesas", "Mesas auxiliares", "Sillas de diseño", "Sillas metálicas", "Sillas plásticas"]
+  },
+
+  "campos_por_confirmar": []
+}

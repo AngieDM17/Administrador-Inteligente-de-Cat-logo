@@ -1,0 +1,80 @@
+{
+  "_version_ficha": "1.4",
+  "_uso": "Plantilla de la ficha estándar Ekipon. El Investigador la llena campo por campo. TODO campo lleva su origen. Valores de origen permitidos: verificado | encontrado_web | generado_ia | generado_ia_sin_verificar | confirmado_por_angie | PENDIENTE_ANGIE",
+
+  "modo_entrada": "investigacion_web",
+  "entrada_original": {
+    "nombre_dado": "",
+    "codigo_proveedor": "",
+    "foto_referencia": "descripción de la foto que entregó Angie (rasgos visibles)"
+  },
+  "fecha_investigacion": "AAAA-MM-DD",
+  "estado": "pendiente_revision",
+
+  "identificacion_del_producto": {
+    "resultado": "IDENTIFICADO | IDENTIFICACION_DUDOSA | NO_IDENTIFICADO",
+    "detalle": "",
+    "fuente_principal": "",
+    "advertencias": [],
+    "estado_en_proveedor": "existencias y precio publicado en la fuente principal, con fecha"
+  },
+
+  "producto": {
+    "nombre_propuesto": "MAYÚSCULAS, formato: PRODUCTO CARACTERÍSTICA – DETALLE",
+    "nombre_origen": "generado_ia (formato de nombres Ekipon)",
+    "modelo": "",
+    "sku": "AUTOMATICO — lo asigna el sistema de la tienda, no se muestra al público",
+    "categoria_propuesta": "",
+    "categoria_confianza": "PENDIENTE_ANGIE — el árbol de categorías debe leerse EN VIVO desde WooCommerce, nunca de una copia",
+    "etiquetas_propuestas": [],
+    "garantia": "1 año (política fija de la tienda)"
+  },
+
+  "precios": {
+    "precio": null,
+    "precio_origen": "PENDIENTE_ANGIE — REGLA FIJA: el precio SIEMPRE lo define Angie manualmente. El sistema solo aporta referencias.",
+    "referencias_mercado": [],
+    "nota_envio": "El precio suele incluir ~$100.000 de envío; se publica 'Envío GRATIS a todo el país' + pago contra entrega",
+    "moneda": "COP"
+  },
+
+  "descripcion_principal": "",
+  "descripcion_origen": "",
+
+  "caracteristicas": [],
+  "caracteristicas_origen": "",
+
+  "ficha_tecnica": {
+    "_origen_global": "",
+    "_nota": "Claves en MAYÚSCULAS. Todo dato estimado lleva 'aprox.' y marca [generado_ia_sin_verificar] en el valor."
+  },
+
+  "criterio_verificacion_visual": {
+    "definido_por": "Angie, con par de ejemplo SÍ/NO",
+    "SI_es": "rasgos estructurales que confirman el producto (panel, displays, conectores, disposición)",
+    "NO_es": "productos parecidos que deben rechazarse y por qué rasgo",
+    "rasgo_decisivo": "NUNCA el color",
+    "uso": "criterio para aceptar/rechazar imágenes; revisión final siempre humana"
+  },
+
+  "multimedia": {
+    "imagenes_galeria_confirmadas": [],
+    "imagenes_nota": "META: 8 galería + 1 banner Canva + video ~1 min",
+    "briefs_generacion_ia": [],
+    "regla_generacion": "PROHIBIDO inventar textos, etiquetas, modelos o conectores que no estén en las fotos reales. Ante duda, la toma se descarta. Sufijo _IA en el archivo.",
+    "formato_destino": "WebP 700x700 (estándar de la tienda)",
+    "video_youtube": null,
+    "video_nota": "Fase 5. Se sube a YouTube y el enlace va en la plantilla Elementor."
+  },
+
+  "seo": {
+    "meta_titulo": "… | Ekipon (máx ~60 caracteres)",
+    "meta_descripcion": "máx ~155 caracteres, cerrar con 'Envío GRATIS a todo el país y pago contra entrega' cuando quepa",
+    "palabras_clave": [],
+    "texto_alt_base": "",
+    "origen": "generado_ia"
+  },
+
+  "campos_por_confirmar": [],
+  "fuentes_consultadas": []
+}

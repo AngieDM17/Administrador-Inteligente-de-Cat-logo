@@ -1,0 +1,151 @@
+{
+  "_version_ficha": "1.4",
+  "_uso": "Ficha estándar Ekipon. TODO campo lleva su origen. Valores permitidos: verificado | encontrado_web | generado_ia | generado_ia_sin_verificar | confirmado_por_angie | PENDIENTE_ANGIE",
+  "modo_entrada": "investigacion_web",
+  "entrada_original": {
+    "nombre_dado": "4212 COMPRESOR DE AIRE COMPRIMIDO X 3 PIZ MAN-860",
+    "codigo_proveedor": "4212",
+    "foto_referencia": "Tanque vertical cilíndrico color verde (申江龙) con manómetro y patas. IMPORTANTE: la foto mostraba solo UNA de las 3 piezas del set (el tanque)."
+  },
+  "fecha_investigacion": "2026-07-15",
+  "estado": "pendiente_revision",
+  "identificacion_del_producto": {
+    "resultado": "IDENTIFICADO",
+    "detalle": "4212 = 'Compresor De Aire Comprimido X 3 (MAN-860)': un SET de 3 piezas según el catálogo oficial IO Company 2026 (página 89). Las 3 piezas son: tanque pulmón vertical de 600 L (0,6 m³ / 0,8 MPa) + un secador de aire refrigerado + una tercera unidad de tratamiento (filtro o segundo secador). 'X 3' = 3 piezas. La foto de referencia de Angie mostraba solo el tanque (1 de 3).",
+    "fuente_principal": "Catálogo IO Company 2026, p.89 (COD 4212) + https://www.iocompanysas.com.co/product/4212-compresor-de-aire-comprimido-x-3-man-860/",
+    "advertencias": [
+      "'X 3' = 3 PIEZAS (un set), no un solo equipo. La foto de referencia mostraba únicamente el tanque.",
+      "El título del proveedor dice 'compresor', pero ni el catálogo ni la imagen muestran una bomba/motor de compresor: solo tanque + unidades de tratamiento de aire. Confirmar con IO Company si el set incluye un compresor.",
+      "CORRECCIÓN: las specs de secador/refrigeración (220V, agua, entrada de aire) NO estaban contaminadas — corresponden al secador del set. Son válidas.",
+      "La identidad exacta de la 3ª pieza (filtro de línea vs segundo secador) está por confirmar."
+    ],
+    "estado_en_proveedor": "IO Company web: $16.334.999 COP, SIN EXISTENCIAS (15-jul-2026). Catálogo 2026 p.89, COD 4212."
+  },
+  "producto": {
+    "nombre_propuesto": "SISTEMA DE AIRE COMPRIMIDO 3 PIEZAS – TANQUE PULMÓN 600 L + SECADOR REFRIGERADO + FILTRO",
+    "nombre_origen": "generado_ia (formato Ekipon; PENDIENTE confirmar que la 3ª pieza es un filtro para cerrar el nombre)",
+    "modelo": "MAN-860 (set de 3 piezas)",
+    "sku": "AUTOMATICO — lo asigna el sistema de la tienda, no se muestra al público",
+    "categoria_propuesta": "Neumática y Accesorios > Sistemas y tratamiento de aire comprimido",
+    "categoria_confianza": "PENDIENTE_ANGIE — leer árbol EN VIVO desde WooCommerce. IO Company lo clasifica en 'Compresores y cabezotes'.",
+    "etiquetas_propuestas": [
+      "sistema de aire comprimido",
+      "tanque pulmón",
+      "600 litros",
+      "secador de aire",
+      "secador refrigerado",
+      "tratamiento de aire",
+      "8 bar"
+    ],
+    "garantia": "1 año (política fija de la tienda)"
+  },
+  "precios": {
+    "precio": null,
+    "precio_origen": "PENDIENTE_ANGIE — REGLA FIJA: el precio SIEMPRE lo define Angie manualmente. El sistema solo aporta referencias.",
+    "referencias_mercado": [
+      {
+        "fuente": "IO Company (importador)",
+        "url": "https://www.iocompanysas.com.co/product/4212-compresor-de-aire-comprimido-x-3-man-860/",
+        "precio": "$16.334.999 COP",
+        "existencias": "Sin existencias",
+        "fecha": "2026-07-15",
+        "nota": "Plausible para un SET de 3 piezas (tanque + secador + filtro). Ya no se considera anómalo, como sí lo sería para un tanque solo."
+      }
+    ],
+    "nota_envio": "El precio suele incluir ~$100.000 de envío; se publica 'Envío GRATIS a todo el país' + pago contra entrega",
+    "moneda": "COP"
+  },
+  "descripcion_principal": "El Sistema de Aire Comprimido de 3 piezas reúne en un solo conjunto lo necesario para almacenar y tratar el aire de tu compresor. Incluye un tanque pulmón vertical de 600 litros (0,6 m³) que estabiliza el suministro y reduce el arranque constante del compresor, un secador de aire refrigerado que elimina la humedad antes de que llegue a la línea (evitando óxido y fallas en herramientas y equipos neumáticos) y una etapa adicional de tratamiento de aire. El tanque trabaja hasta 8 bar (0,8 MPa) y el secador opera a 220 V con refrigeración por aire o por agua. Gracias a su gran capacidad de almacenamiento, su secado del aire y su formato vertical de bajo espacio, este sistema es una excelente opción para talleres, industrias y líneas de producción que requieren aire comprimido limpio, seco y de suministro constante.",
+  "descripcion_origen": "generado_ia (redacción a partir del catálogo p.89; menciona las piezas confirmadas — tanque + secador — y la 3ª etapa de tratamiento por confirmar)",
+  "caracteristicas": [
+    "Conjunto de 3 piezas: tanque pulmón + secador de aire refrigerado + unidad de tratamiento/filtro",
+    "Tanque pulmón vertical de 600 L (0,6 m³), presión de trabajo hasta 8 bar (0,8 MPa)",
+    "Secador de aire refrigerado: retira la humedad del aire comprimido",
+    "Secador a 220 V / 50 Hz, con refrigeración por aire o por agua",
+    "Entrada de aire estándar hasta 45 °C (versión de alta temperatura hasta 80 °C)",
+    "Instalación en interior; el tanque admite instalación sin base"
+  ],
+  "caracteristicas_origen": "encontrado_web (catálogo IO Company 2026 p.89) + generado_ia (redacción)",
+  "ficha_tecnica": {
+    "_origen_global": "encontrado_web (catálogo IO Company 2026, p.89) + PENDIENTE (dimensiones/peso por pieza)",
+    "_nota": "Claves en MAYÚSCULAS. Set de 3 piezas: los datos se agrupan por pieza. Todo dato estimado lleva 'aprox.' y marca [generado_ia_sin_verificar].",
+    "COMPOSICIÓN DEL SET": "3 piezas: tanque pulmón + secador de aire refrigerado + filtro/tratamiento  [encontrado_web]",
+    "TANQUE — CAPACIDAD": "600 L (0,6 m³)  [encontrado_web]",
+    "TANQUE — PRESIÓN": "0,8 MPa (~8 bar)  [encontrado_web]",
+    "TANQUE — ORIENTACIÓN": "Vertical, con patas  [verificado por foto]",
+    "TANQUE — MATERIAL / COLOR": "Acero, verde  [verificado por foto]",
+    "SECADOR — VOLTAJE": "220 V / 50 Hz  [encontrado_web]",
+    "SECADOR — PRESIÓN NOMINAL": "0,8 MPa (r/0,6 MPa ~1,0 MPa)  [encontrado_web]",
+    "SECADOR — TIPO / REFRIGERANTE": "Secador de superficie de suspensión grado C  [encontrado_web]",
+    "SECADOR — ENTRADA DE AIRE": "Estándar: nominal 38 °C, máx. 45 °C · Alta temperatura: 65–80 °C  [encontrado_web]",
+    "SECADOR — REFRIGERACIÓN": "Por aire (ambiente >2 °C, <38 °C) o por agua (>2 °C, <45 °C)  [encontrado_web]",
+    "SECADOR — AGUA DE REFRIGERACIÓN": "0,2–0,5 MPa; entrada 31 °C / salida 37 °C; pH 6,5–7,5, sin impurezas sólidas  [encontrado_web]",
+    "SECADOR — INSTALACIÓN / ENTORNO": "Interior (tanque admite sin base); altitud < 1000 m; humedad ≤ 80 %; sin humos cáusticos  [encontrado_web]",
+    "CONEXIÓN": "Puesta a tierra obligatoria  [encontrado_web]",
+    "3ª PIEZA (FILTRO / 2º SECADOR)": "PENDIENTE — visible en la imagen del catálogo, sin specs propias. Confirmar con IO Company.",
+    "DIMENSIONES / PESO POR PIEZA": "PENDIENTE (no aparecen en el catálogo)",
+    "MARCA FÍSICA (no pública)": "申江龙 (tanque) / IO Tools"
+  },
+  "criterio_verificacion_visual": {
+    "definido_por": "Investigador (propuesto). PENDIENTE validación final de Angie contra los equipos.",
+    "SI_es": "El producto es un CONJUNTO de 3 equipos: (1) tanque cilíndrico vertical verde con manómetro y patas; (2) secador de aire refrigerado (gabinete con panel de control y rejillas de ventilación); (3) una tercera unidad de tratamiento (gabinete). Las 3 piezas juntas = 4212.",
+    "NO_es": "Una sola pieza suelta NO es el producto completo. Un compresor con bomba/motor NO forma parte de lo mostrado (confirmar). Un tanque horizontal o de otra capacidad NO es este.",
+    "rasgo_decisivo": "Es un SET de 3 piezas (tanque + 2 unidades de tratamiento). NUNCA el color.",
+    "uso": "criterio para aceptar/rechazar imágenes; revisión final siempre humana"
+  },
+  "multimedia": {
+    "imagenes_galeria_confirmadas": [
+      {
+        "url": "https://www.iocompanysas.com.co/wp-content/uploads/2025/09/4212-COMPRESOR-DE-AIRE-COMPRIMIDO-X-3-MAN-2.webp",
+        "nota": "Foto real — PIEZA 1: tanque pulmón vertical 600 L (verificado)"
+      },
+      {
+        "url": "https://www.iocompanysas.com.co/wp-content/uploads/2025/09/4212-COMPRESOR-DE-AIRE-COMPRIMIDO-X-3-MAN-8.webp",
+        "nota": "Foto real — PIEZA (tratamiento): gabinete con panel de control (secador refrigerado)"
+      },
+      {
+        "url": "https://www.iocompanysas.com.co/wp-content/uploads/2025/09/4212-COMPRESOR-DE-AIRE-COMPRIMIDO-X-3-MAN-9.webp",
+        "nota": "Foto real — PIEZA (tratamiento): gabinete vista 3/4 (secador/filtro)"
+      },
+      {
+        "url": "https://www.iocompanysas.com.co/wp-content/uploads/2025/09/4212-COMPRESOR-DE-AIRE-COMPRIMIDO-X-3-MAN-7.webp",
+        "nota": "Foto real — detalle: manómetro del tanque (0–1,6 MPa)"
+      }
+    ],
+    "imagenes_nota": "META: 8 galería + 1 banner Canva + video ~1 min. Ahora tenemos foto real de las 3 piezas (tanque=MAN-2, tratamiento=MAN-8 y MAN-9, manómetro=MAN-7). La imagen COMPUESTA del set está en el catálogo p.89 (referencia para un montaje/hero del conjunto). Plan de 8: (1) hero del set, (2-3) tanque + recorte de manómetro/placa, (4-5) las dos unidades de tratamiento, (6) detalle manómetro, (7-8) tomas de detalle o montaje. Preferir foto real; IA solo si falta variedad, con las reales como referencia estricta. El entorno de Claude no descarga imágenes; Angie las aporta en la carpeta.",
+    "briefs_generacion_ia": [],
+    "regla_generacion": "PROHIBIDO inventar textos, etiquetas, modelos o conectores que no estén en las fotos reales. Ante duda, la toma se descarta. Sufijo _IA en el archivo.",
+    "formato_destino": "WebP 700x700 (estándar de la tienda)",
+    "video_youtube": null,
+    "video_nota": "Fase 5. Se sube a YouTube y el enlace va en la plantilla Elementor."
+  },
+  "seo": {
+    "meta_titulo": "Sistema Aire Comprimido: Tanque 600 L + Secador | Ekipon",
+    "meta_descripcion": "Sistema de aire comprimido de 3 piezas: tanque pulmón 600 L (8 bar) + secador refrigerado. Envío GRATIS a todo el país y pago contra entrega.",
+    "palabras_clave": [
+      "sistema de aire comprimido",
+      "tanque pulmón 600 litros",
+      "secador de aire refrigerado",
+      "tratamiento de aire comprimido",
+      "tanque y secador para compresor"
+    ],
+    "texto_alt_base": "Sistema de aire comprimido de 3 piezas: tanque vertical de 600 litros, secador refrigerado y unidad de filtrado",
+    "origen": "generado_ia"
+  },
+  "campos_por_confirmar": [
+    "Identidad exacta de la 3ª pieza (¿filtro de línea? ¿segundo secador?) y ajustar el nombre. El catálogo muestra 2 gabinetes de tratamiento + el tanque.",
+    "¿El set incluye un COMPRESOR (bomba/motor)? El título dice 'compresor' pero ni el catálogo ni las fotos muestran bomba: solo tanque + tratamiento.",
+    "Dimensiones y peso de cada pieza — no están en el catálogo. Preguntar a IO Company o revisar la caja.",
+    "Precio final (regla fija: lo define Angie). Referencia proveedor $16.334.999 — plausible para un set de 3 piezas.",
+    "Categoría final en el árbol EN VIVO de WooCommerce (IO Company lo tiene en 'Compresores y cabezotes').",
+    "Cerrar galería de 8: verificar/etiquetar las fotos por pieza y decidir hero/montaje del conjunto."
+  ],
+  "fuentes_consultadas": [
+    "USADA (oficial) — Catálogo IO Company 2026, página 89: 'Compresor De Aire Comprimido X 3 Man 860', COD 4212. La imagen muestra 3 piezas (tanque verde + 2 gabinetes de tratamiento) y specs de secador + tanque (0,6 m³ / 0,8 MPa).",
+    "USADA — Página oficial IO Company 4212: https://www.iocompanysas.com.co/product/4212-compresor-de-aire-comprimido-x-3-man-860/ ($16.334.999; sin existencias; 4 fotos: tanque, manómetro y 2 gabinetes de tratamiento).",
+    "USADA (contexto de marca) — 申江龙 / Shanghai Shenjiang Pressure Vessel Co.: fabricante de recipientes a presión.",
+    "DESCARTADA — Buscador interno de IO Company (?s=4212): productos no relacionados; solo sirvió para hallar la URL.",
+    "DESCARTADA como fuente de specs — MercadoLibre y distribuidores (Fabriles, Evans, Kaeser): solo referencia de mercado.",
+    "NO LEÍBLE — Ficha técnica PDF del proveedor (parece imagen; no se pudo extraer texto)."
+  ]
+}

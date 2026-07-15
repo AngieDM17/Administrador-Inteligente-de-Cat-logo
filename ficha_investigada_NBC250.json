@@ -1,0 +1,159 @@
+{
+  "_comentario": "FICHA ESTÁNDAR v1.3 — CORRECCIÓN MAYOR (14-jul-2026): la v1.2 identificó por error el producto 9060 (SOLDADOR MULTIPROCESO MMA MIG 250) cuando el código real de Angie era 9060C (SOLDADOR MIG MULTIFUNCION NBC 250) — otra referencia del mismo importador. Esta versión usa exclusivamente datos del producto correcto.",
+  "leccion_para_el_sistema": "El código del proveedor debe coincidir EXACTAMENTE, sufijos incluidos (9060C ≠ 9060). El Investigador debe tratar cualquier diferencia de código como producto distinto y verificar contra la foto de referencia antes de dar por buena una identificación.",
+  "modo_entrada": "investigacion_web",
+  "entrada_original": {
+    "nombre_dado": "9060c soldador mig multifuncion NBC 250",
+    "foto_referencia": "1 imagen (equipo rojo, carrete superior expuesto, panel con doble display digital, frente corrugado negro)"
+  },
+  "fecha_investigacion": "2026-07-14",
+  "estado": "pendiente_revision",
+  "identificacion_del_producto": {
+    "resultado": "IDENTIFICADO — producto exacto del importador",
+    "detalle": "Código 9060C del catálogo IO Company (Importadores Orientales, Colombia), marca IO Tools.",
+    "fuente_principal": "https://www.iocompanysas.com.co/product/9060c-soldador-mig-multifuncion-nbc-250/",
+    "estado_en_importador": "SIN EXISTENCIAS en IO Company al 14-jul-2026, precio publicado $2.354.703"
+  },
+  "producto": {
+    "nombre_propuesto": "SOLDADOR MIG MULTIFUNCIÓN NBC 250 – MIG/MMA/TIG 250A",
+    "nombre_origen": "generado_ia (formato de nombres Ekipon)",
+    "modelo": "NBC 250 Multifunción (código proveedor: 9060C)",
+    "sku": "PENDIENTE — el sistema de la tienda lo asigna automáticamente al crear el producto",
+    "categoria_propuesta": "Industria > Equipos de Soldadura",
+    "categoria_confianza": "confirmada_por_angie (14-jul-2026)",
+    "etiquetas_propuestas": [
+      "soldadura",
+      "MIG",
+      "MAG",
+      "MMA",
+      "TIG",
+      "multifunción",
+      "sin gas",
+      "110V",
+      "220V",
+      "taller"
+    ],
+    "garantia": "1 año (política fija de la tienda)",
+    "accesorios_incluidos": {
+      "lista": [
+        "Antorcha MIG",
+        "Careta de soldadura",
+        "Pinza de tierra",
+        "Portaelectrodo",
+        "Cepillo"
+      ],
+      "origen": "confirmado_por_angie (14-jul-2026): SÍ vienen incluidos. Base: evidencia visual de las fotos de galería del 9060C. El texto de la página del importador no los lista. Ratificación con IO Company (WhatsApp +57 310 745 4644, Alejandra) queda como refuerzo opcional, no bloqueante."
+    }
+  },
+  "precios": {
+    "precio": 2454703,
+    "precio_origen": "confirmado_por_angie (14-jul-2026). El precio SIEMPRE lo define Angie manualmente. Incluye $100.000 de envío y se publica como 'Envío GRATIS a todo el país' con pago contra entrega.",
+    "referencia_encontrada": "IO Company publica el 9060C en $2.354.703 COP (sin existencias, 14-jul-2026)",
+    "moneda": "COP"
+  },
+  "descripcion_principal": "Soldador multifunción NBC 250 con tecnología inversor que reúne cuatro procesos en un solo equipo: MIG/MAG con gas, alambre tubular sin gas, electrodo revestido (MMA) y TIG Lift. Funciona a 110V o 220V y entrega hasta 250 amperios, con capacidad para carretes de alambre de hasta 15 kg. Gracias a su diseño multifunción y construcción de alta calidad, el SOLDADOR MIG MULTIFUNCIÓN NBC 250 es una excelente opción para talleres metalmecánicos, empresas de fabricación, mantenimiento industrial y trabajos profesionales que requieren soldaduras limpias, resistentes y de excelente acabado.",
+  "descripcion_origen": "generado_ia + estilo aprobado por Angie (14-jul-2026): intro técnica + párrafo de cierre 'Gracias a su… es una excelente opción para… que requieren…'. Sin código de proveedor (9060C no se muestra al público).",
+  "caracteristicas": [
+    "4 procesos en 1: MIG/MAG (con gas), alambre tubular sin gas, MMA (electrodo) y TIG Lift",
+    "Doble voltaje 110V / 220V — funciona en cualquier instalación",
+    "Hasta 250 A con ciclo de trabajo del 60% a 250A y 100% a 194A",
+    "Capacidad de carrete de alambre de 15 kg",
+    "Compatible con electrodos 6010, 6011, 6013, 7018 y acero inoxidable",
+    "Panel con doble display digital para control preciso de parámetros"
+  ],
+  "caracteristicas_origen": "generado_ia a partir de la ficha del importador; el doble display se confirma en las fotos oficiales",
+  "ficha_tecnica": {
+    "_origen_global": "encontrado_web — página oficial del producto 9060C en IO Company (14-jul-2026)",
+    "MODELO": "NBC 250 (Multifunción)",
+    "CÓDIGO PROVEEDOR": "9060C",
+    "VOLTAJE DE ENTRADA": "110V – 220V / 50-60 Hz (monofásico)",
+    "RANGO DE AMPERAJE": "20 – 250 A",
+    "CICLO DE TRABAJO": "60% a 250A / 100% a 194A",
+    "POTENCIA NOMINAL": "Aprox. 5.5 kW – 8.5 kVA",
+    "PROCESOS COMPATIBLES": "MIG/MAG (Gas / No Gas), MMA (Electrodo), TIG Lift",
+    "DIÁMETRO DE ALAMBRE": "0.8 – 1.0 mm",
+    "CAPACIDAD DE CARRETE": "15 kg",
+    "TIPOS DE ELECTRODO": "6010, 6011, 6013, 7018, acero inoxidable",
+    "PESO": "16 – 19 kg aprox. [generado_ia_sin_verificar — Angie acepta la estimación. Publicar siempre con 'aprox.']",
+    "DIMENSIONES": "540 x 260 x 430 mm aprox. [generado_ia_sin_verificar — Angie acepta la estimación. Publicar siempre con 'aprox.']"
+  },
+  "criterio_verificacion_visual": {
+    "definido_por": "confirmado_por_angie (14-jul-2026): TRES perillas rojas + un botón rojo (corrige la versión previa que decía 'dos perillas')",
+    "SI_es_NBC250_9060C": "Panel con DOBLE DISPLAY DIGITAL (dos indicadores numéricos), TRES perillas rojas y un botón rojo, carrete de alambre expuesto montado arriba, frente corrugado negro, cuerpo rojo",
+    "NO_es": "Panel sin display con solo perillas análogas (ese es el WTSM-250) o panel de pantalla distinta (variantes de MercadoLibre)",
+    "rasgo_decisivo": "El panel de control. El color rojo NO es criterio suficiente."
+  },
+  "multimedia": {
+    "galeria_final": {
+      "estado": "GENERADA 14-jul (sesión 3): 8 imágenes WebP 700x700 en carpeta NBC250_imagenes/, listas para revisión de Angie.",
+      "decision_angie": "Angie eligió usar las imágenes de ChatGPT, incluidas las vistas recreadas (trasera, lateral, superior). Claude borró la etiqueta 'AC 220V' de las traseras porque contradecía el doble voltaje 110V/220V.",
+      "imagenes": [
+        {
+          "archivo": "9060C-NBC250-01-panel-izquierda.webp",
+          "vista": "3/4 izquierda con panel",
+          "origen": "foto_real (verificado)"
+        },
+        {
+          "archivo": "9060C-NBC250-02-panel-derecha-logo.webp",
+          "vista": "3/4 derecha con panel y logo I.O. Tools",
+          "origen": "foto_real (verificado)"
+        },
+        {
+          "archivo": "9060C-NBC250-03-trasera.webp",
+          "vista": "trasera recta (ventilador, GAS IN)",
+          "origen": "generado_ia (recreación; etiqueta AC 220V eliminada)"
+        },
+        {
+          "archivo": "9060C-NBC250-04-trasera-3-4.webp",
+          "vista": "3/4 trasera",
+          "origen": "generado_ia (recreación; etiquetas AC 220V y EXPORT eliminadas)"
+        },
+        {
+          "archivo": "9060C-NBC250-05-lateral.webp",
+          "vista": "lateral",
+          "origen": "generado_ia (recreación)"
+        },
+        {
+          "archivo": "9060C-NBC250-06-superior.webp",
+          "vista": "superior (asa y tapa)",
+          "origen": "generado_ia (recreación)"
+        },
+        {
+          "archivo": "9060C-NBC250-07-antorcha.webp",
+          "vista": "antorcha MIG",
+          "origen": "foto_real (accesorio)"
+        },
+        {
+          "archivo": "9060C-NBC250-08-kit-accesorios.webp",
+          "vista": "kit: careta, pinza, portaelectrodo, cepillo",
+          "origen": "foto_real (accesorio)"
+        }
+      ],
+      "nota_riesgo": "Las 4 vistas generado_ia son recreaciones de estilo aprobadas por Angie; los detalles traseros/laterales/superiores NO están verificados contra foto real. El panel frontal (cara que identifica y vende) sí es real en 01 y 02."
+    },
+    "formato_destino": "WebP 700x700 (estándar de la tienda)",
+    "video_youtube": null,
+    "video_nota": "Sin video del modelo exacto. Se construirá en Fase 5 (miniatura Canva al inicio, cortes, música, voz en off comercial, subtítulos, logo)."
+  },
+  "seo": {
+    "meta_titulo": "Soldador MIG Multifunción NBC 250 – MIG/MMA/TIG 250A | Ekipon",
+    "meta_descripcion": "Soldador 4 en 1: MIG con y sin gas, electrodo y TIG Lift. 110V/220V, 250A, carrete de 15 kg. Envío GRATIS a todo el país y pago contra entrega.",
+    "palabras_clave": [
+      "soldador MIG 250A",
+      "soldador multifunción 110V 220V",
+      "soldadora MIG sin gas",
+      "soldador MIG MMA TIG Colombia"
+    ],
+    "texto_alt_base": "Soldador MIG multifunción NBC 250 rojo de 250 amperios con doble display digital y carrete de alambre superior",
+    "origen": "generado_ia"
+  },
+  "campos_por_confirmar": [
+    "GALERÍA: 8 imágenes generadas y listas para tu revisión final (2 reales de la máquina + 2 de accesorios + 4 recreaciones IA aprobadas). Ver galeria_final.",
+    "ACCESORIOS: confirmados como incluidos; ratificación con IO Company opcional."
+  ],
+  "fuentes_consultadas": [
+    "https://www.iocompanysas.com.co/product/9060c-soldador-mig-multifuncion-nbc-250/ (FUENTE PRINCIPAL — producto exacto 9060C)",
+    "https://www.iocompanysas.com.co/product/soldador-multiproceso-mma-mig-250-amp/ (código 9060 SIN C — producto DISTINTO, usado por error en v1.2)",
+    "https://www.mercadolibre.com.co/... (rechazado por Angie: otra referencia)"
+  ]
+}
