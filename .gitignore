@@ -19,5 +19,8 @@ Desktop.ini
 # === Temp working files ===
 _tmp/
 
+# Estado local
+*.db
+
 # === Tooling caches ===
 .atl/.skill-registry.cache.json
