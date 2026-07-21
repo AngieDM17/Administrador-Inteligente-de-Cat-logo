@@ -24,7 +24,6 @@ ficha, categoria o tienda; 2 = problema con el archivo (via cargar_json).
 
 import argparse
 import difflib
-import html
 import json
 import sys
 import tempfile
@@ -40,11 +39,11 @@ from esquema_ficha import FichaEkipon
 from texto_publico import limpiar_valor_publico
 from validar_ficha import cargar_json, describir_error, imprimir_lista
 
-# Plantillas Elementor guardadas en la tienda de pruebas. RESERVADAS para la
-# futura dinamizacion (sesion de diseño pendiente): hoy la descripcion se
-# genera como HTML simple desde la ficha (decision de Angie, 16-jul-2026),
-# porque las plantillas guardadas resultaron estaticas y casi duplicadas.
-# Los meta_data ekipon_* siguen viajando intactos: alimentaran ese trabajo.
+# Plantillas Elementor guardadas en la tienda de pruebas. La plantilla del
+# producto ya arma la descripcion completa (tabla de ficha tecnica + banner +
+# caracteristicas + video) de forma dinamica, leyendo los meta_data ekipon_*.
+# Por eso el publicador deja el campo 'description' vacio: los meta_data ekipon_*
+# viajan intactos y son la unica fuente que la plantilla renderiza.
 PLANTILLA_FICHA_TECNICA = 50198
 PLANTILLA_CARACTERISTICAS_VIDEO = 50201
 
@@ -141,66 +140,15 @@ def _es_clave_publica(clave: str) -> bool:
 
 def ficha_tecnica_publica(datos: dict) -> dict:
     """Version apta para publico de la ficha tecnica: sin claves internas ni
-    no publicas, y con los valores limpios de marcas de origen. La usan tanto
-    la descripcion HTML como los meta_data que alimentaran las plantillas
-    dinamicas — asi ningun consumidor futuro puede filtrar cocina interna."""
+    no publicas, y con los valores limpios de marcas de origen. Alimenta los
+    meta_data ekipon_* que la plantilla Elementor renderiza — asi ningun
+    consumidor puede filtrar cocina interna."""
     ficha_tecnica = datos.get("ficha_tecnica") or {}
     return {
         str(clave): limpiar_valor_publico(str(valor))
         for clave, valor in ficha_tecnica.items()
         if _es_clave_publica(str(clave))
     }
-
-
-def generar_descripcion_html(datos: dict, banner: dict | None = None) -> str:
-    """Genera la descripcion del producto en HTML simple, desde la ficha.
-
-    Funcion pura: la pestaña Descripcion muestra los DATOS CORRECTOS de la
-    ficha (banner como cabecera + tabla de ficha tecnica + caracteristicas +
-    video si hay). Todo texto pasa por html.escape; las claves internas o no
-    publicas se omiten y los valores se limpian de marcas de origen.
-
-    Si se pasa banner ({"url", "alt"}), va como imagen al frente, antes de la
-    ficha tecnica (decision de Angie).
-    """
-    bloques = []
-
-    if banner and banner.get("url"):
-        url = html.escape(str(banner["url"]), quote=True)
-        alt = html.escape(str(banner.get("alt") or ""), quote=True)
-        bloques.append(
-            f'<figure class="ekipon-banner"><img src="{url}" alt="{alt}" '
-            'style="max-width:100%;height:auto" /></figure>'
-        )
-
-    filas = [
-        f'<tr><th scope="row">{html.escape(clave)}</th>'
-        f"<td>{html.escape(valor)}</td></tr>"
-        for clave, valor in ficha_tecnica_publica(datos).items()
-    ]
-    if filas:
-        bloques.append(
-            "<h3>Ficha técnica</h3>\n<table>\n<tbody>\n"
-            + "\n".join(filas)
-            + "\n</tbody>\n</table>"
-        )
-
-    caracteristicas = [
-        str(c).strip() for c in (datos.get("caracteristicas") or []) if str(c).strip()
-    ]
-    if caracteristicas:
-        elementos = "\n".join(f"<li>{html.escape(c)}</li>" for c in caracteristicas)
-        bloques.append("<h3>Características</h3>\n<ul>\n" + elementos + "\n</ul>")
-
-    # La ficha guarda el video en multimedia.video_youtube (null si no hay).
-    video = (datos.get("multimedia") or {}).get("video_youtube")
-    if isinstance(video, str) and video.strip():
-        url = html.escape(video.strip(), quote=True)
-        bloques.append(
-            f'<h3>Video</h3>\n<p><a href="{url}">Ver video del producto</a></p>'
-        )
-
-    return "\n".join(bloques)
 
 
 def construir_payload(datos: dict, codigo: str, slug: str, categoria_id,
@@ -244,7 +192,10 @@ def construir_payload(datos: dict, codigo: str, slug: str, categoria_id,
         "short_description": limpiar_valor_publico(
             datos.get("descripcion_principal") or ""
         ),
-        "description": generar_descripcion_html(datos, banner),
+        # La plantilla Elementor arma la descripcion (ficha tecnica + banner +
+        # caracteristicas + video) leyendo los meta_data ekipon_*. El campo queda
+        # vacio para no duplicar ese contenido en la pestaña Descripcion.
+        "description": "",
         "images": [{"id": img["id"], "alt": img["alt"]} for img in imagenes],
         "meta_data": meta_data,
     }

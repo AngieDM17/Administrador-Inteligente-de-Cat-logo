@@ -19,7 +19,6 @@ from publicador import (
     construir_payload_actualizacion,
     ejecutar,
     extraer_codigo_proveedor,
-    generar_descripcion_html,
     generar_slug,
     precio_a_texto,
     preparar_imagenes,
@@ -164,36 +163,29 @@ class PruebasPayloadFichaReal(unittest.TestCase):
             self.payload["tags"][0], {"name": "sistema de aire comprimido"}
         )
 
-    def test_descripcion_es_html_de_la_ficha_sin_shortcodes(self):
-        descripcion = self.payload["description"]
-        self.assertNotIn("[elementor-template", descripcion)
-        self.assertIn("<h3>Ficha técnica</h3>", descripcion)
-        self.assertIn("<h3>Características</h3>", descripcion)
+    def test_descripcion_queda_vacia(self):
+        # La plantilla Elementor arma la descripcion desde los meta_data
+        # ekipon_*: el campo 'description' viaja vacio para no duplicarla.
+        self.assertEqual(self.payload["description"], "")
 
-    def test_descripcion_lleva_filas_de_ficha_tecnica_escapadas(self):
-        descripcion = self.payload["description"]
+    def test_meta_ficha_tecnica_lleva_filas_limpias(self):
+        meta = {m["key"]: m["value"] for m in self.payload["meta_data"]}
+        tabla = json.loads(meta["ekipon_ficha_tecnica"])
         # El valor publico va LIMPIO: sin la marca interna [encontrado_web]
-        self.assertIn(
-            '<tr><th scope="row">TANQUE — CAPACIDAD</th>'
-            "<td>600 L (0,6 m³)</td></tr>",
-            descripcion,
-        )
-        # El '<' de "altitud < 1000 m" viaja escapado como &lt;
-        self.assertIn("altitud &lt; 1000 m", descripcion)
-        # Las claves internas (_origen_global, _nota) no se muestran
-        self.assertNotIn("_origen_global", descripcion)
-        self.assertNotIn("Claves en MAYÚSCULAS", descripcion)
+        self.assertEqual(tabla["TANQUE — CAPACIDAD"], "600 L (0,6 m³)")
+        # Las claves internas (_origen_global, _nota) no viajan
+        self.assertNotIn("_origen_global", meta["ekipon_ficha_tecnica"])
+        self.assertNotIn("Claves en MAYÚSCULAS", meta["ekipon_ficha_tecnica"])
 
-    def test_descripcion_lleva_las_caracteristicas_en_lista(self):
-        descripcion = self.payload["description"]
-        for caracteristica in FICHA_4212["caracteristicas"]:
-            if "<" in caracteristica or "&" in caracteristica:
-                continue  # las escapadas se cubren en PruebasDescripcionHtml
-            self.assertIn(f"<li>{caracteristica}</li>", descripcion)
+    def test_meta_caracteristicas_lleva_la_lista(self):
+        meta = {m["key"]: m["value"] for m in self.payload["meta_data"]}
+        caracteristicas = json.loads(meta["ekipon_caracteristicas"])
+        self.assertEqual(caracteristicas, FICHA_4212["caracteristicas"])
 
-    def test_descripcion_sin_video_porque_es_nulo(self):
-        # La ficha 4212 trae video_youtube: null → no hay bloque de video.
-        self.assertNotIn("<h3>Video</h3>", self.payload["description"])
+    def test_sin_video_porque_es_nulo(self):
+        # La ficha 4212 trae video_youtube: null → no hay meta de video.
+        claves = {m["key"] for m in self.payload["meta_data"]}
+        self.assertNotIn("ekipon_video_url", claves)
 
     def test_meta_codigo_proveedor_presente(self):
         claves = {m["key"]: m["value"] for m in self.payload["meta_data"]}
@@ -211,55 +203,6 @@ class PruebasPayloadFichaReal(unittest.TestCase):
 
     def test_imagenes_en_orden(self):
         self.assertEqual(self.payload["images"], self.imagenes)
-
-
-class PruebasDescripcionHtml(unittest.TestCase):
-    def test_escapa_html_en_claves_y_valores(self):
-        ficha = {"ficha_tecnica": {"A<B": 'x & "y"'}}
-        generado = generar_descripcion_html(ficha)
-        self.assertIn("A&lt;B", generado)
-        self.assertIn("x &amp; &quot;y&quot;", generado)
-        self.assertNotIn("A<B", generado)
-
-    def test_escapa_html_en_caracteristicas(self):
-        ficha = {"caracteristicas": ["Presion < 8 bar & seguro"]}
-        generado = generar_descripcion_html(ficha)
-        self.assertIn("<li>Presion &lt; 8 bar &amp; seguro</li>", generado)
-
-    def test_ficha_vacia_devuelve_cadena_vacia(self):
-        self.assertEqual(generar_descripcion_html({}), "")
-
-    def test_omite_seccion_de_tabla_si_no_hay_ficha_tecnica(self):
-        generado = generar_descripcion_html({"caracteristicas": ["Una"]})
-        self.assertNotIn("Ficha técnica", generado)
-        self.assertNotIn("<table>", generado)
-        self.assertIn("<li>Una</li>", generado)
-
-    def test_omite_lista_si_no_hay_caracteristicas(self):
-        generado = generar_descripcion_html({"ficha_tecnica": {"CLAVE": "valor"}})
-        self.assertNotIn("Características", generado)
-        self.assertNotIn("<ul>", generado)
-        self.assertIn("<table>", generado)
-
-    def test_solo_claves_internas_omite_la_tabla_entera(self):
-        generado = generar_descripcion_html(
-            {"ficha_tecnica": {"_origen_global": "x", "_nota": "y"}}
-        )
-        self.assertEqual(generado, "")
-
-    def test_video_presente_agrega_enlace(self):
-        ficha = {"multimedia": {"video_youtube": "https://youtu.be/abc123"}}
-        generado = generar_descripcion_html(ficha)
-        self.assertIn("<h3>Video</h3>", generado)
-        self.assertIn('href="https://youtu.be/abc123"', generado)
-
-    def test_video_nulo_o_vacio_no_agrega_bloque(self):
-        self.assertEqual(
-            generar_descripcion_html({"multimedia": {"video_youtube": None}}), ""
-        )
-        self.assertEqual(
-            generar_descripcion_html({"multimedia": {"video_youtube": "  "}}), ""
-        )
 
 
 class PruebasPayloadActualizacion(unittest.TestCase):
@@ -287,7 +230,7 @@ class PruebasPayloadActualizacion(unittest.TestCase):
         )
         self.assertEqual(self.payload["regular_price"], "16434999")
         self.assertEqual(self.payload["categories"], [{"id": 428}])
-        self.assertIn("<h3>Ficha técnica</h3>", self.payload["description"])
+        self.assertEqual(self.payload["description"], "")
 
 
 class PruebasActualizarBorrador(unittest.TestCase):
@@ -414,10 +357,11 @@ class PruebasIdempotencia(unittest.TestCase):
         payload = cliente.creaciones[0]
         self.assertEqual(payload["status"], "draft")
         self.assertEqual(payload["categories"], [{"id": 428}])
-        # El banner viaja como meta y como cabecera de la descripcion
+        # El banner viaja SOLO como meta (la plantilla lo renderiza); la
+        # descripcion queda vacia para no duplicar el contenido.
         metas = {m["key"]: m["value"] for m in payload["meta_data"]}
         self.assertIn("ekipon_banner_url", metas)
-        self.assertIn('class="ekipon-banner"', payload["description"])
+        self.assertEqual(payload["description"], "")
         self.assertEqual(len(payload["images"]), 8)  # el banner NO va en la galeria
         fila = registro.obtener_publicacion("4212", self.ruta_db)
         self.assertEqual(fila["product_id"], 9001)
@@ -433,7 +377,7 @@ class PruebasIdempotencia(unittest.TestCase):
         self.assertEqual(len(cliente.subidas), 8)  # solo galeria, sin banner
         metas = {m["key"]: m["value"] for m in cliente.creaciones[0]["meta_data"]}
         self.assertNotIn("ekipon_banner_url", metas)
-        self.assertNotIn("ekipon-banner", cliente.creaciones[0]["description"])
+        self.assertEqual(cliente.creaciones[0]["description"], "")
 
     def test_banner_corrupto_se_publica_sin_banner(self):
         # Un recorte existente pero corrupto no debe abortar: se degrada a None.
@@ -508,8 +452,11 @@ class PruebasActualizacion(unittest.TestCase):
         self.assertEqual(product_id, 555)
         self.assertNotIn("images", payload)  # la galeria no se toca ni borra
         self.assertEqual(payload["status"], "draft")
-        self.assertIn("<h3>Ficha técnica</h3>", payload["description"])
-        self.assertIn('class="ekipon-banner"', payload["description"])
+        # El banner viaja como meta (la plantilla lo renderiza); la descripcion
+        # queda vacia.
+        metas = {m["key"]: m["value"] for m in payload["meta_data"]}
+        self.assertIn("ekipon_banner_url", metas)
+        self.assertEqual(payload["description"], "")
         fila = registro.obtener_publicacion("4212", self.ruta_db)
         self.assertEqual(fila["product_id"], 555)
         self.assertEqual(fila["estado"], "borrador_actualizado")
@@ -583,29 +530,32 @@ class PruebasLimpiezaPublica(unittest.TestCase):
     def test_clave_no_publica_se_omite(self):
         import publicador
 
-        html_desc = publicador.generar_descripcion_html(
+        tabla = publicador.ficha_tecnica_publica(
             {"ficha_tecnica": {
                 "MARCA FÍSICA (no pública)": "申江龙 (tanque) / IO Tools",
                 "TANQUE — CAPACIDAD": "600 L  [encontrado_web]",
             }}
         )
-        self.assertNotIn("MARCA", html_desc)
-        self.assertNotIn("IO Tools", html_desc)
-        self.assertIn("TANQUE — CAPACIDAD", html_desc)
+        blob = json.dumps(tabla, ensure_ascii=False)
+        # La clave no publica y su valor (la marca) no viajan al publico.
+        self.assertNotIn("MARCA", blob)
+        self.assertNotIn("IO Tools", blob)
+        self.assertIn("TANQUE — CAPACIDAD", tabla)
 
     def test_marcas_de_origen_se_limpian_del_valor(self):
         import publicador
 
-        html_desc = publicador.generar_descripcion_html(
+        tabla = publicador.ficha_tecnica_publica(
             {"ficha_tecnica": {
                 "COMPRESOR": "Incluido  [confirmado_por_angie]; specs PENDIENTE",
                 "TANQUE": "600 L (0,6 m³)  [encontrado_web]",
             }}
         )
-        self.assertNotIn("[confirmado_por_angie]", html_desc)
-        self.assertNotIn("[encontrado_web]", html_desc)
-        self.assertIn("Incluido; specs PENDIENTE", html_desc)
-        self.assertIn("600 L (0,6 m³)", html_desc)
+        blob = json.dumps(tabla, ensure_ascii=False)
+        self.assertNotIn("[confirmado_por_angie]", blob)
+        self.assertNotIn("[encontrado_web]", blob)
+        self.assertEqual(tabla["COMPRESOR"], "Incluido; specs PENDIENTE")
+        self.assertEqual(tabla["TANQUE"], "600 L (0,6 m³)")
 
     def test_limpiar_valor_publico_colapsa_espacios(self):
         import publicador
@@ -618,11 +568,12 @@ class PruebasLimpiezaPublica(unittest.TestCase):
     def test_ficha_4212_no_expone_marca_ni_origenes(self):
         import publicador
 
-        html_desc = publicador.generar_descripcion_html(FICHA_4212)
-        self.assertNotIn("no pública", html_desc)
-        self.assertNotIn("IO Tools", html_desc)
-        self.assertNotIn("[encontrado_web]", html_desc)
-        self.assertNotIn("[confirmado_por_angie", html_desc)
+        tabla = publicador.ficha_tecnica_publica(FICHA_4212)
+        blob = json.dumps(tabla, ensure_ascii=False)
+        self.assertNotIn("no pública", blob)
+        self.assertNotIn("IO Tools", blob)
+        self.assertNotIn("[encontrado_web]", blob)
+        self.assertNotIn("[confirmado_por_angie", blob)
 
     def test_meta_ficha_tecnica_tambien_viaja_limpia(self):
         # Los meta_data alimentan las futuras plantillas dinamicas: si llevan
