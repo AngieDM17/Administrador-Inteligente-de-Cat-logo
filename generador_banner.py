@@ -27,7 +27,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont, UnidentifiedImageError
 
 from esquema_ficha import FichaEkipon  # noqa: F401  (valida al cargar la ficha)
-from publicador import limpiar_valor_publico
+from texto_publico import limpiar_valor_publico
 from validar_ficha import cargar_json, describir_error
 
 
@@ -356,6 +356,20 @@ def componer_banner(ruta_plantilla: Path, datos: dict, ruta_recorte: Path,
     dibujar_bloque(lienzo, descripcion_banner(datos),
                    _caja_px(config["descripcion"]["caja"], ancho, alto), cfg_desc)
     return lienzo
+
+
+RUTA_PLANTILLA = Path(__file__).parent / "plantilla_banner.png"
+
+
+def generar_a_archivo(datos: dict, ruta_recorte: Path, ruta_salida: Path,
+                      ruta_plantilla: Path = None) -> Path:
+    """Compone el banner y lo guarda como PNG. Devuelve la ruta de salida.
+    Pensada para que el Publicador la use sin pasar por el CLI. Lanza
+    ErrorRecurso si la plantilla o el recorte no se pueden leer."""
+    ruta_plantilla = ruta_plantilla or RUTA_PLANTILLA
+    banner = componer_banner(ruta_plantilla, datos, ruta_recorte)
+    banner.convert("RGB").save(ruta_salida, "PNG")
+    return ruta_salida
 
 
 def cargar_ficha_validada(ruta_ficha: Path) -> dict:

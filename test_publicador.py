@@ -64,7 +64,8 @@ class ClienteFalso:
 
     def subir_imagen(self, ruta_archivo, alt_text, titulo, slug_medio=None):
         self.subidas.append((Path(ruta_archivo).name, alt_text, titulo, slug_medio))
-        return {"id": 100 + len(self.subidas)}
+        indice = 100 + len(self.subidas)
+        return {"id": indice, "source_url": f"https://pruebas.ekipon.co/media/{titulo}.png"}
 
     def actualizar_borrador(self, product_id, payload):
         seguro = forzar_borrador(payload)
@@ -407,14 +408,57 @@ class PruebasIdempotencia(unittest.TestCase):
             FICHA_4212, "4212", slug, RAIZ, cliente, self.ruta_db
         )
         self.assertEqual(codigo_salida, 0)
-        self.assertEqual(len(cliente.subidas), 8)  # las 8 imagenes de la galeria
+        # 8 imagenes de la galeria + 1 banner (existe 4212_recorte.png en RAIZ)
+        self.assertEqual(len(cliente.subidas), 9)
         self.assertEqual(len(cliente.creaciones), 1)
         payload = cliente.creaciones[0]
         self.assertEqual(payload["status"], "draft")
         self.assertEqual(payload["categories"], [{"id": 428}])
+        # El banner viaja como meta y como cabecera de la descripcion
+        metas = {m["key"]: m["value"] for m in payload["meta_data"]}
+        self.assertIn("ekipon_banner_url", metas)
+        self.assertIn('class="ekipon-banner"', payload["description"])
+        self.assertEqual(len(payload["images"]), 8)  # el banner NO va en la galeria
         fila = registro.obtener_publicacion("4212", self.ruta_db)
         self.assertEqual(fila["product_id"], 9001)
         self.assertEqual(fila["estado"], "borrador_creado")
+
+    def test_sin_recorte_se_publica_sin_banner(self):
+        # Un codigo sin <codigo>_recorte.png: no se genera banner, no rompe.
+        cliente = ClienteFalso(categorias=[{"id": 428, "name": "Compresores"}])
+        codigo_salida = publicar(
+            FICHA_4212, "SINRECORTE", "sinrecorte-slug", RAIZ, cliente, self.ruta_db
+        )
+        self.assertEqual(codigo_salida, 0)
+        self.assertEqual(len(cliente.subidas), 8)  # solo galeria, sin banner
+        metas = {m["key"]: m["value"] for m in cliente.creaciones[0]["meta_data"]}
+        self.assertNotIn("ekipon_banner_url", metas)
+        self.assertNotIn("ekipon-banner", cliente.creaciones[0]["description"])
+
+    def test_banner_corrupto_se_publica_sin_banner(self):
+        # Un recorte existente pero corrupto no debe abortar: se degrada a None.
+        from publicador import generar_y_subir_banner
+        with tempfile.TemporaryDirectory() as carpeta:
+            recorte = Path(carpeta) / "X_recorte.png"
+            recorte.write_text("no soy una imagen", encoding="utf-8")
+            cliente = ClienteFalso()
+            banner = generar_y_subir_banner(
+                FICHA_4212, "X", "x-slug", Path(carpeta), cliente
+            )
+        self.assertIsNone(banner)
+        self.assertEqual(cliente.subidas, [])  # no se subio nada
+
+    def test_fallo_de_tienda_al_subir_banner_se_propaga(self):
+        # La subida es critica: si la tienda falla, NO se degrada en silencio.
+        from publicador import generar_y_subir_banner
+
+        class ClienteQueFallaAlSubir(ClienteFalso):
+            def subir_imagen(self, *args, **kwargs):
+                raise ErrorTienda("la tienda rechazo la subida")
+
+        cliente = ClienteQueFallaAlSubir()
+        with self.assertRaises(ErrorTienda):
+            generar_y_subir_banner(FICHA_4212, "4212", "un-slug", RAIZ, cliente)
 
     def test_categoria_inexistente_termina_con_1_sin_crear(self):
         slug = generar_slug("4212", FICHA_4212["producto"]["nombre_propuesto"])
@@ -456,13 +500,16 @@ class PruebasActualizacion(unittest.TestCase):
         )
         self.assertEqual(codigo_salida, 0)
         self.assertEqual(len(cliente.actualizaciones), 1)  # hubo el PUT
-        self.assertEqual(cliente.subidas, [])       # CERO imagenes subidas
+        # Se sube SOLO el banner (1), nunca las 8 fotos de la galeria
+        self.assertEqual(len(cliente.subidas), 1)
+        self.assertEqual(cliente.subidas[0][2], "4212-banner")
         self.assertEqual(cliente.creaciones, [])    # y nada se creo
         product_id, payload = cliente.actualizaciones[0]
         self.assertEqual(product_id, 555)
         self.assertNotIn("images", payload)  # la galeria no se toca ni borra
         self.assertEqual(payload["status"], "draft")
         self.assertIn("<h3>Ficha técnica</h3>", payload["description"])
+        self.assertIn('class="ekipon-banner"', payload["description"])
         fila = registro.obtener_publicacion("4212", self.ruta_db)
         self.assertEqual(fila["product_id"], 555)
         self.assertEqual(fila["estado"], "borrador_actualizado")
@@ -502,7 +549,7 @@ class PruebasActualizacion(unittest.TestCase):
         self.assertEqual(codigo_salida, 0)
         self.assertEqual(cliente.actualizaciones, [])
         self.assertEqual(len(cliente.creaciones), 1)
-        self.assertEqual(len(cliente.subidas), 8)
+        self.assertEqual(len(cliente.subidas), 9)  # 8 galeria + 1 banner
 
 
 class PruebasSimulacro(unittest.TestCase):

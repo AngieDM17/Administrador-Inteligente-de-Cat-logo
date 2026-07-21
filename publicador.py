@@ -26,16 +26,18 @@ import argparse
 import difflib
 import html
 import json
-import re
 import sys
+import tempfile
 import unicodedata
 from pathlib import Path
 
 from pydantic import ValidationError
 
+import generador_banner
 import registro
 from cliente_tienda import ClienteTienda, ErrorTienda
 from esquema_ficha import FichaEkipon
+from texto_publico import limpiar_valor_publico
 from validar_ficha import cargar_json, describir_error, imprimir_lista
 
 # Plantillas Elementor guardadas en la tienda de pruebas. RESERVADAS para la
@@ -137,14 +139,6 @@ def _es_clave_publica(clave: str) -> bool:
     return "no publica" not in plano.casefold()
 
 
-def limpiar_valor_publico(texto: str) -> str:
-    """Quita las marcas internas de origen ("[encontrado_web]", etc.) de un
-    valor antes de mostrarlo al publico. La version completa con origenes
-    vive SOLO en la ficha JSON (fuente de verdad); a la tienda viaja limpio."""
-    sin_marcas = re.sub(r"\s*\[[^\]]*\]", "", texto)
-    return " ".join(sin_marcas.split())
-
-
 def ficha_tecnica_publica(datos: dict) -> dict:
     """Version apta para publico de la ficha tecnica: sin claves internas ni
     no publicas, y con los valores limpios de marcas de origen. La usan tanto
@@ -158,16 +152,26 @@ def ficha_tecnica_publica(datos: dict) -> dict:
     }
 
 
-def generar_descripcion_html(datos: dict) -> str:
+def generar_descripcion_html(datos: dict, banner: dict | None = None) -> str:
     """Genera la descripcion del producto en HTML simple, desde la ficha.
 
     Funcion pura: la pestaña Descripcion muestra los DATOS CORRECTOS de la
-    ficha (tabla de ficha tecnica + lista de caracteristicas + video si hay),
-    en lugar de los shortcodes de plantillas Elementor. Todo texto pasa por
-    html.escape; las claves internas o no publicas se omiten y los valores
-    se limpian de marcas de origen antes de mostrarse.
+    ficha (banner como cabecera + tabla de ficha tecnica + caracteristicas +
+    video si hay). Todo texto pasa por html.escape; las claves internas o no
+    publicas se omiten y los valores se limpian de marcas de origen.
+
+    Si se pasa banner ({"url", "alt"}), va como imagen al frente, antes de la
+    ficha tecnica (decision de Angie).
     """
     bloques = []
+
+    if banner and banner.get("url"):
+        url = html.escape(str(banner["url"]), quote=True)
+        alt = html.escape(str(banner.get("alt") or ""), quote=True)
+        bloques.append(
+            f'<figure class="ekipon-banner"><img src="{url}" alt="{alt}" '
+            'style="max-width:100%;height:auto" /></figure>'
+        )
 
     filas = [
         f'<tr><th scope="row">{html.escape(clave)}</th>'
@@ -200,14 +204,14 @@ def generar_descripcion_html(datos: dict) -> str:
 
 
 def construir_payload(datos: dict, codigo: str, slug: str, categoria_id,
-                      imagenes: list) -> dict:
+                      imagenes: list, banner: dict | None = None) -> dict:
     """Arma el payload de creacion del producto WooCommerce.
 
     Es una funcion pura: recibe la ficha (dict crudo), el id de categoria ya
-    resuelto y la lista de imagenes [{"id", "alt"}] ya subidas (o marcadores,
-    en un simulacro). No define sku: lo asigna WooCommerce (regla fija).
-    Los metadatos van con prefijo ekipon_ para alimentar las futuras
-    plantillas dinamicas de Elementor.
+    resuelto, la lista de imagenes [{"id", "alt"}] ya subidas (o marcadores en
+    un simulacro) y el banner opcional ({"id", "url", "alt"}). No define sku:
+    lo asigna WooCommerce (regla fija). Los metadatos van con prefijo ekipon_
+    para alimentar las plantillas dinamicas de Elementor.
     """
     producto = datos["producto"]
     meta_data = [
@@ -222,6 +226,11 @@ def construir_payload(datos: dict, codigo: str, slug: str, categoria_id,
     video = (datos.get("multimedia") or {}).get("video_youtube")
     if isinstance(video, str) and video.strip():
         meta_data.append({"key": "ekipon_video_url", "value": video.strip()})
+    # El banner viaja tambien como meta: es el dato que la plantilla Elementor
+    # va a leer (widget Imagen dinamico) para mostrarlo por producto.
+    if banner and banner.get("url"):
+        meta_data.append({"key": "ekipon_banner_id", "value": banner.get("id") or ""})
+        meta_data.append({"key": "ekipon_banner_url", "value": banner["url"]})
 
     return {
         "name": producto["nombre_propuesto"],
@@ -235,23 +244,24 @@ def construir_payload(datos: dict, codigo: str, slug: str, categoria_id,
         "short_description": limpiar_valor_publico(
             datos.get("descripcion_principal") or ""
         ),
-        "description": generar_descripcion_html(datos),
+        "description": generar_descripcion_html(datos, banner),
         "images": [{"id": img["id"], "alt": img["alt"]} for img in imagenes],
         "meta_data": meta_data,
     }
 
 
 def construir_payload_actualizacion(datos: dict, codigo: str,
-                                    categoria_id) -> dict:
+                                    categoria_id, banner: dict | None = None) -> dict:
     """Arma el payload de ACTUALIZACION: solo los campos textuales.
 
     Regla fija: las imagenes solo se suben al crear; una actualizacion nunca
     las toca (el payload NI SIQUIERA lleva la clave 'images', para que la
     tienda no borre la galeria existente). Tampoco lleva slug ni type: eso
-    quedo fijado al crear el producto.
+    quedo fijado al crear el producto. El banner (si se pasa) si viaja: es
+    texto/meta, no toca la galeria.
     """
     completo = construir_payload(datos, codigo, slug="", categoria_id=categoria_id,
-                                 imagenes=[])
+                                 imagenes=[], banner=banner)
     campos_textuales = (
         "name", "regular_price", "categories", "tags",
         "short_description", "description", "meta_data",
@@ -377,10 +387,15 @@ def simular_publicacion(datos: dict, codigo: str, slug: str,
         {"id": f"(pendiente {n}: se asigna al subir)", "alt": imagen["alt"]}
         for n, imagen in enumerate(imagenes, start=1)
     ]
+    # Banner: en simulacro no se genera ni sube; solo se marca si hay recorte.
+    hay_recorte = (carpeta_ficha / f"{codigo}_recorte.png").is_file()
+    banner = {"id": "(pendiente)", "url": "(banner: se generaria y subiria)",
+              "alt": ""} if hay_recorte else None
+    print(f"\nBanner: {'se generaria desde ' + codigo + '_recorte.png' if hay_recorte else 'sin recorte, no se genera'}")
     payload = construir_payload(
         datos, codigo, slug,
         categoria_id=f"(pendiente: id en vivo de '{categoria}')",
-        imagenes=marcadores,
+        imagenes=marcadores, banner=banner,
     )
 
     # Resumen en palabras simples (para revision humana, no tecnica).
@@ -391,6 +406,7 @@ def simular_publicacion(datos: dict, codigo: str, slug: str,
     print(f"  Categoria:  {categoria}")
     print(f"  Etiquetas:  {len(payload['tags'])}")
     print(f"  Imagenes:   {len(marcadores)}")
+    print(f"  Banner:     {'si' if hay_recorte else 'no (falta recorte)'}")
 
     # Detalle tecnico completo, por si se quiere revisar a fondo.
     print("\nDetalle tecnico (payload que se enviaria a WooCommerce):")
@@ -422,11 +438,39 @@ def resolver_categoria_en_vivo(cliente, datos: dict) -> dict | None:
     return categoria
 
 
+def generar_y_subir_banner(datos: dict, codigo: str, slug: str,
+                           carpeta_ficha: Path, cliente) -> dict | None:
+    """Si existe <codigo>_recorte.png en la carpeta del caso, genera el banner,
+    lo sube a la mediateca (idempotente por titulo) y devuelve {id, url, alt}.
+    Si no hay recorte, devuelve None: el producto se publica sin banner."""
+    ruta_recorte = carpeta_ficha / f"{codigo}_recorte.png"
+    if not ruta_recorte.is_file():
+        print(f"Sin recorte ({ruta_recorte.name}): se publica sin banner.")
+        return None
+    alt = generador_banner.titulo_banner(datos)
+    print("Generando el banner y subiendolo...")
+    with tempfile.TemporaryDirectory() as tmp:
+        ruta_banner = Path(tmp) / f"{codigo}_banner.png"
+        # Solo la GENERACION se degrada con gracia: si el recorte o la plantilla
+        # son ilegibles, o el disco se llena al guardar, se publica sin banner.
+        try:
+            generador_banner.generar_a_archivo(datos, ruta_recorte, ruta_banner)
+        except (generador_banner.ErrorRecurso, OSError) as error:
+            print(f"Aviso: no se pudo generar el banner ({error}). Se publica sin banner.")
+            return None
+        # La SUBIDA queda fuera del try: un fallo de la tienda es critico y se
+        # propaga (igual que las imagenes de la galeria), no se traga en silencio.
+        medio = cliente.subir_imagen(ruta_banner, alt, f"{codigo}-banner",
+                                     f"{slug}-banner")
+    return {"id": medio.get("id"), "url": medio.get("source_url"), "alt": alt}
+
+
 def actualizar_existente(datos: dict, codigo: str, slug: str, existente: dict,
-                         cliente, ruta_db=None) -> int:
+                         cliente, carpeta_ficha: Path, ruta_db=None) -> int:
     """Actualiza el TEXTO de un borrador existente (--actualizar).
 
-    Las imagenes no se tocan: solo se suben al crear. El cliente verifica
+    Las imagenes de la galeria no se tocan: solo se suben al crear. El banner
+    si se regenera (es texto/meta, no toca la galeria). El cliente verifica
     ademas que el producto siga en borrador antes de enviar nada.
     """
     print(f"Actualizando el borrador existente (id {existente['id']})...")
@@ -435,7 +479,8 @@ def actualizar_existente(datos: dict, codigo: str, slug: str, existente: dict,
     if categoria is None:
         return 1
 
-    payload = construir_payload_actualizacion(datos, codigo, categoria["id"])
+    banner = generar_y_subir_banner(datos, codigo, slug, carpeta_ficha, cliente)
+    payload = construir_payload_actualizacion(datos, codigo, categoria["id"], banner)
     producto = cliente.actualizar_borrador(existente["id"], payload)
 
     registro.registrar_publicacion(
@@ -460,7 +505,7 @@ def publicar(datos: dict, codigo: str, slug: str, carpeta_ficha: Path,
     if existente:
         if actualizar:
             return actualizar_existente(
-                datos, codigo, slug, existente, cliente, ruta_db
+                datos, codigo, slug, existente, cliente, carpeta_ficha, ruta_db
             )
         print(f"El producto ya existe (id {existente['id']}), no se duplica.")
         registro.registrar_publicacion(
@@ -482,7 +527,8 @@ def publicar(datos: dict, codigo: str, slug: str, carpeta_ficha: Path,
         )
         subidas.append({"id": medio["id"], "alt": imagen["alt"]})
 
-    payload = construir_payload(datos, codigo, slug, categoria["id"], subidas)
+    banner = generar_y_subir_banner(datos, codigo, slug, carpeta_ficha, cliente)
+    payload = construir_payload(datos, codigo, slug, categoria["id"], subidas, banner)
     print("Creando el producto como BORRADOR...")
     producto = cliente.crear_producto(payload)
 
