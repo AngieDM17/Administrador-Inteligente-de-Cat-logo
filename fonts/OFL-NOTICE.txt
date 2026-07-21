@@ -1,0 +1,8 @@
+OpenSans-Bold.ttf
+Fuente: Open Sans (Bold), por Steve Matteson.
+Licencia: SIL Open Font License, Version 1.1 (OFL-1.1).
+Texto de la licencia: https://openfontlicense.org
+Origen del archivo: https://github.com/googlefonts/opensans (fonts/ttf/OpenSans-Bold.ttf)
+
+Se incluye en el repositorio para que el generador de banners sea reproducible
+sin depender de fuentes instaladas en el sistema.

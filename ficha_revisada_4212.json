@@ -56,6 +56,8 @@
   },
   "descripcion_principal": "El Sistema de Aire Comprimido reúne en un solo conjunto todo lo necesario para producir, almacenar y tratar el aire comprimido de tu taller o industria: un compresor de aire, un tanque pulmón vertical de 600 litros (0,6 m³) que estabiliza el suministro y reduce el arranque constante del compresor, un secador de aire refrigerado que elimina la humedad antes de que llegue a la línea (evitando óxido y fallas en herramientas y equipos neumáticos) y un filtro para un aire más limpio. El tanque trabaja hasta 8 bar (0,8 MPa) y el secador opera a 220 V con refrigeración por aire o por agua. Gracias a su gran capacidad de almacenamiento, su secado del aire y su solución completa en un solo conjunto, es una excelente opción para talleres, industrias y líneas de producción que requieren aire comprimido limpio, seco y de suministro constante.",
   "descripcion_origen": "generado_ia (redacción a partir del catálogo p.89 + composición confirmada por Angie)",
+  "descripcion_banner": "Todo el aire comprimido de tu taller o industria en un solo conjunto: compresor, tanque pulmón de 600 L, secador refrigerado y filtro. Aire limpio, seco y de suministro constante.",
+  "descripcion_banner_origen": "generado_ia_sin_verificar (gancho corto para el banner; a confirmar por Angie)",
   "caracteristicas": [
     "Solución completa de 4 componentes: compresor + tanque pulmón + secador de aire refrigerado + filtro",
     "Tanque pulmón vertical de 600 L (0,6 m³), presión de trabajo hasta 8 bar (0,8 MPa)",

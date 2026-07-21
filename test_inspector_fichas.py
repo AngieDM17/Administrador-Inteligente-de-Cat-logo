@@ -34,6 +34,25 @@ class PruebasReglasDeNegocio(unittest.TestCase):
     def test_ficha_4212_es_valida(self):
         FichaEkipon.model_validate(FICHA_4212)  # no debe lanzar
 
+    def test_descripcion_banner_exige_origen(self):
+        datos = copy.deepcopy(FICHA_4212)
+        datos["descripcion_banner"] = "Gancho de banner sin origen declarado"
+        datos["descripcion_banner_origen"] = "sin un origen valido"
+        with self.assertRaises(ValidationError):
+            FichaEkipon.model_validate(datos)
+
+    def test_descripcion_principal_exige_origen(self):
+        datos = copy.deepcopy(FICHA_4212)
+        datos["descripcion_origen"] = "sin un origen valido"
+        with self.assertRaises(ValidationError):
+            FichaEkipon.model_validate(datos)
+
+    def test_caracteristicas_exigen_origen(self):
+        datos = copy.deepcopy(FICHA_4212)
+        datos["caracteristicas_origen"] = "sin un origen valido"
+        with self.assertRaises(ValidationError):
+            FichaEkipon.model_validate(datos)
+
     def test_ficha_nbc250_es_invalida(self):
         with self.assertRaises(ValidationError):
             FichaEkipon.model_validate(FICHA_NBC250)

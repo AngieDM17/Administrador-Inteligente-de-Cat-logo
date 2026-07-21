@@ -328,6 +328,8 @@ class FichaEkipon(ModeloBase):
     precios: Precios
     descripcion_principal: Optional[str] = None
     descripcion_origen: Optional[str] = None
+    descripcion_banner: Optional[str] = None
+    descripcion_banner_origen: Optional[str] = None
     caracteristicas: Optional[list] = None
     caracteristicas_origen: Optional[str] = None
     ficha_tecnica: FichaTecnica
@@ -342,17 +344,23 @@ class FichaEkipon(ModeloBase):
         # Regla de origen aplicada en pareja: si hay contenido, su campo
         # *_origen debe declarar un origen permitido. Si el contenido esta
         # vacio (como en la plantilla), no se exige nada.
+        # Cada tupla es (campo, campo_origen, contenido, origen): si hay
+        # contenido, su campo_origen debe declarar un origen permitido.
+        # Una sola regla para los tres pares.
+        pares = [
+            ("descripcion_principal", "descripcion_origen",
+             self.descripcion_principal, self.descripcion_origen),
+            ("descripcion_banner", "descripcion_banner_origen",
+             self.descripcion_banner, self.descripcion_banner_origen),
+            ("caracteristicas", "caracteristicas_origen",
+             self.caracteristicas, self.caracteristicas_origen),
+        ]
         problemas = []
-        if self.descripcion_principal and self.descripcion_principal.strip():
-            if not tiene_origen_permitido(self.descripcion_origen):
+        for campo, campo_origen, contenido, origen in pares:
+            hay_contenido = contenido.strip() if isinstance(contenido, str) else contenido
+            if hay_contenido and not tiene_origen_permitido(origen):
                 problemas.append(
-                    "descripcion_principal tiene texto pero descripcion_origen "
-                    "no declara un origen permitido"
-                )
-        if self.caracteristicas:
-            if not tiene_origen_permitido(self.caracteristicas_origen):
-                problemas.append(
-                    "caracteristicas tiene elementos pero caracteristicas_origen "
+                    f"{campo} tiene contenido pero {campo_origen} "
                     "no declara un origen permitido"
                 )
         if problemas:

@@ -22,5 +22,8 @@ _tmp/
 # Estado local
 *.db
 
+# Banners generados (salida regenerable del generador de banner)
+*_banner_preview.png
+
 # === Tooling caches ===
 .atl/.skill-registry.cache.json
