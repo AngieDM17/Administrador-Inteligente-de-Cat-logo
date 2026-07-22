@@ -1,3 +1,20 @@
+# Proyecto: Administrador Inteligente de Catálogo (Ekipon)
+
+**Antes de responder o proponer nada en este proyecto, tomá el contexto en este orden:**
+
+1. `ESTADO_PROYECTO.md` y `ANALISIS_Y_PLAN.md` — visión y plan general.
+2. `AUDITORIA_ABOGADO_DEL_DIABLO.md` — las 6 grietas y la hoja de ruta priorizada. **Es la fuente de qué hacer después.**
+3. `ETAPA_IMAGENES.md` — motor de galería: principios, plantilla por categoría, módulos, uso, contrato de ficha, limitaciones.
+4. `investigador_v0.3/investigador-ekipon/references/reglas_negocio.md` — reglas de negocio fijas (precio manual, borrador siempre, origen por campo, imágenes 1080×1080).
+5. `esquema_ficha.py` — contrato de la ficha v1.4, incluidas las secciones `multimedia.plan_galeria` (qué lleva la galería y de qué foto sale cada pieza) y `multimedia.galeria_tomas` (los datos con que se dibujan las piezas generadas).
+6. **Engram** — las observaciones fijadas (*pinned*) traen "Dónde tomar el contexto" y "Estado actual". ⚠️ Las herramientas de Engram vienen **diferidas**: cargalas con ToolSearch (`select:mcp__engram__mem_search,mcp__engram__mem_save,mcp__engram__mem_session_summary`) **antes** de llamarlas, o fallan con "No such tool available" y la sesión termina sin guardar nada.
+
+**Precedencia ante conflicto:** manda el **REPO** (código y reglas vigentes) por encima de la memoria. La memoria puede quedar vieja; el código no. Verificá contra el código antes de afirmar.
+
+**Estado a 22-jul-2026:** viabilidad técnica **CERRADA** (pipeline completo end-to-end, 193 tests OK). Escala y producción **NO empezadas**. Prioridad A: (1) prueba de lote de 100-200 productos midiendo la tasa de error del Investigador (umbral >5% = todavía no es automatización); (2) rotar credenciales + `.env` fuera del repo + allowlist `TIENDAS_PERMITIDAS` antes de apuntar a la tienda real.
+
+**Rol de Angie:** dueña de negocio y diseñadora gráfica, **no programadora**. No se le piden capturas ni datos que se puedan investigar solos, y **no define reglas por producto ni por categoría** — eso es trabajo del sistema. Su intervención se limita a: identidad inicial del producto, confirmación final y precio.
+
 <!-- gentle-ai:persona -->
 ## Rules
 
