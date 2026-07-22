@@ -2,8 +2,33 @@
 
 **Última actualización:** 2026-07-22
 
-Genera la galería de producto de forma automática y determinista: el mismo producto
-sale siempre igual, y cualquier producto nuevo entra y sale sin definir reglas a mano.
+Genera las piezas de la galería de forma determinista: el mismo producto sale siempre
+igual, sin definir reglas a mano.
+
+---
+
+## ⚠️ Estado del flujo (22-jul-2026): la etapa NO cierra
+
+Las piezas funcionan. **La cadena no.** De seis eslabones funcionan dos:
+
+| # | Eslabón | Estado |
+|---|---------|--------|
+| 1 | Foto del proveedor → recorte (`recortar_producto.py`) | ✅ |
+| 2 | El Investigador emite `plan_galeria` y `galeria_tomas` | ❌ `SKILL.md` no los menciona |
+| 3 | Ubicar los puntos de los callouts sobre la foto | ❌ manual; el paso de visión no existe |
+| 4 | El motor arma las piezas (`motor_galeria.py`) | ✅ |
+| 5 | Subir las piezas a la tienda | ❌ nadie conecta el motor con la tienda |
+| 6 | El Publicador las asigna al producto | ❌ sube galería **solo al crear** |
+
+**Qué significa en la práctica:** si hoy se investiga un producto nuevo, su ficha sale sin
+plan y el motor no tiene qué leer. La ficha del molino con la que se probó todo esto
+(`molino_imagenes/ficha_molino_tomas.json`) **está escrita a mano** — es un fixture, no una
+corrida real. Ver la regla 2 de "Rigor exigido" en `.claude/CLAUDE.md`.
+
+**Orden para cerrar la etapa:** (1) enseñarle los contratos al Investigador en `SKILL.md`
+—desbloquea todo lo de arriba—; (2) cerrar la salida: subir la galería y asignarla, con un
+camino de "refrescar galería"; (3) resolver los puntos: construir el paso de visión o
+declarar explícitamente que es asistido; (4) recién después, los slots que faltan.
 
 ---
 

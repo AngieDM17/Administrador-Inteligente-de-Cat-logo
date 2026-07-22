@@ -30,7 +30,7 @@ Estamos exactamente en la bisagra entre "probé que se puede" y "lo hago aguanta
 | **Inspector / validación** | `esquema_ficha.py` + `validar_ficha.py` (contrato v1.4) | ✅ |
 | **Publicador** | `publicador.py` — crea BORRADOR vía API REST, idempotente (`--actualizar`) | ✅ 4212 = ID 50238 |
 | **Dinamización Elementor** | `snippets/shortcodes_ekipon.php` vía Code Snippets | ✅ la plantilla se llena sola desde la meta `ekipon_*` |
-| **Imágenes (galería)** | Motor propio Pillow — ver `ETAPA_IMAGENES.md` | ✅ construido, ⬜ sin conectar al Publicador |
+| **Imágenes (galería)** | Motor propio Pillow — ver `ETAPA_IMAGENES.md` | ⚠️ **la etapa NO cierra**: las piezas funcionan, la cadena no (2 de 6 eslabones) |
 | **Banner** | `generador_banner.py` (motor propio, ya no Canva) | ✅ integrado al Publicador |
 | **Video** | — | ⬜ última fase, no empezada |
 | **Orquestador** | — | ⬜ no empezado |
@@ -46,14 +46,23 @@ commit: `78e3d4c`. Trabajo real fuera de git = trabajo que se puede perder.
 
 ## ▶️ PRÓXIMO PASO (Prioridad A)
 
-1. **Commitear la etapa Imágenes.** Sacar el trabajo del limbo antes de seguir.
-2. **Prueba de lote real** — correr el pipeline sobre 100-200 productos *sin revisar* y medir la
-   tasa de error del Investigador.
-   *Terminado cuando:* hay un número medido. Umbral: **>5% = todavía no es automatización**,
-   primero se mejora el Investigador.
+1. **Cerrar la etapa de Imágenes.** Las piezas funcionan pero la cadena no: 2 de 6 eslabones.
+   Empezar por enseñarle los contratos al Investigador (`SKILL.md`), que desbloquea el resto.
+   *Terminado cuando:* un producto nuevo entra por el Investigador y sale con su galería
+   puesta en la tienda, sin pasos manuales intermedios. Detalle en `ETAPA_IMAGENES.md`.
+
+2. **Medir la tasa de error del Investigador — con un lote CHICO primero.**
+   ⚠️ Ojo: el Investigador es una **skill, no código**, así que 100-200 productos no se pueden
+   correr sin niñera. Empezar con 20-30 a mano: es el experimento más barato capaz de
+   invalidar la apuesta. Si la tasa es mala, se evitó construir un motor de lotes para algo
+   roto; si es buena, recién ahí se justifica hacerlo ejecutable.
+   *Terminado cuando:* hay un número medido. Umbral: **>5% = todavía no es automatización**.
+
 3. **Endurecer seguridad** — rotar claves de WooCommerce/WordPress, `.env` fuera del repo,
    allowlist `TIENDAS_PERMITIDAS` lista antes de apuntar a la tienda real.
    *Terminado cuando:* llaves nuevas en uso, viejas revocadas, `.env` no rastreado por git.
+   *Verificado el 22-jul:* `claves_pruebas.txt` y `.env` nunca entraron al historial de git;
+   las claves están en texto plano solo en la máquina local.
 
 Prioridades B y C (staging, rollback, runbook de incidentes, SEO) están detalladas en la auditoría.
 
