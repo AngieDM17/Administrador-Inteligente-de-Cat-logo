@@ -4,8 +4,8 @@
       {
         "hooks": [
           {
-            "command": "engram context ekipon",
-            "statusMessage": "Cargando memoria de engram (proyecto ekipon)...",
+            "command": "engram context administrador-inteligente-de-cat-logo",
+            "statusMessage": "Cargando memoria de engram (administrador-inteligente-de-cat-logo)...",
             "timeout": 20,
             "type": "command"
           }
