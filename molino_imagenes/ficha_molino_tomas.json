@@ -1,0 +1,82 @@
+{
+  "_comentario": "Fragmento de ficha del molino con los datos de las tomas generadas. Demuestra el contrato nuevo multimedia.galeria_tomas: los generadores leen de aqui, no de JSONs sueltos.",
+  "producto": {
+    "nombre_propuesto": "MOLINO PULVERIZADOR DE GRANO SECO Y COCIDO"
+  },
+  "multimedia": {
+    "formato_destino": "WebP 1080x1080 (estándar de la tienda)",
+    "galeria_tomas": {
+      "callouts": [
+        {
+          "label": "Tolva de alimentación extra grande",
+          "point": [
+            0.5,
+            0.1
+          ]
+        },
+        {
+          "label": "Motor eléctrico",
+          "point": [
+            0.74,
+            0.44
+          ]
+        },
+        {
+          "label": "Botón de ajuste grueso y fino",
+          "point": [
+            0.3,
+            0.47
+          ]
+        },
+        {
+          "label": "Puerto de descarga",
+          "point": null,
+          "_nota": "sin punto: el puerto de descarga no se identifica con certeza en la unica foto disponible. Regla: si no esta verificado, se OMITE — nunca se estima una posicion."
+        },
+        {
+          "label": "Soporte robusto",
+          "point": [
+            0.55,
+            0.84
+          ]
+        }
+      ],
+      "callouts_origen": "encontrado_web (partes del listado del proveedor); posiciones ubicadas sobre la foto real, no estimadas",
+      "dimensiones": {
+        "alto": "85 cm",
+        "ancho": "43,5 cm",
+        "fondo": "46,5 cm",
+        "peso": "20 kg"
+      },
+      "dimensiones_origen": "encontrado_web (ficha técnica del proveedor: 85*43,5*46,5 CM, 20 kilos)"
+    },
+    "plan_galeria": {
+      "_comentario": "Plan de galeria del molino: demuestra el contrato multimedia.plan_galeria y el motor que lo lee.",
+      "imagen_base": "molino_imagenes/Molino_01.png",
+      "imagen_base_origen": "encontrado_web",
+      "slots": [
+        {
+          "tipo": "producto_limpio",
+          "fuente": "generado_motor"
+        },
+        {
+          "tipo": "medidas",
+          "fuente": "generado_motor"
+        },
+        {
+          "tipo": "partes_senaladas",
+          "fuente": "generado_motor"
+        },
+        {
+          "tipo": "foto_real",
+          "fuente": "foto_real",
+          "origen": "encontrado_web"
+        },
+        {
+          "tipo": "otro_angulo_ia",
+          "fuente": "imagen_a_imagen"
+        }
+      ]
+    }
+  }
+}

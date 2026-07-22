@@ -1,0 +1,10 @@
+{
+  "_nota": "Callouts del molino. Etiquetas = partes REALES visibles en la foto. 'point' = posicion relativa (x,y de 0 a 1) sobre la caja del producto colocado. Se ajustan mirando el preview.",
+  "callouts": [
+    { "label": "Tolva de alimentación extra grande", "point": [0.50, 0.10] },
+    { "label": "Motor eléctrico", "point": [0.74, 0.44] },
+    { "label": "Botón de ajuste grueso y fino", "point": [0.30, 0.47] },
+    { "label": "Puerto de descarga", "point": [0.32, 0.61] },
+    { "label": "Soporte robusto", "point": [0.55, 0.84] }
+  ]
+}

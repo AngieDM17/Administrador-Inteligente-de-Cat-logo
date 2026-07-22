@@ -25,5 +25,8 @@ _tmp/
 # Banners generados (salida regenerable del generador de banner)
 *_banner_preview.png
 
+# Salida del motor de galeria (se regenera con motor_galeria.py)
+galeria_motor/
+
 # === Tooling caches ===
 .atl/.skill-registry.cache.json
