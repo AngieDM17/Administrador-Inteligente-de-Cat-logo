@@ -282,6 +282,241 @@ class ImagenGaleria(ModeloBase):
     nota: str = Field(min_length=1)
 
 
+class CalloutParte(ModeloBase):
+    """Una parte senalada del producto, para la toma de callouts.
+
+    'point' es OPCIONAL a proposito: el Investigador puede averiguar QUE partes
+    tiene el producto (de la web), pero no DONDE caen sobre la foto real. Sin
+    punto, la parte no se dibuja — se omite, nunca se inventa una posicion.
+    """
+
+    label: str = Field(min_length=1)
+    point: Optional[list[float]] = None  # [x, y] relativos al producto, 0..1
+
+    @field_validator("point")
+    @classmethod
+    def _v_point(cls, valor):
+        if valor is None:
+            return valor
+        if len(valor) != 2 or not all(0.0 <= c <= 1.0 for c in valor):
+            raise ValueError("point debe ser [x, y] con valores entre 0 y 1")
+        return valor
+
+
+class DimensionesProducto(ModeloBase):
+    """Medidas reales del producto para la toma de tamano. Todas opcionales:
+    lo que no este verificado se OMITE, no se inventa ni frena el pipeline."""
+
+    alto: Optional[str] = None
+    ancho: Optional[str] = None
+    fondo: Optional[str] = None
+    peso: Optional[str] = None
+
+    def hay_alguna(self) -> bool:
+        return any([self.alto, self.ancho, self.fondo, self.peso])
+
+
+class GaleriaTomas(ModeloBase):
+    """Datos que alimentan las tomas GENERADAS de la galeria (callouts y
+    dimensiones). Los emite el Investigador para que la etapa de imagenes salga
+    sola, sin JSONs sueltos escritos a mano."""
+
+    callouts: Optional[list[CalloutParte]] = None
+    callouts_origen: Optional[str] = None
+    dimensiones: Optional[DimensionesProducto] = None
+    dimensiones_origen: Optional[str] = None
+
+    @model_validator(mode="after")
+    def _exigir_origen_si_hay_datos(self):
+        """Regla del proyecto: dato sin origen = dato inventado."""
+        if self.callouts:
+            _exigir_origen(self.callouts_origen)
+        if self.dimensiones is not None and self.dimensiones.hay_alguna():
+            _exigir_origen(self.dimensiones_origen)
+        return self
+
+
+# --- Plan de galeria -------------------------------------------------------
+# Los slots salen del proceso manual que Angie ejecuta hoy producto por
+# producto (descrito por ella el 22-jul-2026). La etapa de imagenes no inventa
+# un metodo nuevo: automatiza ESTE. Ver ETAPA_IMAGENES.md.
+TIPOS_SLOT = (
+    "producto_limpio",        # hero: recorte limpio sobre blanco
+    "persona_escala",         # persona al lado para dar idea del tamano
+    "partes_senaladas",       # callouts sobre la maquina completa
+    "portada_variantes",      # portada con las variantes de motor del producto
+    "escena_funcionamiento",  # la maquina en uso
+    "foto_real",              # foto del proveedor / web / Alibaba
+    "medidas",                # medidas sobre la maquina
+    "otro_angulo_ia",         # re-render imagen->imagen del mismo equipo
+    "accesorios",             # accesorios incluidos, si vienen
+)
+
+# COMO se produjo la imagen. Es un eje distinto del origen: 'fuente' dice con
+# que se hizo, 'origen' dice quien responde por ella. Los dos hacen falta para
+# saber, meses despues, que imagen es una foto y cual es una recreacion.
+FUENTES_SLOT = (
+    "foto_real",        # material real tal cual; no deriva de nada
+    "edicion_manual",   # foto real editada a mano (lo que Angie hace hoy en Canva)
+    "generado_motor",   # pieza determinista del motor propio (Pillow)
+    "compuesto",        # montaje de material real
+    "escena_ia",        # entorno generado con el producto real encima
+    "imagen_a_imagen",  # re-render del producto a partir de una foto real
+)
+
+# Fuentes que NO son una fotografia: no pueden declarar un origen que afirme
+# que la imagen es real. Regla 6 de reglas_negocio.md.
+_FUENTES_IA = ("escena_ia", "imagen_a_imagen")
+
+# Origenes que afirman "esto es una foto del producto".
+_ORIGENES_QUE_AFIRMAN_FOTO = ("verificado", "encontrado_web")
+
+# Origenes que afirman "esto lo genero una IA".
+_ORIGENES_QUE_AFIRMAN_IA = ("generado_ia", "generado_ia_sin_verificar")
+
+
+def _patron_de(origenes: tuple[str, ...]) -> re.Pattern:
+    """Patron con limites de palabra, igual que _PATRON_ORIGEN.
+
+    Los limites importan: '_' cuenta como caracter de palabra, asi que
+    'generado_ia' NO matchea dentro de 'generado_ia_sin_verificar'. Cada
+    origen se reconoce solo a si mismo.
+    """
+    return re.compile(
+        "|".join(
+            rf"(?<!\w){re.escape(o)}(?!\w)"
+            for o in sorted(origenes, key=len, reverse=True)
+        )
+    )
+
+
+_PATRON_AFIRMA_FOTO = _patron_de(_ORIGENES_QUE_AFIRMAN_FOTO)
+_PATRON_AFIRMA_IA = _patron_de(_ORIGENES_QUE_AFIRMAN_IA)
+
+# Fuentes que obligan a declarar de que imagen REAL salieron. Con esto la
+# generacion desde la nada (texto->imagen, la que invento la marca falsa
+# "SHENGKEY") queda IMPOSIBLE de expresar en el contrato: toda imagen del
+# producto esta anclada a una foto real, o no entra.
+_FUENTES_QUE_EXIGEN_BASE = (
+    "edicion_manual",
+    "generado_motor",
+    "compuesto",
+    "escena_ia",
+    "imagen_a_imagen",
+)
+
+
+class SlotGaleria(ModeloBase):
+    """Una posicion de la galeria: que se muestra, como se produjo y quien
+    responde por ella.
+
+    'archivo' vacio = slot planificado pero todavia no producido. Por eso el
+    origen solo se exige cuando la imagen existe: sin imagen no hay nada que
+    declarar.
+    """
+
+    tipo: str
+    fuente: str
+    origen: Optional[str] = None
+    archivo: Optional[str] = None
+    # De que imagen real salio. Si falta, se usa el imagen_base del plan.
+    deriva_de: Optional[str] = None
+    nota: Optional[str] = None
+
+    @field_validator("tipo")
+    @classmethod
+    def _tipo_conocido(cls, valor: str) -> str:
+        if valor not in TIPOS_SLOT:
+            raise ValueError(
+                f"'{valor[:40]}' no es un tipo de slot valido. "
+                "Esperado uno de: " + " | ".join(TIPOS_SLOT)
+            )
+        return valor
+
+    @field_validator("fuente")
+    @classmethod
+    def _fuente_conocida(cls, valor: str) -> str:
+        if valor not in FUENTES_SLOT:
+            raise ValueError(
+                f"'{valor[:40]}' no es una fuente valida. "
+                "Esperado uno de: " + " | ".join(FUENTES_SLOT)
+            )
+        return valor
+
+    @model_validator(mode="after")
+    def _coherencia_fuente_origen(self) -> "SlotGaleria":
+        # Una imagen producida sin origen es una imagen sin responsable.
+        if self.archivo is not None and not self.archivo.strip():
+            raise ValueError("slot con 'archivo' vacio; omitir la clave o poner la ruta.")
+        if self.archivo:
+            _exigir_origen(self.origen)
+
+        if self.origen:
+            afirma_foto = _PATRON_AFIRMA_FOTO.search(self.origen) is not None
+            afirma_ia = _PATRON_AFIRMA_IA.search(self.origen) is not None
+
+            # Una recreacion jamas puede presentarse como fotografia.
+            if self.fuente in _FUENTES_IA and afirma_foto:
+                raise ValueError(
+                    f"el slot '{self.tipo}' se produjo con '{self.fuente}' (la genero una IA) "
+                    f"pero su origen dice '{self.origen[:40]}', que afirma que es una foto real. "
+                    "Esperado: generado_ia, generado_ia_sin_verificar o confirmado_por_angie."
+                )
+            # Y una foto real no se marca como generada.
+            if self.fuente == "foto_real" and afirma_ia:
+                raise ValueError(
+                    f"el slot '{self.tipo}' dice ser foto_real pero su origen "
+                    f"'{self.origen[:40]}' afirma que la genero una IA. "
+                    "Esperado: cambiar la fuente, o declarar un origen de material real."
+                )
+
+        # Regla 6: las imagenes de IA se reconocen por el nombre del archivo.
+        if self.fuente in _FUENTES_IA and self.archivo and "_IA" not in self.archivo:
+            raise ValueError(
+                f"'{self.archivo[:60]}' es una imagen generada por IA y su nombre no lleva "
+                "el sufijo _IA (regla 6: siempre debe poder reconocerse a simple vista)."
+            )
+        return self
+
+    def necesita_base(self) -> bool:
+        """Si es True, esta imagen debe declarar de que foto real salio."""
+        return self.fuente in _FUENTES_QUE_EXIGEN_BASE
+
+
+class PlanGaleria(ModeloBase):
+    """Plan de la galeria de un producto: los slots, y cual es la foto base.
+
+    'imagen_base' es la foto canonica del producto. Sirve para dos cosas:
+    que todas las piezas generadas se vean como la MISMA maquina, y que
+    ninguna imagen del producto pueda nacer sin una foto real detras.
+    """
+
+    imagen_base: Optional[str] = None
+    imagen_base_origen: Optional[str] = None
+    slots: Optional[list[SlotGaleria]] = None
+
+    def hay_slots(self) -> bool:
+        return bool(self.slots)
+
+    @model_validator(mode="after")
+    def _reglas_del_plan(self) -> "PlanGaleria":
+        if self.imagen_base:
+            _exigir_origen(self.imagen_base_origen)
+
+        sin_ancla = [
+            s.tipo for s in (self.slots or [])
+            if s.necesita_base() and not (s.deriva_de or self.imagen_base)
+        ]
+        if sin_ancla:
+            raise ValueError(
+                "estos slots se producen a partir de una imagen pero no declaran cual: "
+                + ", ".join(sin_ancla)
+                + ". Esperado: 'deriva_de' en el slot, o 'imagen_base' en el plan. "
+                "Ninguna imagen del producto puede nacer sin una foto real detras."
+            )
+        return self
+
+
 class Multimedia(ModeloBase):
     """Imagenes, briefs y video."""
 
@@ -295,6 +530,14 @@ class Multimedia(ModeloBase):
     formato_destino: Optional[str] = None
     video_youtube: Optional[str] = None
     video_nota: Optional[str] = None
+    # Datos de las tomas generadas (callouts y dimensiones). Opcional: si el
+    # Investigador no los trae, esas tomas simplemente no se generan.
+    galeria_tomas: Optional[GaleriaTomas] = None
+    # Plan de la galeria: QUE slots lleva el producto, de que foto sale cada
+    # uno y quien responde por el. No se superpone con galeria_tomas:
+    # plan_galeria dice QUE se arma, galeria_tomas trae los DATOS con que se
+    # dibujan las piezas generadas (labels, puntos, medidas).
+    plan_galeria: Optional[PlanGaleria] = None
 
 
 class Seo(ModeloBase):

@@ -62,9 +62,48 @@
     "imagenes_nota": "META: 8 galería + 1 banner Canva + video ~1 min",
     "briefs_generacion_ia": [],
     "regla_generacion": "PROHIBIDO inventar textos, etiquetas, modelos o conectores que no estén en las fotos reales. Ante duda, la toma se descarta. Sufijo _IA en el archivo.",
-    "formato_destino": "WebP 700x700 (estándar de la tienda)",
+    "formato_destino": "WebP 1080x1080 (estándar de la tienda)",
     "video_youtube": null,
-    "video_nota": "Fase 5. Se sube a YouTube y el enlace va en la plantilla Elementor."
+    "video_nota": "Fase 5. Se sube a YouTube y el enlace va en la plantilla Elementor.",
+
+    "galeria_tomas": {
+      "_comentario": "Datos que alimentan las tomas GENERADAS de la galería (el motor las dibuja solo). Lo que no esté verificado se OMITE: nunca inventar.",
+      "callouts": [
+        {
+          "label": "nombre de una parte REAL y visible del producto (ej. 'Tolva de alimentación')",
+          "point": null
+        }
+      ],
+      "callouts_origen": "encontrado_web",
+      "dimensiones": {
+        "alto": null,
+        "ancho": null,
+        "fondo": null,
+        "peso": null
+      },
+      "dimensiones_origen": "encontrado_web"
+    },
+
+    "plan_galeria": {
+      "_comentario": "QUE lleva la galería y de qué foto sale cada pieza. No se superpone con galeria_tomas: aquí se planifica, allí están los DATOS con que se dibujan las piezas generadas. No hay cuota fija de 8: se llenan los slots que el material real permita llenar con honestidad.",
+      "_imagen_base": "foto canónica del producto: la que define su identidad visual. Toda pieza derivada sale de ella (o de la que el slot indique en 'deriva_de'), para que las 8 imágenes se vean como la MISMA máquina.",
+      "imagen_base": null,
+      "imagen_base_origen": null,
+      "_tipos": "producto_limpio | persona_escala | partes_senaladas | portada_variantes | escena_funcionamiento | foto_real | medidas | otro_angulo_ia | accesorios",
+      "_fuentes": "foto_real (material real tal cual) | edicion_manual (foto real editada a mano) | generado_motor (pieza determinista del motor) | compuesto (montaje de material real) | escena_ia (entorno generado, producto real encima) | imagen_a_imagen (re-render del producto desde una foto real)",
+      "_regla_dura": "toda fuente distinta de foto_real DEBE anclarse a una imagen real (imagen_base o deriva_de). Generar el producto desde texto no se puede expresar en este contrato: no existe.",
+      "_regla_origen": "escena_ia e imagen_a_imagen NUNCA pueden declarar origen 'verificado' ni 'encontrado_web' (eso afirmaría que son fotos). Van con generado_ia_sin_verificar y, tras revisión de Angie, confirmado_por_angie. Su archivo lleva sufijo _IA.",
+      "slots": [
+        {
+          "tipo": "foto_real",
+          "fuente": "foto_real",
+          "origen": "encontrado_web",
+          "archivo": null,
+          "deriva_de": null,
+          "nota": "una entrada por cada foto real encontrada; son la materia prima de todo lo demás"
+        }
+      ]
+    }
   },
 
   "seo": {
