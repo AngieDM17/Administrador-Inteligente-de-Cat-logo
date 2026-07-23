@@ -59,7 +59,7 @@
 
   "multimedia": {
     "imagenes_galeria_confirmadas": [],
-    "imagenes_nota": "META: 8 galería + 1 banner Canva + video ~1 min",
+    "imagenes_nota": "META: galería según la plantilla de su CATEGORÍA (sin cuota fija: se llenan los slots que el material real permita) + 1 banner que produce el motor propio `generador_banner.py` + video ~1 min",
     "briefs_generacion_ia": [],
     "regla_generacion": "PROHIBIDO inventar textos, etiquetas, modelos o conectores que no estén en las fotos reales. Ante duda, la toma se descarta. Sufijo _IA en el archivo.",
     "formato_destino": "WebP 1080x1080 (estándar de la tienda)",
@@ -68,37 +68,35 @@
 
     "galeria_tomas": {
       "_comentario": "Datos que alimentan las tomas GENERADAS de la galería (el motor las dibuja solo). Lo que no esté verificado se OMITE: nunca inventar.",
-      "callouts": [
-        {
-          "label": "nombre de una parte REAL y visible del producto (ej. 'Tolva de alimentación')",
-          "point": null
-        }
-      ],
-      "callouts_origen": "encontrado_web",
+      "_callouts": "Cada entrada es {'label': nombre de una parte REAL y visible del producto (ej. 'Tolva de alimentación'), 'point': null}. El 'point' SIEMPRE se deja en null: el Investigador sabe QUÉ partes hay, no DÓNDE caen sobre la foto. En cuanto agregues una entrada, 'callouts_origen' pasa a ser obligatorio.",
+      "callouts": [],
+      "callouts_origen": null,
       "dimensiones": {
         "alto": null,
         "ancho": null,
         "fondo": null,
         "peso": null
       },
-      "dimensiones_origen": "encontrado_web"
+      "dimensiones_origen": null
     },
 
     "plan_galeria": {
       "_comentario": "QUE lleva la galería y de qué foto sale cada pieza. No se superpone con galeria_tomas: aquí se planifica, allí están los DATOS con que se dibujan las piezas generadas. No hay cuota fija de 8: se llenan los slots que el material real permita llenar con honestidad.",
-      "_imagen_base": "foto canónica del producto: la que define su identidad visual. Toda pieza derivada sale de ella (o de la que el slot indique en 'deriva_de'), para que las 8 imágenes se vean como la MISMA máquina.",
+      "_imagen_base": "foto canónica del producto: la que define su identidad visual. Toda pieza derivada sale de ella (o de la que el slot indique en 'deriva_de'), para que TODAS las imágenes de la galería se vean como la MISMA máquina.",
+      "_slots_omitidos_y_por_que": "OPCIONAL — reemplazar este texto por una lista de strings, o borrar la clave si no se omitió ningún slot. Va un renglón por cada slot que la plantilla de la categoría pedía y este producto NO lleva, cada uno con su motivo (ej. 'persona_escala: no hay foto con referencia de tamaño'). Se escribe para que la omisión quede VISIBLE: sin esto, la etapa siguiente no distingue 'no aplica' de 'se olvidó', y el próximo que abra la ficha repite el análisis.",
       "imagen_base": null,
       "imagen_base_origen": null,
       "_tipos": "producto_limpio | persona_escala | partes_senaladas | portada_variantes | escena_funcionamiento | foto_real | medidas | otro_angulo_ia | accesorios",
       "_fuentes": "foto_real (material real tal cual) | edicion_manual (foto real editada a mano) | generado_motor (pieza determinista del motor) | compuesto (montaje de material real) | escena_ia (entorno generado, producto real encima) | imagen_a_imagen (re-render del producto desde una foto real)",
       "_regla_dura": "toda fuente distinta de foto_real DEBE anclarse a una imagen real (imagen_base o deriva_de). Generar el producto desde texto no se puede expresar en este contrato: no existe.",
       "_regla_origen": "escena_ia e imagen_a_imagen NUNCA pueden declarar origen 'verificado' ni 'encontrado_web' (eso afirmaría que son fotos). Van con generado_ia_sin_verificar y, tras revisión de Angie, confirmado_por_angie. Su archivo lleva sufijo _IA.",
+      "_regla_archivo": "en los slots de MATERIAL REAL (foto_real, accesorios) el 'archivo' lo escribes TÚ, con la ruta de la foto dentro de la carpeta del producto — como en el slot de ejemplo de abajo. El motor no genera nada para ellos, así que un 'archivo' vacío deja el slot inservible: nunca llega a la galería. En los slots que produce el motor (producto_limpio, medidas, partes_senaladas, …) la clave se OMITE: la escribe él al generar la pieza, junto con su origen.",
       "slots": [
         {
           "tipo": "foto_real",
           "fuente": "foto_real",
           "origen": "encontrado_web",
-          "archivo": null,
+          "archivo": "<carpeta_del_producto>/foto_01.jpg",
           "deriva_de": null,
           "nota": "una entrada por cada foto real encontrada; son la materia prima de todo lo demás"
         }

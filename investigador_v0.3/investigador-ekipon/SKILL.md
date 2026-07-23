@@ -42,12 +42,138 @@ Copia `assets/plantilla_ficha_v1.4.json` como `ficha_investigada_<CODIGO>.json` 
 - Todo lo demás que quede sin resolver va a `campos_por_confirmar`.
 - Registra TODAS las fuentes en `fuentes_consultadas`, incluidas las descartadas y por qué — las fuentes descartadas del piloto evitaron repetir el mismo error en la corrección.
 
-## Fase 4 — Multimedia
+## Fase 4 — Multimedia: el plan de la galería
 
-Meta: 8 imágenes de galería. Recolecta las URLs de las fotos reales del producto exacto (verifícalas contra el criterio de la Fase 2). Si hay menos de 8, completa en este orden de preferencia:
+Llenas **dos** contratos de la sección `multimedia`, y no se superponen:
 
-1. **Recorte de foto real** — para zooms de partes (panel, conectores, carrete): recorta y amplía la foto real. Es más fiel que la IA, no puede inventar nada y no necesita sufijo `_IA` (sigue siendo foto real). Marca la imagen como `recorte_foto_real`.
-2. **Generación IA** — solo para lo que un recorte no puede dar (ángulos nuevos, vistas no fotografiadas): escribe briefs citando qué fotos reales sirven de referencia estricta. Prohibido que la IA invente textos, etiquetas, modelos o conectores; ante duda la toma se descarta; sufijo `_IA` en el archivo. No ejecutes los briefs sin que Angie los apruebe.
+| Contrato | Qué responde |
+|---|---|
+| `plan_galeria` | **QUÉ** lleva la galería y **de qué foto real** sale cada pieza |
+| `galeria_tomas` | Los **DATOS** con los que el motor dibuja las piezas generadas (etiquetas, medidas) |
+
+Lo que **NO** llenas: el campo `archivo` de los slots que **produce el motor** (lo escribe él al
+generar la pieza) ni `imagenes_galeria_confirmadas` (se arma solo a partir del plan, después). Tú
+planificas; la máquina produce.
+
+**Excepción — los slots de material real SÍ llevan `archivo`.** En `foto_real` y `accesorios` la
+imagen ya existe: el motor no genera nada para ellos y los omite diciendo que son "material real,
+entra por la carpeta del producto". Si dejas su `archivo` vacío, ese slot no apunta a ninguna imagen
+y queda inservible: nunca llega a la galería. Regla práctica:
+
+| El material del slot… | `archivo` |
+|---|---|
+| ya existe (`foto_real`, `accesorios`) | **lo escribes tú**, con la ruta de la foto real dentro de la carpeta del producto |
+| lo dibuja el motor (`producto_limpio`, `medidas`, `partes_senaladas`, …) | lo dejas ausente; lo escribe el motor |
+
+### 4.1 Reunir el material real
+
+Normalmente llega **una sola foto**. El primer trabajo es buscar en internet la mayor cantidad de
+fotos reales del producto exacto, y verificar cada una contra el criterio de la Fase 2.
+
+**No hay meta de 8 imágenes. La cuota fija está muerta.** Se llenan los slots que el material real
+permita llenar con honestidad, y nada más. Rellenar hasta un número con recortes redundantes del
+mismo objeto es lo que produjo la galería "cortada y toda igual" del piloto 4212: mejor 3 tomas
+honestas que 8 con relleno. Un slot que no aplica **no se sustituye por otra cosa**: se omite.
+
+Sobre los recortes: solo sirven con originales de alta resolución. En el NBC 250 se rechazaron
+porque venían de capturas de ~500 px ampliadas. **Un recorte nunca sustituye un ángulo nuevo.**
+
+### 4.2 `plan_galeria`
+
+- `imagen_base` — la **foto canónica** del producto: la que define su identidad visual. Toda pieza
+  derivada sale de ella, y por eso las piezas se ven como la MISMA máquina y no derivan hacia otro
+  equipo. Lleva su `imagen_base_origen`.
+- `slots` — la lista, **en el orden en que se verá la galería**. Cada slot declara:
+
+| Campo | Qué es |
+|---|---|
+| `tipo` | qué muestra la toma (lista cerrada, abajo) |
+| `fuente` | **CÓMO** se hizo la imagen (lista cerrada, abajo) |
+| `origen` | **QUIÉN responde** por ella (los mismos orígenes de la Fase 3). **Condicional:** ver abajo |
+| `deriva_de` | de qué foto real salió, si no es la `imagen_base` |
+| `nota` | descripción breve de la toma; termina siendo el texto ALT de SEO |
+
+**`tipo`** — uno de: `producto_limpio`, `persona_escala`, `partes_senaladas`, `portada_variantes`,
+`escena_funcionamiento`, `foto_real`, `medidas`, `otro_angulo_ia`, `accesorios`.
+
+**`fuente`** — uno de: `foto_real` (material real tal cual), `edicion_manual` (foto real editada a
+mano), `generado_motor` (pieza determinista del motor propio), `compuesto` (montaje de material
+real), `escena_ia` (entorno generado con el producto real encima), `imagen_a_imagen` (re-render del
+producto a partir de una foto real).
+
+**`origen` va SOLO si el slot ya tiene `archivo`.** El esquema lo exige exactamente en ese caso y en
+ningún otro: un slot planificado y todavía no producido no tiene imagen, y sin imagen no hay de qué
+responder. O sea que va junto con la excepción de arriba —los slots de material real llevan los dos,
+`archivo` y `origen`— y los que produce el motor no llevan ninguno de los dos: él escribe el archivo
+y hereda el origen del dato con que dibujó la pieza. **No inventes un responsable para una imagen
+que todavía no existe**, y si la validación te rechaza un slot por origen, mirá primero si le pusiste
+`archivo`.
+
+**Slots condicionales:** `portada_variantes` solo si el producto TIENE variantes de motor;
+`accesorios` solo si viene con accesorios. Si no aplican, no van.
+
+#### Un slot que no va se DECLARA: `_slots_omitidos_y_por_que`
+
+Omitir un slot en silencio pierde información. La etapa siguiente no puede distinguir "este producto
+no lleva `persona_escala`" de "el Investigador se olvidó", y el próximo que abra la ficha rehace el
+mismo análisis para llegar a la misma conclusión.
+
+Por eso, cuando dejes fuera un slot que la plantilla de su categoría pedía, escribí el motivo en la
+clave **opcional** `_slots_omitidos_y_por_que` dentro de `plan_galeria`: una lista de textos, un
+renglón por slot omitido. Si no omitiste ninguno, no pongas la clave.
+
+```json
+"plan_galeria": {
+  "_slots_omitidos_y_por_que": [
+    "persona_escala: ninguna foto muestra el equipo junto a una referencia de tamaño",
+    "portada_variantes: el producto no tiene variantes de motor"
+  ],
+  "imagen_base": "…"
+}
+```
+
+Va con guion bajo a propósito: las claves `_` son ayuda para humanos y el motor las descarta antes
+de validar, así que documentar la omisión no cambia en nada lo que se produce.
+
+#### Las dos reglas que el esquema hace cumplir
+
+1. **Ninguna imagen del producto nace sin una foto real detrás.** Toda `fuente` distinta de
+   `foto_real` está obligada a declarar de dónde salió (`deriva_de` propio, o la `imagen_base` del
+   plan). Consecuencia buscada: **texto → imagen es imposible de escribir en este contrato**. El
+   caso que inventó una marca falsa ("SHENGKEY") no se puede ni representar.
+2. **Una recreación jamás se disfraza de fotografía.** `fuente` y `origen` son ejes distintos y el
+   esquema no los deja contradecirse: una imagen hecha con `escena_ia` o `imagen_a_imagen` **no
+   puede** declarar `verificado` ni `encontrado_web` (eso afirmaría que es una foto). Sí puede
+   declarar `generado_ia_sin_verificar`, o `confirmado_por_angie` cuando ella la revisó y responde
+   por ella. Además el archivo lleva `_IA` en el nombre, para que se delate a simple vista.
+
+Si intentas escribir una combinación prohibida, la validación la rechaza con el motivo. No la
+esquives: significa que la imagen no es lo que dice ser.
+
+### 4.3 `galeria_tomas`
+
+Los datos con los que el motor dibuja las tomas generadas. Todo es opcional y **lo que no esté
+verificado se OMITE**: ningún dato faltante frena el pipeline, y ninguno se inventa.
+
+- `callouts` — lista de partes señaladas del producto: `{ "label": "...", "point": null }`.
+  Va con `callouts_origen` obligatorio si hay al menos una.
+- `dimensiones` — `alto`, `ancho`, `fondo`, `peso`, como texto **con su unidad** ("85 cm", "20 kg").
+  Va con `dimensiones_origen` obligatorio si hay al menos una.
+
+#### `point` SIEMPRE va en `null`
+
+Tú averiguas **QUÉ partes** tiene el producto leyendo la web; **no sabes DÓNDE caen sobre la foto**
+— eso solo se sabe mirando la imagen. Sin punto, esa parte simplemente no se dibuja. **Nunca
+inventes una coordenada.** Ubicar los puntos es un paso visual posterior.
+
+### 4.4 Generación con IA
+
+Sigue permitida y acotada: solo `imagen_a_imagen` (otro ángulo del MISMO equipo) o `escena_ia`
+(entorno generado con el producto real encima). Escribe los briefs citando qué fotos reales sirven
+de referencia estricta. Prohibido que la IA invente textos, etiquetas, modelos o conectores; ante
+duda, la toma se descarta. **No ejecutes los briefs sin que Angie los apruebe**, y recuerda que
+imagen → imagen inventa las caras que ninguna foto muestra (trasera, superior): eso se comprobó en
+el NBC 250.
 
 ## Fase 5 — SEO
 

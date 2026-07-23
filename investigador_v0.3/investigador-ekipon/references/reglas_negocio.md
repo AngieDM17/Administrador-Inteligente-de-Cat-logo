@@ -64,7 +64,10 @@ Reglas al aplicar la fórmula:
 - Adaptar audiencias y beneficios al tipo de producto (no todo es soldadura).
 - Mantener el nombre del producto en el mismo formato del campo `nombre_propuesto`.
 
-## Estilo del banner (Canva, aprobado por Angie 14-jul-2026)
-- Plantilla base: post cuadrado 1080x1080 de Ekipon (título arriba, descripción a la izquierda, foto del producto a la derecha, sellos "ENVÍOS A TODO EL PAÍS" y "PAGO CONTRAENTREGA" abajo).
+## Estilo del banner (aprobado por Angie 14-jul-2026; lo produce `generador_banner.py`)
+
+El estilo que sigue es el que Angie aprobó y **no cambia**. Lo que cambió es la herramienta: el diseño nació en Canva, pero hoy el banner de cada producto lo dibuja el motor propio `generador_banner.py`, y el Publicador lo genera y lo sube solo (regla 8). Nadie abre Canva por producto.
+
+- Composición: cuadrado 1080x1080 de Ekipon (título arriba, descripción a la izquierda, foto del producto a la derecha, sellos "ENVÍOS A TODO EL PAÍS" y "PAGO CONTRAENTREGA" abajo).
 - Descripción del banner = párrafo REDACTADO de **largo medio** (ni muy largo ni solo specs; ~40-50 palabras), estilo del ejemplo de la Peletizadora: "El [producto] reúne/está diseñado para [función]… Ideal para [audiencias] que requieren [beneficios]."
-- Siempre trabajar sobre una COPIA de la plantilla, no sobre el original.
+- Lo único que aporta el Investigador es ese texto y la foto del producto; la composición la pone el motor y no se retoca a mano por producto. Si el estilo tiene que cambiar, se cambia en `generador_banner.py` —una vez, para todo el catálogo—, nunca copiando y editando una pieza suelta.
