@@ -1,0 +1,237 @@
+{
+  "_version_ficha": "1.4",
+
+  "modo_entrada": "investigacion_web",
+  "entrada_original": {
+    "nombre_dado": "MOLINO PULVERIZADOR DE GRANO SECO Y COCIDO",
+    "codigo_proveedor": "NO_ENTREGADO — Angie no entrego codigo de proveedor. Se registra la ausencia; NO se inventa ninguno. Sin codigo exacto no se puede aplicar la leccion 1 del piloto NBC 250 (9060C != 9060), y la identificacion queda limitada a la verificacion visual.",
+    "foto_referencia": "molino_imagenes/Molino_01.png (228x310 px, PNG con transparencia). Molino de discos sobre fondo blanco de estudio, vista de tres cuartos desde el frente izquierdo. Rasgos visibles: (1) tolva conica de alimentacion en acero inoxidable pulido, boca ancha abierta, que baja a un cuello corto de color claro sobre el cabezal; (2) cabezal de molienda azul, cilindrico horizontal, con tapa frontal circular grande; (3) perilla azul estriada al centro de la tapa frontal, con un pequeño vastago oscuro a su izquierda; (4) salida de producto en la parte baja del cabezal; (5) motor electrico azul acoplado DIRECTAMENTE al cabezal (sin correa ni poleas), con aletas de refrigeracion, caja negra sobre el cuello de la tolva y caja azul rectangular sobre la carcasa, y rejilla de ventilacion en el extremo derecho; (6) base metalica negra de cuatro patas tubulares inclinadas, con travesaños de refuerzo y apoyos planos, sobre la que el cabezal y el motor se atornillan en dos plataformas separadas. No hay ninguna etiqueta, marca, placa de caracteristicas ni codigo legible en la foto."
+  },
+  "fecha_investigacion": "2026-07-22",
+  "estado": "pendiente_revision",
+
+  "identificacion_del_producto": {
+    "resultado": "IDENTIFICACION_DUDOSA",
+    "detalle": "Se identifico con confianza el TIPO de maquina, no el modelo exacto. Lo que si esta establecido: es un molino de DISCOS de accionamiento electrico directo, con tolva conica en acero inoxidable y base metalica de cuatro patas; la familia se vende en el mercado hispanoamericano como 'molino de granos secos y humedos' / 'molino dual' y su uso tipico incluye maiz cocido para masa (de ahi 'grano seco y cocido' del nombre dado). Lo que NO se pudo establecer: fabricante, modelo, potencia, voltaje, rpm, capacidad kg/h, diametro de discos, peso ni dimensiones. Motivos concretos, sin adorno: (a) no hay codigo de proveedor, que es la llave que la Fase 1 usa para encontrar la pagina exacta; (b) la maquina no muestra ninguna marca ni placa en la foto; (c) la Fase 1 manda usar busqueda por imagen (Google Lens o equivalente) como herramienta central, y este agente NO dispone de ninguna herramienta de busqueda por imagen: WebSearch solo acepta texto y WebFetch devuelve la pagina como markdown, sin imagenes, asi que la comparacion foto-contra-foto exigida por la Fase 1.5 fue IMPOSIBLE de ejecutar; (d) ademas, en este entorno la resolucion DNS fallo para casi todos los dominios candidatos (lacobacha.com.ec, rumperuimportaciones.com, electrogarline.com, maqjoyo.com, jersimport.com, mundiluz.com.co, faretty.co, colombiaecommerce.com: todos 'getaddrinfo ENOTFOUND'), de modo que ni siquiera se pudo leer el texto de las fichas tecnicas candidatas. Conclusion: NO se declara IDENTIFICADO y NO se copia ni una sola especificacion numerica de un modelo parecido. Los rasgos que si se afirman salen de mirar la foto de referencia.",
+    "fuente_principal": "NINGUNA — no se hallo la pagina del producto exacto (ni importador colombiano, ni fabricante/OEM). Fuente unica de los datos afirmados: la foto de referencia molino_imagenes/Molino_01.png entregada por Angie.",
+    "advertencias": [
+      "Sin codigo de proveedor: cualquier ficha tecnica que se agregue despues debe venir de la pagina del producto EXACTO, nunca de un modelo parecido (leccion 1 del piloto NBC 250).",
+      "La familia 'molino de granos secos y humedos' es una denominacion generica china: varios fabricantes la usan con potencias, capacidades y tamaños distintos. Aplica textualmente la advertencia de la Fase 1.4 sobre denominaciones genericas tipo 'NBC-250'.",
+      "La unica foto real disponible mide 228x310 px. El estandar de la tienda es WebP 1080x1080. Ninguna pieza derivada (recorte, callouts, medidas) puede alcanzar ese estandar a partir de esta foto: la etapa de imagenes esta BLOQUEADA por resolucion, no por falta de plan.",
+      "El arbol de categorias NO se pudo leer en vivo desde WooCommerce (falla de DNS contra pruebas.ekipon.co). La categoria propuesta queda explicitamente sin confirmar, como manda la Fase 3."
+    ],
+    "estado_en_proveedor": "NO_DISPONIBLE — al no existir pagina del producto exacto, no hay existencias ni precio publicado que registrar (verificado 2026-07-22)."
+  },
+
+  "producto": {
+    "nombre_propuesto": "MOLINO PULVERIZADOR ELÉCTRICO PARA GRANO SECO Y COCIDO – TOLVA EN ACERO INOXIDABLE Y BASE METÁLICA",
+    "nombre_origen": "generado_ia (formato de nombres Ekipon: MAYUSCULAS, sin marcas, PRODUCTO CARACTERISTICA – DETALLE). Las tres partes del nombre corresponden a rasgos verificados en la foto: molienda por discos con accionamiento electrico, tolva en acero inoxidable y base metalica.",
+    "modelo": "NO_DETERMINADO — sin codigo de proveedor y sin pagina del producto exacto. No se asigna un modelo por parecido.",
+    "sku": "AUTOMATICO — lo asigna el sistema de la tienda, no se muestra al público",
+    "categoria_propuesta": "Industria > Maquinaria para alimentos > Molinos",
+    "categoria_confianza": "PENDIENTE_ANGIE — propuesta SIN confirmar. La Fase 3 exige leer el arbol de categorias EN VIVO desde WooCommerce y prohibe copiarlo de fichas anteriores; la lectura en vivo fallo (getaddrinfo failed contra pruebas.ekipon.co el 2026-07-22), asi que esta rama es una PROPUESTA y puede no existir en la tienda. Debe reemplazarse por una rama real antes de publicar.",
+    "etiquetas_propuestas": [
+      "molino de granos",
+      "molino de discos",
+      "maiz cocido",
+      "grano seco",
+      "molino electrico"
+    ],
+    "garantia": "1 año (política fija de la tienda)"
+  },
+
+  "precios": {
+    "precio": null,
+    "precio_origen": "PENDIENTE_ANGIE — REGLA FIJA: el precio SIEMPRE lo define Angie manualmente. El sistema solo aporta referencias.",
+    "referencias_mercado": [
+      {
+        "fuente": "MercadoLibre Colombia — listados 'molino electrico para granos' / 'molino pulverizador de granos'",
+        "precio": null,
+        "moneda": "COP",
+        "fecha": "2026-07-22",
+        "existencias": "no verificadas",
+        "nota": "NO se registra precio porque NO se vio ninguna pagina de producto. Las paginas de listado no se pudieron abrir (WebFetch: dominio no resuelto / 403) y un precio salido solo del resumen de un buscador seria un dato inventado. Ademas la Fase 1.3 prohibe usar MercadoLibre como fuente de especificaciones: sirve solo como referencia de mercado."
+      },
+      {
+        "fuente": "Distribuidores de la misma FAMILIA de maquina en Peru, Ecuador, Mexico y Venezuela (Electrogarline, Rumperu, La Cobacha, MaqJoyo, Jers Import)",
+        "precio": null,
+        "moneda": "COP",
+        "fecha": "2026-07-22",
+        "existencias": "no verificadas",
+        "nota": "Aparecen en resultados de busqueda con precios en soles y pesos mexicanos, pero (a) ninguna pagina se pudo abrir para verificar el dato y (b) son otro pais y otra moneda: no son referencia de mercado colombiano. Se dejan nombradas para que nadie repita la busqueda."
+      }
+    ],
+    "nota_envio": "El precio suele incluir ~$100.000 de envío; se publica 'Envío GRATIS a todo el país' + pago contra entrega",
+    "moneda": "COP"
+  },
+
+  "descripcion_principal": "El MOLINO PULVERIZADOR ELÉCTRICO PARA GRANO SECO Y COCIDO – TOLVA EN ACERO INOXIDABLE Y BASE METÁLICA es un molino de discos accionado por un motor eléctrico acoplado directamente al cabezal, sin correas ni poleas intermedias. Su tolva cónica en acero inoxidable alimenta la cámara de molienda por gravedad, la perilla frontal permite ajustar el cabezal según el trabajo, y el producto molido sale por la parte baja de la cámara. Todo el conjunto va montado sobre una base metálica de cuatro patas con apoyos planos, pensada para trabajar de pie y a altura cómoda de operación. Gracias a su tolva en acero inoxidable y a su base metálica de trabajo, el MOLINO PULVERIZADOR ELÉCTRICO PARA GRANO SECO Y COCIDO – TOLVA EN ACERO INOXIDABLE Y BASE METÁLICA es una excelente opción para arepaderas y molinos de barrio, tiendas de maíz y granos, pequeñas agroindustrias y trabajos profesionales que requieren molienda continua, manejo cómodo del producto y un equipo estable durante la operación.",
+  "descripcion_origen": "generado_ia_sin_verificar — redactada con la fórmula fija de reglas_negocio.md (intro técnica + párrafo de cierre comercial), pero apoyada SOLO en los rasgos leídos en la foto de referencia: no menciona potencia, voltaje, capacidad ni materiales de los discos porque ninguno está verificado. Debe reescribirse en cuanto se confirme el modelo exacto y su ficha técnica.",
+
+  "caracteristicas": [
+    "Molienda por discos con motor eléctrico acoplado directamente al cabezal (sin correa ni poleas)",
+    "Tolva cónica de alimentación en acero inoxidable, de boca ancha",
+    "Perilla de regulación en la tapa frontal del cabezal",
+    "Salida de producto molido en la parte baja de la cámara de molienda",
+    "Base metálica de cuatro patas con travesaños de refuerzo y apoyos planos, para trabajo de pie"
+  ],
+  "caracteristicas_origen": "verificado — cada característica corresponde a un rasgo visible en la foto de referencia molino_imagenes/Molino_01.png (leída el 2026-07-22). No hay ninguna característica tomada de un modelo parecido.",
+
+  "ficha_tecnica": {
+    "_origen_global": "verificado — SOLO rasgos constructivos leídos directamente de la foto de referencia. Deliberadamente NO hay datos numéricos: sin la página del producto exacto, copiar potencia, voltaje, rpm, capacidad, peso o medidas de un modelo parecido sería exactamente el error del piloto NBC 250 (9060C vs 9060). Esos datos están listados en campos_por_confirmar.",
+    "_nota": "Claves en MAYÚSCULAS. Todo dato estimado lleva 'aprox.' y marca [generado_ia_sin_verificar] en el valor.",
+    "TIPO DE MOLIENDA": "Molino de discos",
+    "ACCIONAMIENTO": "Motor eléctrico acoplado directamente al cabezal, sin correa ni poleas",
+    "TOLVA": "Cónica, en acero inoxidable, de boca ancha y alimentación por gravedad",
+    "CUERPO DEL CABEZAL": "Cilíndrico horizontal, metálico, con tapa frontal circular desmontable y perilla de regulación",
+    "SALIDA DE PRODUCTO": "En la parte baja de la cámara de molienda",
+    "MONTAJE": "Base metálica de cuatro patas tubulares con travesaños de refuerzo y apoyos planos"
+  },
+
+  "criterio_verificacion_visual": {
+    "definido_por": "PENDIENTE_ANGIE — propuesto por el Investigador a partir de la foto de referencia; la Fase 2 exige definirlo JUNTO con Angie y ella todavía no lo confirmó.",
+    "SI_es": "Molino de discos con: (1) tolva cónica de acero inoxidable de boca ancha que entra por arriba del cabezal; (2) cabezal cilíndrico horizontal con tapa frontal circular y perilla estriada de regulación al centro de esa tapa; (3) motor eléctrico ACOPLADO DIRECTAMENTE al cabezal, eje en línea, sin correa ni poleas; (4) base metálica de cuatro patas tubulares inclinadas con travesaños y apoyos planos, con cabezal y motor atornillados sobre dos plataformas separadas.",
+    "NO_es": "RECHAZAR: (a) molinos de la misma familia SIN base, es decir el cabezal apoyado directamente sobre mesa — es otra presentación del producto; (b) molinos accionados por CORREA y poleas con el motor separado sobre la misma base — es otra máquina; (c) molinos de MARTILLOS, de cuerpo en forma de caja o tambor con tolva rectangular, aunque estén pintados igual; (d) molinos de café o pulverizadores de vaso cerrado, sin tolva abierta.",
+    "rasgo_decisivo": "NUNCA el color. El azul no decide nada: la misma máquina se vende en azul, verde, rojo o gris. Decide el par 'acople directo motor-cabezal' + 'base metálica de cuatro patas'.",
+    "uso": "criterio para aceptar/rechazar imágenes; revisión final siempre humana"
+  },
+
+  "multimedia": {
+    "imagenes_galeria_confirmadas": [],
+    "imagenes_nota": "La galería la define la plantilla de la CATEGORÍA, no un número fijo. Aquí solo hay UNA foto real (Molino_01.png) y mide 228x310 px, muy por debajo del estándar 1080x1080 de la tienda: la galería NO se puede producir con este material. El plan de abajo declara lo que se armaría en cuanto exista una foto de alta resolución.",
+    "briefs_generacion_ia": [],
+    "regla_generacion": "PROHIBIDO inventar textos, etiquetas, modelos o conectores que no estén en las fotos reales. Ante duda, la toma se descarta. Sufijo _IA en el archivo. No se escribió ningún brief: con una sola foto de 228x310 px un re-render imagen→imagen no tendría detalle real del que agarrarse, y la Fase 4.4 exige además la aprobación previa de Angie.",
+    "formato_destino": "WebP 1080x1080 (estándar de la tienda)",
+    "video_youtube": null,
+    "video_nota": "Fase 5. Se sube a YouTube y el enlace va en la plantilla Elementor.",
+
+    "galeria_tomas": {
+      "_comentario": "Datos que alimentan las tomas GENERADAS de la galería. Lo que no esté verificado se OMITE: nunca inventar.",
+      "callouts": [
+        { "label": "Tolva de alimentación en acero inoxidable", "point": null },
+        { "label": "Cámara de molienda", "point": null },
+        { "label": "Perilla frontal de regulación", "point": null },
+        { "label": "Salida de producto molido", "point": null },
+        { "label": "Motor eléctrico de acople directo", "point": null },
+        { "label": "Base metálica de cuatro patas", "point": null }
+      ],
+      "callouts_origen": "verificado — las seis partes se leyeron directamente de la foto de referencia molino_imagenes/Molino_01.png el 2026-07-22; todas son visibles en ella. Los nombres describen lo que se ve. La FUNCIÓN exacta de la perilla frontal (regular el grosor de molienda) no está confirmada por ninguna fuente y queda en campos_por_confirmar. Todos los 'point' van en null: el Investigador sabe QUÉ partes hay, no DÓNDE caen sobre la foto.",
+      "dimensiones": {
+        "alto": null,
+        "ancho": null,
+        "fondo": null,
+        "peso": null
+      },
+      "dimensiones_origen": null
+    },
+
+    "plan_galeria": {
+      "_comentario": "QUÉ lleva la galería y de qué foto sale cada pieza. No hay cuota fija: se declaran solo los slots que el material real permite llenar con honestidad. Aquí el material real es UNA sola foto, así que el plan es corto a propósito.",
+      "imagen_base": "molino_imagenes/Molino_01.png",
+      "imagen_base_origen": "verificado — única foto real disponible, entregada por Angie como foto de referencia del producto. Es la foto canónica: toda pieza derivada sale de ella.",
+      "slots": [
+        {
+          "tipo": "foto_real",
+          "fuente": "foto_real",
+          "origen": "verificado",
+          "archivo": "molino_imagenes/Molino_01.png",
+          "deriva_de": null,
+          "nota": "Molino de discos eléctrico completo, vista de tres cuartos sobre fondo blanco: tolva cónica de acero inoxidable, cabezal azul con perilla frontal, motor acoplado directo y base metálica negra de cuatro patas."
+        },
+        {
+          "tipo": "producto_limpio",
+          "fuente": "generado_motor",
+          "origen": null,
+          "archivo": null,
+          "deriva_de": "molino_imagenes/Molino_01.png",
+          "nota": "Portada: recorte limpio del molino completo sobre fondo blanco, centrado y a 1080x1080. BLOQUEADO: la foto base mide 228x310 px, así que el recorte no alcanza el estándar de la tienda. Producirlo requiere primero una foto de alta resolución."
+        },
+        {
+          "tipo": "partes_senaladas",
+          "fuente": "generado_motor",
+          "origen": null,
+          "archivo": null,
+          "deriva_de": "molino_imagenes/Molino_01.png",
+          "nota": "Las seis partes del molino señaladas sobre la máquina completa: tolva, cámara de molienda, perilla frontal, salida de producto, motor y base. Los datos ya están en galeria_tomas.callouts; falta ubicar los puntos sobre la foto (paso visual posterior) y una foto de alta resolución."
+        }
+      ],
+      "_slots_omitidos_y_por_que": [
+        "medidas — se omite: no hay ni una sola dimensión verificada, así que el motor no tendría qué dibujar. No se estiman medidas para llenar el slot.",
+        "portada_variantes — se omite: no está confirmado que el producto tenga variantes de motor.",
+        "accesorios — se omite: no está verificado qué trae la caja.",
+        "persona_escala / escena_funcionamiento / otro_angulo_ia — se omiten: exigen escena_ia o imagen_a_imagen, y (a) la Fase 4.4 pide aprobación previa de Angie sobre los briefs y (b) una foto de 228x310 px no da detalle real del que anclar un re-render. Se dejan fuera del plan en vez de declararlos y no poder producirlos.",
+        "foto_real adicionales — se omiten: la búsqueda web no devolvió NINGUNA otra foto real atribuible a este producto exacto (sin código de proveedor y sin búsqueda por imagen no hay forma de verificarlas contra el criterio de la Fase 2)."
+      ]
+    }
+  },
+
+  "seo": {
+    "meta_titulo": "MOLINO PULVERIZADOR GRANO SECO Y COCIDO | Ekipon",
+    "meta_descripcion": "Molino eléctrico de discos para grano seco y cocido, con tolva en acero inoxidable y base metálica. Envío GRATIS a todo el país y pago contra entrega.",
+    "palabras_clave": [
+      "molino para grano seco y cocido",
+      "molino de discos eléctrico",
+      "molino de maíz para arepas",
+      "molino de granos con base",
+      "comprar molino eléctrico de granos"
+    ],
+    "texto_alt_base": "Molino pulverizador eléctrico de discos con tolva cónica de acero inoxidable, cabezal azul con perilla frontal, motor acoplado directamente y base metálica negra de cuatro patas",
+    "origen": "generado_ia — redactado a partir de los rasgos visibles verificados. ATENCIÓN: la regla 9 de reglas_negocio.md exige que el texto ALT incluya el CÓDIGO del producto, y este producto no tiene código de proveedor; el ALT queda sin código hasta que la tienda asigne uno o Angie defina cuál usar (anotado en campos_por_confirmar)."
+  },
+
+  "campos_por_confirmar": [
+    "IDENTIFICACIÓN — Confirmar el modelo exacto: fabricante/importador, código y página del producto. Sin eso, ninguna especificación numérica puede entrar a la ficha. Verificado 2026-07-22: no hay código de proveedor, la máquina no muestra marca ni placa en la foto, y no se dispone de búsqueda por imagen (Google Lens o equivalente), que es la herramienta que la Fase 1 señala como central para este caso.",
+    "FICHA TÉCNICA — Todos estos datos faltan y NINGUNO se estimó: potencia (HP/W), voltaje y frecuencia, rpm, capacidad de molienda en kg/h para grano seco y para grano cocido, diámetro y material de los discos, capacidad de la tolva, peso neto y dimensiones (alto x ancho x fondo). Deben salir de la página del producto exacto.",
+    "ACCESORIOS INCLUIDOS — Verificado 2026-07-22: no se pudo revisar ninguna ficha técnica del proveedor porque no se halló la página del producto exacto (y las páginas de productos comparables no se pudieron abrir: fallo de resolución de dominio). En esta familia de molinos es habitual que se entreguen DOS juegos de discos (uno de acero para grano seco y uno de piedra para grano húmedo/cocido), pero eso NO está verificado para este producto y por eso no se afirma. Preguntar al proveedor o revisar la caja.",
+    "FUNCIÓN DE LA PERILLA FRONTAL — Se ve en la foto y se nombra como 'perilla de regulación'. Que regule el grosor de molienda es lo típico en un molino de discos, pero no está confirmado para este equipo. Confirmar contra el manual.",
+    "GRANO COCIDO / DISCOS — El nombre dado dice 'grano seco y cocido'. Falta confirmar con el proveedor si la máquina llega lista para ambos usos o si el disco para grano cocido/húmedo se compra aparte.",
+    "CATEGORÍA — La rama propuesta ('Industria > Maquinaria para alimentos > Molinos') NO fue leída del árbol en vivo de WooCommerce: la conexión falló el 2026-07-22 (getaddrinfo failed contra pruebas.ekipon.co). Releer el árbol en vivo y elegir una rama que exista de verdad.",
+    "CRITERIO DE VERIFICACIÓN VISUAL — La Fase 2 exige definirlo junto con Angie. El par SÍ/NO de esta ficha es una PROPUESTA del Investigador; falta su confirmación.",
+    "FOTO DE ALTA RESOLUCIÓN — Bloqueante para toda la etapa de imágenes. La única foto real disponible mide 228x310 px y el estándar de la tienda es 1080x1080; ninguna pieza derivada (recorte de portada, callouts, medidas) puede producirse con calidad de tienda a partir de ella. Pedir al proveedor la foto original.",
+    "TEXTO ALT — La regla 9 pide que el ALT incluya el código del producto. No hay código. Definir qué código usar (¿el SKU que asigne WooCommerce?) antes de subir imágenes.",
+    "PRECIO — Sin referencias de mercado verificadas: ninguna página de producto colombiana se pudo abrir (fallo de resolución de dominio), y no se registra ningún precio salido solo del resumen de un buscador. Angie define el precio, pero conviene rehacer la búsqueda de referencias con conectividad normal."
+  ],
+
+  "fuentes_consultadas": [
+    {
+      "fuente": "molino_imagenes/Molino_01.png (foto de referencia entregada por Angie)",
+      "uso": "USADA — es la única fuente de todos los datos afirmados en esta ficha (características, ficha técnica constructiva, callouts, criterio visual, texto ALT).",
+      "fecha": "2026-07-22"
+    },
+    {
+      "fuente": "WooCommerce en vivo — https://pruebas.ekipon.co /wp-json/wc/v3/products/categories",
+      "uso": "DESCARTADA por falla técnica — la lectura en vivo del árbol de categorías, que la Fase 3 exige, terminó en 'FALLO de conexión: [Errno 11001] getaddrinfo failed'. Por eso la categoría queda propuesta y sin confirmar, y NO se copió el árbol de fichas anteriores (la Fase 3 lo prohíbe).",
+      "fecha": "2026-07-22"
+    },
+    {
+      "fuente": "WebSearch — 8 búsquedas en español e inglés: 'molino pulverizador grano seco y húmedo Colombia', 'molino grano seco y cocido', 'molino de discos húmedo y seco 150 maíz cocido', 'molino con base metálica 1.5HP tolva inoxidable', 'molino maíz cocido masa arepas 220V kg/h', 'molino húmedo y seco tipo 180/220 con soporte', 'wet and dry grain grinder 150 type', 'grain grinder with stand 150/180 type'.",
+      "uso": "PARCIAL — sirvieron para establecer la FAMILIA de la máquina y su vocabulario comercial. NO sirvieron para identificar el producto exacto: todos los resultados son otras presentaciones (versión de mesa, sin base) o modelos de otros países. Ningún dato numérico de estos resultados entró a la ficha.",
+      "fecha": "2026-07-22"
+    },
+    {
+      "fuente": "https://www.vevor.com/... 'Electric Grain Mill Grinder 1500W' (modelo MFS-140)",
+      "uso": "DESCARTADA como fuente de especificaciones — es la única página que se pudo abrir de verdad, pero es la versión de MESA (sin base metálica), a 110V y de otra marca. Usarla sería exactamente el error 9060C/9060 del piloto: producto parecido, ficha contaminada. Se deja registrada para que nadie la vuelva a mirar.",
+      "fecha": "2026-07-22"
+    },
+    {
+      "fuente": "lacobacha.com.ec (XH-150), rumperuimportaciones.com (dual 3HP), electrogarline.com (Dakota DK-2200MX / Henkel MJ-200GRA), maqjoyo.com (cabezal aluminio 3HP), jersimport.com (dual 3HP), mundiluz.com.co, faretty.co, colombiaecommerce.com, homecenter.com.co",
+      "uso": "DESCARTADAS — dos motivos distintos y ambos importan: (1) técnico: ninguna se pudo abrir; todas devolvieron 'getaddrinfo ENOTFOUND' salvo Homecenter, que devolvió HTTP 403; (2) de fondo: son distribuidores de otros países y de la versión de mesa, no del producto exacto. Aunque hubieran abierto, sus especificaciones NO habrían entrado a la ficha.",
+      "fecha": "2026-07-22"
+    },
+    {
+      "fuente": "Alibaba — resultados '150 Type Grain Grinder Dry Wet Dual Use'",
+      "uso": "DESCARTADA por regla — la Fase 1.3 y la lección 5 del piloto establecen que Alibaba no es fuente confiable automática (bloquea la extracción y sus listados desaparecen). No se abrió ninguno de sus listados.",
+      "fecha": "2026-07-22"
+    },
+    {
+      "fuente": "MercadoLibre Colombia — listados de 'molino eléctrico para granos' y 'molino pulverizador de granos'",
+      "uso": "DESCARTADA como fuente de especificaciones (Fase 1.3: sirve solo como referencia de mercado, y suele ser otra variante). Se intentó usar como referencia de precio: las páginas no se pudieron abrir, así que no se registró ningún precio.",
+      "fecha": "2026-07-22"
+    },
+    {
+      "fuente": "Búsqueda por imagen (Google Lens o equivalente)",
+      "uso": "NO EJECUTADA — herramienta no disponible para este agente. Es la herramienta que la Fase 1.2 señala como central cuando el nombre no rinde y no hay código, que es exactamente este caso. Su ausencia es la razón principal de que el resultado sea IDENTIFICACION_DUDOSA.",
+      "fecha": "2026-07-22"
+    }
+  ]
+}
