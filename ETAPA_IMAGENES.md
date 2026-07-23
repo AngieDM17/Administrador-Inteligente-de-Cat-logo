@@ -7,12 +7,12 @@ igual, sin definir reglas a mano.
 
 ---
 
-## Estado del flujo (23-jul-2026): la generación corre sobre foto real; falta el paso a la tienda
+## Estado del flujo (23-jul-2026): la etapa se CERRÓ end-to-end
 
-**Novedad del 23-jul:** por primera vez la mitad de **generación** corrió de punta a punta sobre
-material REAL y verificado (foto de proveedor de 1080), produciendo **partes** y **medidas**. El
-bloqueo de resolución que congelaba la etapa **está resuelto**. Lo que falta ahora es distinto:
-subir la galería a la tienda (nunca se hizo) y construir los generadores que aún no existen.
+**Novedad del 23-jul:** la cadena completa corrió de punta a punta sobre material REAL hasta dejar
+un **borrador con galería en la tienda de pruebas** (producto **id 50255**, 8 imágenes). Es la
+primera vez que pasa: la *definición de terminado* que estaba pendiente **se cumplió**. Quedan
+mejoras (generadores no construidos, automatizar el sourcing, dims reales), no el cierre.
 
 | # | Eslabón | Estado |
 |---|---------|--------|
@@ -22,7 +22,7 @@ subir la galería a la tienda (nunca se hizo) y construir los generadores que a�
 | 4 | Ubicar los puntos de los callouts | ✅ paso del procedimiento (agente + `validar_puntos.py`) |
 | 5 | El motor arma las piezas (`motor_galeria.py`) | ✅ 3 tipos creados: hero, medidas, partes |
 | 6 | Del plan al campo que lee el Publicador | ✅ `imagenes_confirmadas_del_plan` |
-| 7 | El Publicador sube al borrador | ✅ `--refrescar-galeria` (opt-in) — **nunca corrido de verdad** |
+| 7 | El Publicador sube al borrador | ✅ **corrido 23-jul: borrador 50255, 8 imágenes** |
 
 **Eslabón 2 — la reserva que queda.** La Fase 4 de `SKILL.md` enseña los contratos, y un agente
 que la ejecutó a ciegas produjo una ficha válida al primer intento. La reserva es que el
@@ -76,18 +76,26 @@ ubicados (**6/6 aceptados** por `validar_puntos.py`) → **partes** y **medidas*
 - **Partes** salió bien; pega menor de layout (las etiquetas se apilan a la izquierda y las líneas
   guía cruzan la imagen para llegar a las partes de la derecha).
 
-### Lo que falta para declararla cerrada
+### La etapa quedó cerrada end-to-end — lo que sigue son mejoras
 
-- **El paso a la tienda nunca se corrió.** Falta que el Publicador `--refrescar-galeria` deje la
-  galería en un borrador de `pruebas.ekipon.co`. **Eso es lo que cierra la etapa.**
-- **Generadores no construidos** (tipos *creados* que faltan): `persona_escala` (escala; además
-  necesita la altura real del producto), `escena_funcionamiento` (IA + red + aprobación de Angie),
-  `otro_angulo_ia` (modelo de imagen + red + aprobación), `portada_variantes` (y solo si el
-  producto tiene variantes de motor).
+**Cerrada el 23-jul:** producto real (molino) recorrido entero hasta el borrador **50255** con su
+galería de 8 en `pruebas.ekipon.co`. Bloqueos que saltaron y se resolvieron en vivo: el Publicador
+exige un código único (el molino no tiene código de proveedor → Angie definió el interno `Molino
+pulverizador-prueba Angie`; **no se inventó código de proveedor**), y la categoría propuesta no
+existía → el Publicador lee el árbol en vivo y la real es **Agrícola > Molinos** (id 114).
+
+**Convención de portada (23-jul):** la imagen destacada (primera de la galería) va como **recorte
+con fondo transparente** (PNG/WebP con alfa), no la foto con fondo de estudio; las demás pueden
+llevar contexto. Se elige el recorte de la foto de **mayor resolución con corte limpio** (en el
+50255, `molino_portada_amarillo.png`, 1288×1662). El cliente sube PNG con su mime correcto.
+
+Mejoras que quedan (no son el cierre):
+- **Generadores no construidos** (tipos *creados*): `persona_escala` (escala; necesita la altura
+  real), `escena_funcionamiento` (IA + red + aprobación), `otro_angulo_ia` (íd.), `portada_variantes`
+  (solo si hay variantes de motor).
 - **Dimensiones reales del molino** sin confirmar (para que `medidas` deje de ser provisional).
-
-**Definición de terminado que falta cumplir:** un producto real recorrido entero hasta un borrador
-**con galería en la tienda de pruebas**. La generación ya llega; el subir-a-tienda no se probó.
+- **Automatizar el handoff del sourcing** (el "buzón") y el gate de verificación visual.
+- Aparte de imágenes: **medir la tasa de error del Investigador** (Prioridad A).
 
 ---
 

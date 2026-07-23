@@ -30,7 +30,7 @@ Estamos exactamente en la bisagra entre "probé que se puede" y "lo hago aguanta
 | **Inspector / validación** | `esquema_ficha.py` + `validar_ficha.py` (contrato v1.4) | ✅ |
 | **Publicador** | `publicador.py` — crea BORRADOR vía API REST, idempotente (`--actualizar`) | ✅ 4212 = ID 50238 |
 | **Dinamización Elementor** | `snippets/shortcodes_ekipon.php` vía Code Snippets | ✅ la plantilla se llena sola desde la meta `ekipon_*` |
-| **Imágenes (galería)** | Motor propio Pillow — ver `ETAPA_IMAGENES.md` | 🟡 **generación probada sobre foto real 1080** (23-jul: partes+medidas); falta subir a la tienda y construir generadores (escala/escena/otro-ángulo) |
+| **Imágenes (galería)** | Motor propio Pillow — ver `ETAPA_IMAGENES.md` | ✅ **CERRADA end-to-end** (23-jul: borrador 50255 con galería de 8). Mejoras pendientes: generadores escala/escena/otro-ángulo |
 | **Banner** | `generador_banner.py` (motor propio, ya no Canva) | ✅ integrado al Publicador |
 | **Video** | — | ⬜ última fase, no empezada |
 | **Orquestador** | — | ⬜ no empezado |
@@ -48,13 +48,12 @@ modificados `motor_galeria.py`, `publicador.py`, `test_motor_galeria.py`, `test_
 
 ## ▶️ PRÓXIMO PASO (Prioridad A)
 
-1. **Cerrar la etapa de Imágenes.** Avance del 23-jul: el sourcing tiene camino (navegador sobre
-   el Chrome logueado de Angie) y la **generación ya corre sobre foto real 1080** (partes+medidas
-   sobre el molino). Falta: (a) **subir la galería a la tienda** con el Publicador `--refrescar-galeria`
-   (nunca corrido) — eso es lo que cierra la etapa; (b) construir los generadores que faltan
-   (escala/escena/otro-ángulo); (c) confirmar dimensiones reales para que `medidas` deje de ser
-   provisional. *Terminado cuando:* un producto real sale con su galería puesta en un borrador de
-   la tienda. Detalle y método de sourcing en `ETAPA_IMAGENES.md`.
+1. **Etapa de Imágenes: CERRADA end-to-end el 23-jul.** Un producto real (molino) recorrió toda la
+   cadena hasta el borrador **50255** con su galería de 8 en la tienda de pruebas. Quedan **mejoras,
+   no el cierre**: generadores no construidos (escala/escena/otro-ángulo), automatizar el handoff
+   del sourcing (el "buzón") + su gate de verificación visual, y confirmar dims reales del molino
+   (hoy `medidas` usa provisionales de Alibaba). Con imágenes cerrada, **el próximo paso de
+   Prioridad A pasa a ser el #2: medir la tasa de error del Investigador.** Detalle en `ETAPA_IMAGENES.md`.
 
 2. **Medir la tasa de error del Investigador — con un lote CHICO primero.**
    ⚠️ Ojo: el Investigador es una **skill, no código**, así que 100-200 productos no se pueden
