@@ -11,13 +11,28 @@
 
 **Precedencia ante conflicto:** manda el **REPO** (código y reglas vigentes) por encima de la memoria. La memoria puede quedar vieja; el código no. Verificá contra el código antes de afirmar.
 
-**Estado a 22-jul-2026:** 193 tests OK. Cerrado end-to-end **solo el camino texto** (Investigador → Inspector → Publicador → plantillas Elementor), verificado en vivo sobre el 4212 / ID 50238.
+**Estado a 23-jul-2026:** 226 tests OK. Cerrado end-to-end **solo el camino texto** (Investigador → Inspector → Publicador → plantillas Elementor), verificado en vivo sobre el 4212 / ID 50238.
 
-⚠️ **La etapa de IMÁGENES no cierra.** De sus seis eslabones funcionan dos. Rotos: (a) `SKILL.md` no menciona `plan_galeria` ni `galeria_tomas`, así que ninguna ficha nueva los trae; (b) no existe el paso que ubica los puntos de los callouts —hoy es manual—; (c) nadie sube la galería generada a la tienda; (d) el Publicador sube galería **solo al crear**, no hay camino de "refrescar galería". Detalle en `ETAPA_IMAGENES.md`.
+⚠️ **La etapa de IMÁGENES no cierra todavía, pero avanzó (23-jul).** La **generación ya corre sobre foto real 1080**: se sourcearon 6 fotos reales del molino (verificadas) y se generaron **partes** y **medidas**. El bloqueo de resolución se resolvió. Falta para cerrarla: (a) **subir la galería a un borrador de la tienda** con el Publicador `--refrescar-galeria` (nunca corrido — eso la cierra); (b) construir los generadores que faltan (`persona_escala`/escena/otro-ángulo); (c) confirmar dimensiones reales (hoy `medidas` usa las provisionales de Alibaba). **Regla dura nueva:** todo sourcing automático debe pasar por un gate de verificación visual (bajar fotos por URL a ciegas trajo OTROS productos). Detalle en `ETAPA_IMAGENES.md`.
 
-Escala y producción **NO empezadas**. Prioridad A: (1) cerrar la etapa de imágenes —empezando por enseñarle los contratos al Investigador—; (2) medir la tasa de error del Investigador con un lote CHICO (20-30 productos) antes de invertir en uno grande: hoy el Investigador es una skill, no código, así que 100-200 productos no se pueden correr sin niñera; (3) rotar credenciales + `.env` fuera del repo + allowlist `TIENDAS_PERMITIDAS` antes de apuntar a la tienda real (verificado el 22-jul: `claves_pruebas.txt` y `.env` nunca entraron al historial de git).
+Escala y producción **NO empezadas**. Prioridad A: (1) cerrar la etapa de imágenes —la generación ya corre sobre foto real 1080; falta subir la galería a la tienda y construir los generadores que faltan—; (2) medir la tasa de error del Investigador con un lote CHICO (20-30 productos) antes de invertir en uno grande: hoy el Investigador es una skill, no código, así que 100-200 productos no se pueden correr sin niñera; (3) rotar credenciales + `.env` fuera del repo + allowlist `TIENDAS_PERMITIDAS` antes de apuntar a la tienda real (verificado el 22-jul: `claves_pruebas.txt` y `.env` nunca entraron al historial de git).
 
 **Rol de Angie:** dueña de negocio y diseñadora gráfica, **no programadora**. No se le piden capturas ni datos que se puedan investigar solos, y **no define reglas por producto ni por categoría** — eso es trabajo del sistema. Su intervención se limita a: identidad inicial del producto, confirmación final y precio.
+
+## Comunicación con Angie (regla fija)
+
+Angie es **diseñadora gráfica, no desarrolladora**. Toda respuesta se ajusta a esto:
+
+1. **Registro: español criollo colombiano, cálido y asertivo.** Esto **anula** el voseo
+   rioplatense por defecto de la persona: es una preferencia explícita de la usuaria (23-jul-2026),
+   no una opción. Nada de "che", "dale", "tenés/podés"; sí un colombiano natural y directo.
+2. **Menos es más.** Ir al grano; sin relleno ni párrafos de más. Si algo se puede decir en
+   dos líneas, se dice en dos líneas.
+3. **Cada tecnicismo se explica con una analogía de la vida cotidiana**, la primera vez que
+   aparece y en una sola línea. Si un término técnico es inevitable, se define; no se asume.
+
+Esto convive con las reglas de rigor y de rol asesor de abajo: se puede objetar y ser franco
+sin dejar de ser claro para alguien que no programa.
 
 ## Rigor exigido — definición de terminado
 

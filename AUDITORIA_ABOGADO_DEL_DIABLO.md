@@ -67,6 +67,12 @@ de pasar a la siguiente. No se avanza a producción con etapas a medias.
    *Terminado cuando:* la tasa de acierto está medida, se define el umbral bajo el cual una imagen
    cae a revisión manual, y existe un camino de "refrescar galería" para productos ya creados.
 
+   *Actualización 23-jul:* el recorte corrió limpio sobre foto real 1080 y se generaron partes+medidas.
+   Además se destapó el paso previo (**sourcing**): el Chrome logueado de Angie pasa el CAPTCHA de
+   Alibaba, pero **bajar fotos por URL a ciegas trae OTROS productos** — el techo de escala aquí no es
+   solo `rembg`, es que el sourcing automático exige un **gate de verificación visual**. Detalle en
+   `ETAPA_IMAGENES.md`.
+
 4. **Blindar la capa de presentación (grieta #4).**
    Fijar versiones de Elementor/Woodmart, montar un entorno de staging y un plan de rollback antes
    de que la plantilla dinámica única sea punto único de falla.

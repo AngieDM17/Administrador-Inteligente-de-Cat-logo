@@ -1,6 +1,6 @@
 # ESTADO DEL PROYECTO — Administrador Inteligente de Catálogo Ekipon
 
-**Última actualización:** 22-jul-2026.
+**Última actualización:** 23-jul-2026.
 **Para retomar en un chat nuevo:** pídele a Claude que lea PRIMERO este archivo, luego
 `AUDITORIA_ABOGADO_DEL_DIABLO.md` y `ETAPA_IMAGENES.md`.
 **Regla de oro:** ante cualquier discrepancia entre este documento y el código, **gana el código**.
@@ -30,26 +30,31 @@ Estamos exactamente en la bisagra entre "probé que se puede" y "lo hago aguanta
 | **Inspector / validación** | `esquema_ficha.py` + `validar_ficha.py` (contrato v1.4) | ✅ |
 | **Publicador** | `publicador.py` — crea BORRADOR vía API REST, idempotente (`--actualizar`) | ✅ 4212 = ID 50238 |
 | **Dinamización Elementor** | `snippets/shortcodes_ekipon.php` vía Code Snippets | ✅ la plantilla se llena sola desde la meta `ekipon_*` |
-| **Imágenes (galería)** | Motor propio Pillow — ver `ETAPA_IMAGENES.md` | ⚠️ **la etapa NO cierra**: las piezas funcionan, la cadena no (2 de 6 eslabones) |
+| **Imágenes (galería)** | Motor propio Pillow — ver `ETAPA_IMAGENES.md` | 🟡 **generación probada sobre foto real 1080** (23-jul: partes+medidas); falta subir a la tienda y construir generadores (escala/escena/otro-ángulo) |
 | **Banner** | `generador_banner.py` (motor propio, ya no Canva) | ✅ integrado al Publicador |
 | **Video** | — | ⬜ última fase, no empezada |
 | **Orquestador** | — | ⬜ no empezado |
 
-**Tests:** 136, todos en verde (`python -m unittest discover -p "test_*.py"`).
+**Tests:** 226, todos en verde (`python -m unittest discover -p "test_*.py"`, corrido el 23-jul).
 
 **Estado en git:** el repo es `AngieDM17/Administrador-Inteligente-de-Cat-logo`, rama `main`.
-⚠️ **Al 22-jul la etapa Imágenes completa está SIN COMMITEAR** (los 4 generadores, sus 5 archivos
-de tests, `ETAPA_IMAGENES.md`, `AUDITORIA_ABOGADO_DEL_DIABLO.md` y `molino_imagenes/`). Último
-commit: `78e3d4c`. Trabajo real fuera de git = trabajo que se puede perder.
+Último commit (HEAD) al 23-jul: `e13d251`. ⚠️ **Sigue sin commitear trabajo real de imágenes:**
+modificados `motor_galeria.py`, `publicador.py`, `test_motor_galeria.py`, `test_publicador.py`,
+`ETAPA_IMAGENES.md`, los archivos del Investigador y `.claude/CLAUDE.md`; sin trackear `Imagenes/`
+(fotos reales del molino + galería generada) y `molino_imagenes/ficha_investigada_MOLINO.json` /
+`ficha_molino_corrida.json`. Trabajo real fuera de git = trabajo que se puede perder.
 
 ---
 
 ## ▶️ PRÓXIMO PASO (Prioridad A)
 
-1. **Cerrar la etapa de Imágenes.** Las piezas funcionan pero la cadena no: 2 de 6 eslabones.
-   Empezar por enseñarle los contratos al Investigador (`SKILL.md`), que desbloquea el resto.
-   *Terminado cuando:* un producto nuevo entra por el Investigador y sale con su galería
-   puesta en la tienda, sin pasos manuales intermedios. Detalle en `ETAPA_IMAGENES.md`.
+1. **Cerrar la etapa de Imágenes.** Avance del 23-jul: el sourcing tiene camino (navegador sobre
+   el Chrome logueado de Angie) y la **generación ya corre sobre foto real 1080** (partes+medidas
+   sobre el molino). Falta: (a) **subir la galería a la tienda** con el Publicador `--refrescar-galeria`
+   (nunca corrido) — eso es lo que cierra la etapa; (b) construir los generadores que faltan
+   (escala/escena/otro-ángulo); (c) confirmar dimensiones reales para que `medidas` deje de ser
+   provisional. *Terminado cuando:* un producto real sale con su galería puesta en un borrador de
+   la tienda. Detalle y método de sourcing en `ETAPA_IMAGENES.md`.
 
 2. **Medir la tasa de error del Investigador — con un lote CHICO primero.**
    ⚠️ Ojo: el Investigador es una **skill, no código**, así que 100-200 productos no se pueden
@@ -158,6 +163,18 @@ Cada lección vino de un error real. No se repiten por gusto: son el criterio de
     ~500px ampliadas. El recorte solo sirve con originales de alta resolución.
 12. **Se estandarizan los TIPOS de toma, no el contenido.** Labels y medidas salen SIEMPRE de la
     ficha de cada producto, nunca hardcodeados.
+
+**Sourcing y verificación (23-jul-2026):**
+- **Slots ENCONTRADOS vs CREADOS.** Los encontrados (foto real, accesorios) los limita cuántas
+  fotos reales existan; los creados (hero, medidas, partes, escala, escena, otro-ángulo) se
+  fabrican desde UNA foto real + la ficha y NO dependen del número de fotos. La "cuota muerta"
+  prohíbe una sola cosa: rellenar con recortes repetidos, no fabricar tomas creadas.
+- **Todo sourcing automático DEBE pasar por un gate de verificación visual.** Verificado en vivo:
+  bajar fotos de proveedor por URL a ciegas trajo OTROS productos (una lancha, motores) en vez del
+  molino; solo se atrapó mirándolas. El `criterio_verificacion_visual` no es teoría: es lo que
+  evita publicar una lancha en la ficha de un molino.
+- **El Chrome logueado de Angie pasa el CAPTCHA de Alibaba** (el navegador limpio no). Conducir ese
+  navegador es un camino más liviano que un scraper headless (matiza la lección 6).
 
 ### Proceso y herramientas
 
