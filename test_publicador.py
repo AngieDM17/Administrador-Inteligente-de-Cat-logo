@@ -6,15 +6,19 @@ Todas las pruebas son SIN RED: usan un cliente falso inyectado y una libreta
 SQLite temporal. Usa la ficha real 4212 como caso dorado del payload.
 """
 
+import copy
+import io
 import json
 import tempfile
 import unittest
-from contextlib import closing
+from contextlib import closing, redirect_stdout
 from pathlib import Path
 
 import registro
 from cliente_tienda import ClienteTienda, ErrorTienda, forzar_borrador
+from esquema_ficha import FichaEkipon
 from publicador import (
+    anunciar_reemplazo_de_galeria,
     construir_payload,
     construir_payload_actualizacion,
     ejecutar,
@@ -231,6 +235,22 @@ class PruebasPayloadActualizacion(unittest.TestCase):
         self.assertEqual(self.payload["regular_price"], "16434999")
         self.assertEqual(self.payload["categories"], [{"id": 428}])
         self.assertEqual(self.payload["description"], "")
+
+    def test_con_imagenes_explicitas_si_lleva_images(self):
+        # Unica forma de que una actualizacion toque la galeria: pedirlo.
+        imagenes = [{"id": 11, "alt": "toma 1"}, {"id": 12, "alt": "toma 2"}]
+        payload = construir_payload_actualizacion(
+            FICHA_4212, "4212", 428, imagenes=imagenes
+        )
+        self.assertEqual(payload["images"], imagenes)
+
+    def test_lista_vacia_de_imagenes_no_es_lo_mismo_que_omitirlas(self):
+        # imagenes=[] es una orden explicita de dejar el producto sin galeria;
+        # imagenes=None (el defecto) es 'no toques nada'.
+        payload = construir_payload_actualizacion(
+            FICHA_4212, "4212", 428, imagenes=[]
+        )
+        self.assertEqual(payload["images"], [])
 
 
 class PruebasActualizarBorrador(unittest.TestCase):
@@ -487,6 +507,71 @@ class PruebasActualizacion(unittest.TestCase):
         self.assertEqual(codigo_salida, 1)
         self.assertEqual(cliente.actualizaciones, [])
 
+    def test_sin_refrescar_galeria_la_actualizacion_no_manda_images(self):
+        # Pin del comportamiento por defecto: una actualizacion no puede
+        # borrar una galeria viva.
+        cliente = self._cliente_con_existente()
+        codigo_salida = publicar(
+            FICHA_4212, "4212", self.slug, RAIZ, cliente, self.ruta_db,
+            actualizar=True, refrescar_galeria=False,
+        )
+        self.assertEqual(codigo_salida, 0)
+        _, payload = cliente.actualizaciones[0]
+        self.assertNotIn("images", payload)
+        self.assertEqual(len(cliente.subidas), 1)  # solo el banner
+
+    def test_con_refrescar_galeria_si_manda_images(self):
+        cliente = self._cliente_con_existente()
+        codigo_salida = publicar(
+            FICHA_4212, "4212", self.slug, RAIZ, cliente, self.ruta_db,
+            actualizar=True, refrescar_galeria=True,
+        )
+        self.assertEqual(codigo_salida, 0)
+        self.assertEqual(len(cliente.subidas), 9)  # 8 galeria + 1 banner
+        _, payload = cliente.actualizaciones[0]
+        self.assertEqual(len(payload["images"]), 8)
+        self.assertEqual(payload["status"], "draft")  # sigue siendo borrador
+        # Las imagenes viajan con su texto alt, igual que al crear.
+        self.assertTrue(all(img["alt"] for img in payload["images"]))
+
+    def test_refrescar_galeria_con_categoria_inexistente_no_sube_nada(self):
+        # La galeria no se toca si la actualizacion ni siquiera va a ocurrir.
+        cliente = ClienteFalso(
+            respuestas_obtener={
+                f"/wp-json/wc/v3/products?slug={self.slug}&status=any": [
+                    {"id": 555, "slug": self.slug, "status": "draft"}
+                ]
+            },
+            categorias=[{"id": 1, "name": "Taladros"}],
+        )
+        codigo_salida = publicar(
+            FICHA_4212, "4212", self.slug, RAIZ, cliente, self.ruta_db,
+            actualizar=True, refrescar_galeria=True,
+        )
+        self.assertEqual(codigo_salida, 1)
+        self.assertEqual(cliente.actualizaciones, [])
+        self.assertEqual(cliente.subidas, [])
+
+    def test_refrescar_galeria_sin_imagenes_no_borra_la_galeria_viva(self):
+        # "No hay nada que subir" y "borra todo" no pueden ser la misma orden.
+        # Esta ficha es VALIDA y su galeria confirmada esta vacia — que es lo
+        # que devuelve motor_galeria.imagenes_confirmadas_del_plan cuando
+        # ningun slot tiene archivo o todos vienen sin firmar. Sin el corte,
+        # subir_galeria([]) devolvia [] (que no es None) y el PUT viajaba con
+        # 'images': [], o sea con la orden de vaciar la galeria del producto.
+        ficha = copy.deepcopy(FICHA_4212)
+        ficha["multimedia"]["imagenes_galeria_confirmadas"] = []
+        FichaEkipon.model_validate(ficha)  # sigue cumpliendo el contrato
+
+        cliente = self._cliente_con_existente()
+        codigo_salida = publicar(
+            ficha, "4212", self.slug, RAIZ, cliente, self.ruta_db,
+            actualizar=True, refrescar_galeria=True,
+        )
+        self.assertNotEqual(codigo_salida, 0)
+        self.assertEqual(cliente.actualizaciones, [])  # ningun PUT
+        self.assertEqual(cliente.subidas, [])          # ni siquiera el banner
+
     def test_producto_inexistente_con_bandera_crea_normalmente(self):
         cliente = ClienteFalso(categorias=[{"id": 428, "name": "Compresores"}])
         codigo_salida = publicar(
@@ -497,6 +582,26 @@ class PruebasActualizacion(unittest.TestCase):
         self.assertEqual(cliente.actualizaciones, [])
         self.assertEqual(len(cliente.creaciones), 1)
         self.assertEqual(len(cliente.subidas), 9)  # 8 galeria + 1 banner
+
+
+class PruebasAvisoDeReemplazo(unittest.TestCase):
+    """Refrescar la galeria pisa imagenes vivas: no puede pasar en silencio."""
+
+    def test_el_aviso_nombra_el_reemplazo_y_cada_imagen(self):
+        preparadas = [
+            {"ruta": Path("galeria/01-producto_limpio.webp"), "alt": "toma 1",
+             "titulo": "01", "slug_medio": "4212-01"},
+            {"ruta": Path("galeria/02-medidas.webp"), "alt": "toma 2",
+             "titulo": "02", "slug_medio": "4212-02"},
+        ]
+        salida = io.StringIO()
+        with redirect_stdout(salida):
+            anunciar_reemplazo_de_galeria(preparadas)
+        texto = salida.getvalue()
+        self.assertIn("REEMPLAZADA", texto)
+        self.assertIn("01-producto_limpio.webp", texto)
+        self.assertIn("02-medidas.webp", texto)
+        self.assertIn("toma 2", texto)
 
 
 class PruebasSimulacro(unittest.TestCase):
@@ -520,6 +625,17 @@ class PruebasSimulacro(unittest.TestCase):
         codigo_salida = ejecutar(
             RUTA_FICHA_4212, simular=True,
             fabrica_cliente=fabrica_prohibida, actualizar=True,
+        )
+        self.assertEqual(codigo_salida, 0)
+
+    def test_simular_refrescar_galeria_sigue_sin_red(self):
+        # La bandera se puede ensayar entera sin tocar la tienda.
+        def fabrica_prohibida():
+            raise AssertionError("el simulacro NO debe construir el cliente")
+
+        codigo_salida = ejecutar(
+            RUTA_FICHA_4212, simular=True, fabrica_cliente=fabrica_prohibida,
+            actualizar=True, refrescar_galeria=True,
         )
         self.assertEqual(codigo_salida, 0)
 

@@ -1,6 +1,7 @@
 """Publicador Ekipon — crea un producto en la tienda de PRUEBAS como borrador.
 
 Uso:  python publicador.py <ruta_ficha.json> [--simular] [--actualizar]
+                                             [--refrescar-galeria]
 
 Pipeline:
 1. Valida la ficha contra el contrato v1.4 (mismo inspector que validar_ficha).
@@ -18,8 +19,15 @@ texto (nombre, precio, categoria, etiquetas, descripciones y metadatos).
 Las imagenes NO se tocan en una actualizacion: solo se suben al crear.
 Un producto publicado nunca se modifica (lo verifica el cliente).
 
+Con --refrescar-galeria (junto a --actualizar) SI se vuelve a subir la
+galeria y se manda en la actualizacion, REEMPLAZANDO la que hay en la tienda.
+Es opt-in y ruidoso a proposito: sin la bandera, una actualizacion jamas puede
+borrar una galeria viva. Y si la ficha no trae NINGUNA imagen preparada, la
+corrida se detiene: "no hay nada que subir" no puede significar "borra todo".
+
 Codigos de salida: 0 = creado o ya existia (o simulacro OK); 1 = error de
-ficha, categoria o tienda; 2 = problema con el archivo (via cargar_json).
+ficha, categoria o tienda, o refresco de galeria sin imagenes; 2 = problema
+con el archivo (via cargar_json).
 """
 
 import argparse
@@ -202,22 +210,35 @@ def construir_payload(datos: dict, codigo: str, slug: str, categoria_id,
 
 
 def construir_payload_actualizacion(datos: dict, codigo: str,
-                                    categoria_id, banner: dict | None = None) -> dict:
+                                    categoria_id, banner: dict | None = None,
+                                    imagenes: list | None = None) -> dict:
     """Arma el payload de ACTUALIZACION: solo los campos textuales.
 
-    Regla fija: las imagenes solo se suben al crear; una actualizacion nunca
-    las toca (el payload NI SIQUIERA lleva la clave 'images', para que la
-    tienda no borre la galeria existente). Tampoco lleva slug ni type: eso
-    quedo fijado al crear el producto. El banner (si se pasa) si viaja: es
-    texto/meta, no toca la galeria.
+    Regla fija por defecto: las imagenes solo se suben al crear; una
+    actualizacion nunca las toca (el payload NI SIQUIERA lleva la clave
+    'images', para que la tienda no borre la galeria existente). Tampoco lleva
+    slug ni type: eso quedo fijado al crear el producto. El banner (si se pasa)
+    si viaja: es texto/meta, no toca la galeria.
+
+    'imagenes' es la unica excepcion, y hay que pedirla a mano
+    (--refrescar-galeria): si llega una lista, el payload lleva 'images' y la
+    galeria de la tienda queda REEMPLAZADA por ella. None (el defecto) es
+    exactamente el comportamiento de siempre.
+
+    OJO: una lista VACIA no es None. Mandaria 'images': [] y la tienda borraria
+    la galeria. Quien llame con --refrescar-galeria corta antes con
+    `sin_galeria_para_refrescar`; aqui no se adivina la intencion.
     """
     completo = construir_payload(datos, codigo, slug="", categoria_id=categoria_id,
-                                 imagenes=[], banner=banner)
+                                 imagenes=imagenes or [], banner=banner)
     campos_textuales = (
         "name", "regular_price", "categories", "tags",
         "short_description", "description", "meta_data",
     )
-    return {campo: completo[campo] for campo in campos_textuales}
+    payload = {campo: completo[campo] for campo in campos_textuales}
+    if imagenes is not None:
+        payload["images"] = completo["images"]
+    return payload
 
 
 def imagenes_de_la_ficha(datos: dict) -> list[dict]:
@@ -291,6 +312,61 @@ def preparar_imagenes(datos: dict, carpeta_ficha: Path) -> list[dict]:
     return preparadas
 
 
+def subir_galeria(preparadas: list[dict], cliente) -> list[dict]:
+    """Sube las imagenes ya preparadas y devuelve [{"id", "alt"}] en su orden.
+
+    La subida es idempotente por slug_medio: reintentar tras un fallo reutiliza
+    la imagen ya subida en vez de duplicarla en la mediateca.
+    """
+    subidas = []
+    for numero, imagen in enumerate(preparadas, start=1):
+        print(f"Subiendo imagen {numero}/{len(preparadas)}: {imagen['ruta'].name}...")
+        medio = cliente.subir_imagen(
+            imagen["ruta"], imagen["alt"], imagen["titulo"], imagen["slug_medio"]
+        )
+        subidas.append({"id": medio["id"], "alt": imagen["alt"]})
+    return subidas
+
+
+def anunciar_reemplazo_de_galeria(preparadas: list[dict]) -> None:
+    """Aviso a viva voz antes de pisar una galeria que ya esta en la tienda.
+
+    Se imprime siempre que se pide --refrescar-galeria, tambien en simulacro:
+    reemplazar la galeria de un producto vivo no puede pasar en silencio.
+    """
+    print("\n" + "!" * 62)
+    print("REFRESCAR GALERIA — la galeria que hay en la tienda sera REEMPLAZADA")
+    print(f"por estas {len(preparadas)} imagenes, en este orden:")
+    for numero, imagen in enumerate(preparadas, start=1):
+        print(f"  {numero:>2}. {imagen['ruta'].name}  (alt: {imagen['alt']})")
+    print("Las imagenes que hoy tenga el producto y no esten en esta lista")
+    print("dejan de estar asociadas a el.")
+    print("!" * 62)
+
+
+def sin_galeria_para_refrescar(preparadas: list[dict]) -> bool:
+    """True (con el motivo ya impreso) si se pidio refrescar la galeria y no
+    hay ni una sola imagen preparada.
+
+    "No hay nada que subir" y "borra todo" no pueden ser la misma orden. Un PUT
+    con `images: []` deja al producto SIN galeria en la tienda, y esa lista
+    vacia se produce sola: una ficha valida puede tener todos sus slots sin
+    archivo, o con origen sin firmar, y `imagenes_confirmadas_del_plan` devuelve
+    []. Por eso el corte va aqui: antes de subir nada y antes de armar payload.
+    """
+    if preparadas:
+        return False
+    print("\n" + "!" * 62)
+    print("REFRESCAR GALERIA CANCELADO — no hay ninguna imagen preparada")
+    print("La ficha no trae imagenes en multimedia.imagenes_galeria_confirmadas,")
+    print("asi que NO HAY NADA QUE SUBIR. Por eso la galeria que el producto ya")
+    print("tiene en la tienda NO se toca: mandar una galeria vacia la borraria.")
+    print("Que hacer: producir la galeria (motor_galeria.py) y reintentar, o")
+    print("actualizar solo el texto quitando --refrescar-galeria.")
+    print("!" * 62)
+    return True
+
+
 def buscar_existente(cliente, codigo: str, slug: str, ruta_db) -> dict | None:
     """Idempotencia: devuelve el producto si ya existe, o None.
 
@@ -319,7 +395,8 @@ def buscar_existente(cliente, codigo: str, slug: str, ruta_db) -> dict | None:
 
 
 def simular_publicacion(datos: dict, codigo: str, slug: str,
-                        carpeta_ficha: Path) -> int:
+                        carpeta_ficha: Path,
+                        refrescar_galeria: bool = False) -> int:
     """Muestra todo lo que SE HARIA, sin tocar la red en absoluto."""
     print("\n" + "=" * 62)
     print("SIMULACRO — no se envio nada (cero conexiones de red)")
@@ -362,6 +439,23 @@ def simular_publicacion(datos: dict, codigo: str, slug: str,
     # Detalle tecnico completo, por si se quiere revisar a fondo.
     print("\nDetalle tecnico (payload que se enviaria a WooCommerce):")
     print(json.dumps(payload, indent=2, ensure_ascii=False))
+
+    if refrescar_galeria:
+        # Ensayo del camino que pisa una galeria viva: se muestra el aviso y el
+        # payload de actualizacion completo, para poder mirarlo antes de correrlo
+        # de verdad. Sin imagenes el ensayo tambien se detiene: el simulacro
+        # tiene que mostrar el mismo corte que haria la corrida real.
+        if sin_galeria_para_refrescar(imagenes):
+            return 1
+        anunciar_reemplazo_de_galeria(imagenes)
+        payload_actualizacion = construir_payload_actualizacion(
+            datos, codigo,
+            categoria_id=f"(pendiente: id en vivo de '{categoria}')",
+            banner=banner, imagenes=marcadores,
+        )
+        print("\nDetalle tecnico (payload de ACTUALIZACION con galeria refrescada):")
+        print(json.dumps(payload_actualizacion, indent=2, ensure_ascii=False))
+
     print("\nSIMULACRO terminado. Nada se creo ni se subio.")
     return 0
 
@@ -417,21 +511,38 @@ def generar_y_subir_banner(datos: dict, codigo: str, slug: str,
 
 
 def actualizar_existente(datos: dict, codigo: str, slug: str, existente: dict,
-                         cliente, carpeta_ficha: Path, ruta_db=None) -> int:
+                         cliente, carpeta_ficha: Path, ruta_db=None,
+                         refrescar_galeria: bool = False) -> int:
     """Actualiza el TEXTO de un borrador existente (--actualizar).
 
     Las imagenes de la galeria no se tocan: solo se suben al crear. El banner
     si se regenera (es texto/meta, no toca la galeria). El cliente verifica
     ademas que el producto siga en borrador antes de enviar nada.
+
+    Con refrescar_galeria=True (--refrescar-galeria) se vuelve a subir la
+    galeria y viaja en el payload, REEMPLAZANDO la de la tienda. Es la unica
+    forma de que una actualizacion toque imagenes, y hay que pedirla a mano.
     """
     print(f"Actualizando el borrador existente (id {existente['id']})...")
-    print("Solo texto: las imagenes de la galeria no se tocan.")
+    subidas = None
+    if refrescar_galeria:
+        preparadas = preparar_imagenes(datos, carpeta_ficha)
+        # Corte antes de subir nada y antes de armar el payload: por este
+        # camino jamas puede salir un 'images': [] que borre la galeria viva.
+        if sin_galeria_para_refrescar(preparadas):
+            return 1
+        anunciar_reemplazo_de_galeria(preparadas)
+    else:
+        print("Solo texto: las imagenes de la galeria no se tocan.")
     categoria = resolver_categoria_en_vivo(cliente, datos)
     if categoria is None:
         return 1
 
+    if refrescar_galeria:
+        subidas = subir_galeria(preparadas, cliente)
     banner = generar_y_subir_banner(datos, codigo, slug, carpeta_ficha, cliente)
-    payload = construir_payload_actualizacion(datos, codigo, categoria["id"], banner)
+    payload = construir_payload_actualizacion(
+        datos, codigo, categoria["id"], banner, imagenes=subidas)
     producto = cliente.actualizar_borrador(existente["id"], payload)
 
     registro.registrar_publicacion(
@@ -444,19 +555,25 @@ def actualizar_existente(datos: dict, codigo: str, slug: str, existente: dict,
     print("=" * 62)
     print(f"Producto id: {existente['id']}")
     print(f"Nombre: {producto.get('name', payload['name'])}")
+    if subidas is None:
+        print("Galeria: intacta (no se envio 'images')")
+    else:
+        print(f"Galeria: REEMPLAZADA por {len(subidas)} imagenes")
     print(f"Revisar en: {cliente.base}/wp-admin/post.php?post={existente['id']}&action=edit")
     return 0
 
 
 def publicar(datos: dict, codigo: str, slug: str, carpeta_ficha: Path,
-             cliente, ruta_db=None, actualizar: bool = False) -> int:
+             cliente, ruta_db=None, actualizar: bool = False,
+             refrescar_galeria: bool = False) -> int:
     """Ejecuta la publicacion real (siempre como borrador)."""
     print("Verificando que el producto no exista ya...")
     existente = buscar_existente(cliente, codigo, slug, ruta_db)
     if existente:
         if actualizar:
             return actualizar_existente(
-                datos, codigo, slug, existente, cliente, carpeta_ficha, ruta_db
+                datos, codigo, slug, existente, cliente, carpeta_ficha, ruta_db,
+                refrescar_galeria=refrescar_galeria,
             )
         print(f"El producto ya existe (id {existente['id']}), no se duplica.")
         registro.registrar_publicacion(
@@ -469,14 +586,7 @@ def publicar(datos: dict, codigo: str, slug: str, carpeta_ficha: Path,
     if categoria is None:
         return 1
 
-    imagenes = preparar_imagenes(datos, carpeta_ficha)
-    subidas = []
-    for numero, imagen in enumerate(imagenes, start=1):
-        print(f"Subiendo imagen {numero}/{len(imagenes)}: {imagen['ruta'].name}...")
-        medio = cliente.subir_imagen(
-            imagen["ruta"], imagen["alt"], imagen["titulo"], imagen["slug_medio"]
-        )
-        subidas.append({"id": medio["id"], "alt": imagen["alt"]})
+    subidas = subir_galeria(preparar_imagenes(datos, carpeta_ficha), cliente)
 
     banner = generar_y_subir_banner(datos, codigo, slug, carpeta_ficha, cliente)
     payload = construir_payload(datos, codigo, slug, categoria["id"], subidas, banner)
@@ -500,7 +610,7 @@ def publicar(datos: dict, codigo: str, slug: str, carpeta_ficha: Path,
 
 def ejecutar(ruta_ficha: Path, simular: bool,
              fabrica_cliente=ClienteTienda.desde_env, ruta_db=None,
-             actualizar: bool = False) -> int:
+             actualizar: bool = False, refrescar_galeria: bool = False) -> int:
     """Punto de entrada del pipeline; separa el simulacro de la ejecucion real."""
     # La consola de Windows no siempre esta en UTF-8; sin esto, imprimir la
     # ficha tecnica (simbolos como ≤) rompe con UnicodeEncodeError.
@@ -526,13 +636,14 @@ def ejecutar(ruta_ficha: Path, simular: bool,
 
     if simular:
         # Cero red por diseño: ni siquiera se construye el cliente.
-        return simular_publicacion(datos, codigo, slug, ruta_ficha.parent)
+        return simular_publicacion(datos, codigo, slug, ruta_ficha.parent,
+                                   refrescar_galeria=refrescar_galeria)
 
     cliente = fabrica_cliente()
     print(f"Tienda: {cliente.base}  [candado OK: es la tienda de pruebas]")
     return publicar(
         datos, codigo, slug, ruta_ficha.parent, cliente, ruta_db,
-        actualizar=actualizar,
+        actualizar=actualizar, refrescar_galeria=refrescar_galeria,
     )
 
 
@@ -558,12 +669,28 @@ def main() -> None:
         "Las imagenes NO se tocan: solo se suben al crear. Un producto "
         "publicado nunca se modifica.",
     )
+    parser.add_argument(
+        "--refrescar-galeria",
+        action="store_true",
+        help="junto con --actualizar, vuelve a subir la galeria de la ficha y "
+        "la manda en la actualizacion, REEMPLAZANDO la que hay en la tienda. "
+        "Sin esta bandera una actualizacion nunca toca las imagenes. "
+        "Se puede ensayar con --simular.",
+    )
     argumentos = parser.parse_args()
+
+    if argumentos.refrescar_galeria and not argumentos.actualizar:
+        # No se corta la corrida: sin producto existente el camino normal ya
+        # sube la galeria. Pero la bandera no hace nada aqui, y una bandera que
+        # no hace nada en silencio es una trampa.
+        print("Aviso: --refrescar-galeria solo tiene efecto junto con "
+              "--actualizar (al crear, la galeria se sube igual).")
 
     try:
         codigo_salida = ejecutar(
             Path(argumentos.ruta_ficha).resolve(), argumentos.simular,
             actualizar=argumentos.actualizar,
+            refrescar_galeria=argumentos.refrescar_galeria,
         )
     except (ErrorTienda, registro.ErrorRegistro) as error:
         sys.exit(str(error))
