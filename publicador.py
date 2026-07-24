@@ -159,8 +159,24 @@ def ficha_tecnica_publica(datos: dict) -> dict:
     }
 
 
+def cargar_plantilla_elementor() -> str:
+    """Lee la plantilla Elementor del producto (el JSON de _elementor_data).
+
+    Es la maqueta de 2 columnas con los shortcodes ekipon_* (sin id: leen el
+    producto actual). Se aplica al crear para que el producto muestre la ficha
+    SIN armarla a mano en Elementor. Devuelve '' si el archivo no esta: en ese
+    caso el producto se publica sin plantilla (degrada, no falla).
+    """
+    ruta = Path(__file__).resolve().parent / "plantilla_producto_elementor.json"
+    try:
+        return ruta.read_text(encoding="utf-8").strip()
+    except OSError:
+        return ""
+
+
 def construir_payload(datos: dict, codigo: str, slug: str, categoria_id,
-                      imagenes: list, banner: dict | None = None) -> dict:
+                      imagenes: list, banner: dict | None = None,
+                      incluir_plantilla: bool = True) -> dict:
     """Arma el payload de creacion del producto WooCommerce.
 
     Es una funcion pura: recibe la ficha (dict crudo), el id de categoria ya
@@ -187,6 +203,16 @@ def construir_payload(datos: dict, codigo: str, slug: str, categoria_id,
     if banner and banner.get("url"):
         meta_data.append({"key": "ekipon_banner_id", "value": banner.get("id") or ""})
         meta_data.append({"key": "ekipon_banner_url", "value": banner["url"]})
+
+    # Plantilla Elementor: se aplica al CREAR para que el producto muestre la
+    # ficha (los shortcodes que leen la meta ekipon_*) sin armarla a mano. Los
+    # shortcodes van sin id: leen el producto actual. Si falta el archivo de
+    # plantilla, se publica sin ella (degrada, no falla).
+    plantilla = cargar_plantilla_elementor() if incluir_plantilla else ""
+    if plantilla:
+        meta_data.append({"key": "_elementor_data", "value": plantilla})
+        meta_data.append({"key": "_elementor_edit_mode", "value": "builder"})
+        meta_data.append({"key": "_elementor_template_type", "value": "product-post"})
 
     return {
         "name": producto["nombre_propuesto"],
@@ -230,7 +256,8 @@ def construir_payload_actualizacion(datos: dict, codigo: str,
     `sin_galeria_para_refrescar`; aqui no se adivina la intencion.
     """
     completo = construir_payload(datos, codigo, slug="", categoria_id=categoria_id,
-                                 imagenes=imagenes or [], banner=banner)
+                                 imagenes=imagenes or [], banner=banner,
+                                 incluir_plantilla=False)
     campos_textuales = (
         "name", "regular_price", "categories", "tags",
         "short_description", "description", "meta_data",

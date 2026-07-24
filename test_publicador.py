@@ -208,6 +208,14 @@ class PruebasPayloadFichaReal(unittest.TestCase):
     def test_imagenes_en_orden(self):
         self.assertEqual(self.payload["images"], self.imagenes)
 
+    def test_aplica_plantilla_elementor_al_crear(self):
+        # El producto se crea CON la plantilla Elementor (shortcodes ekipon_*)
+        # para mostrar la ficha sin armarla a mano en Elementor.
+        claves = {m["key"]: m["value"] for m in self.payload["meta_data"]}
+        self.assertIn("ficha_tecnica_ekipon", claves["_elementor_data"])
+        self.assertEqual(claves["_elementor_edit_mode"], "builder")
+        self.assertEqual(claves["_elementor_template_type"], "product-post")
+
 
 class PruebasPayloadActualizacion(unittest.TestCase):
     def setUp(self):
@@ -227,6 +235,12 @@ class PruebasPayloadActualizacion(unittest.TestCase):
         self.assertNotIn("images", self.payload)
         self.assertNotIn("slug", self.payload)
         self.assertNotIn("status", self.payload)
+
+    def test_no_toca_la_plantilla_al_actualizar(self):
+        # Actualizar toca texto/meta, NO el diseño: no re-aplica _elementor_data
+        # para no pisar un ajuste manual de Elementor en un producto ya creado.
+        claves = {m["key"] for m in self.payload["meta_data"]}
+        self.assertNotIn("_elementor_data", claves)
 
     def test_contenido_textual_coincide_con_la_ficha(self):
         self.assertEqual(
