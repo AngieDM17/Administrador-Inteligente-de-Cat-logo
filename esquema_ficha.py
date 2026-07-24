@@ -110,6 +110,11 @@ class EntradaOriginal(ModeloBase):
     nombre_dado: Optional[str] = None
     codigo_proveedor: Optional[str] = None
     foto_referencia: Optional[str] = None
+    # Camino preferido del modelo de dos caminos (24-jul-2026): el link exacto
+    # del producto. Si viene, la identificacion se hace por extraccion de la
+    # fuente (identidad mas fuerte que nombre+foto). Opcional: las fichas de
+    # respaldo (solo nombre+foto) entran sin link.
+    link_producto: Optional[str] = None
 
 
 class IdentificacionDelProducto(ModeloBase):
@@ -122,6 +127,12 @@ class IdentificacionDelProducto(ModeloBase):
     # (usa estado_en_importador, que quedara reportado como clave extra).
     advertencias: Optional[list] = None
     estado_en_proveedor: Optional[str] = None
+    # Etiqueta de metodo del modelo de dos caminos (24-jul-2026): COMO se
+    # identifico el producto, para saber cuanto confiar en la ficha durante la
+    # revision. Lista cerrada: 'link' (extraido de la fuente exacta),
+    # 'busqueda_imagen' (link conseguido por reverse-image antes de inferir),
+    # 'inferencia' (solo nombre+foto; ficha nivel-familia, menor confianza).
+    origen_identificacion: Optional[str] = None
 
     @field_validator("resultado")
     @classmethod
@@ -136,6 +147,25 @@ class IdentificacionDelProducto(ModeloBase):
                 "IDENTIFICACION_DUDOSA o NO_IDENTIFICADO."
             )
         return valor
+
+    @field_validator("origen_identificacion")
+    @classmethod
+    def _origen_identificacion_conocido(cls, valor):
+        # Opcional por tolerancia: las fichas v1.3/v1.4 previas no lo traen.
+        # Si viene, debe ser uno de los tres metodos del modelo de dos caminos.
+        # Se normaliza (espacios/mayusculas) para no invalidar una ficha entera
+        # por un ' Link' descuidado, en linea con la tolerancia del resto del
+        # contrato, y se devuelve el token canonico en minusculas.
+        if valor in (None, ""):
+            return valor
+        normalizado = valor.strip().lower() if isinstance(valor, str) else valor
+        permitidos = ("link", "busqueda_imagen", "inferencia")
+        if normalizado not in permitidos:
+            raise ValueError(
+                f"origen_identificacion '{str(valor)[:40]}' no es un metodo valido. "
+                f"Esperado uno de: {', '.join(permitidos)}."
+            )
+        return normalizado
 
 
 class Producto(ModeloBase):

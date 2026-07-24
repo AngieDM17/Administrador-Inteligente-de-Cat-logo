@@ -6,7 +6,8 @@
   "entrada_original": {
     "nombre_dado": "",
     "codigo_proveedor": "",
-    "foto_referencia": "descripción de la foto que entregó Angie (rasgos visibles)"
+    "foto_referencia": "descripción de la foto que entregó Angie (rasgos visibles)",
+    "link_producto": ""
   },
   "fecha_investigacion": "AAAA-MM-DD",
   "estado": "pendiente_revision",
@@ -16,7 +17,8 @@
     "detalle": "",
     "fuente_principal": "",
     "advertencias": [],
-    "estado_en_proveedor": "existencias y precio publicado en la fuente principal, con fecha"
+    "estado_en_proveedor": "existencias y precio publicado en la fuente principal, con fecha",
+    "origen_identificacion": "link | busqueda_imagen | inferencia — cómo se identificó (define cuánto confiar en la ficha)"
   },
 
   "producto": {

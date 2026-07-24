@@ -11,19 +11,38 @@ Antes de empezar, lee `references/reglas_negocio.md` (reglas fijas de la tienda 
 
 ## Fase 0 — Entrada
 
-Requisitos mínimos: **nombre dado** y **foto de referencia**. La foto no es opcional: sin ella no hay verificación visual posible y el piloto demostró que la identificación por nombre solo es poco confiable. Si falta la foto, pídela antes de investigar.
+Hay **dos maneras de entrar**, y una es preferida:
 
-Registra en `entrada_original` el nombre exacto que dio Angie, el código de proveedor tal cual (con sufijos), y una descripción escrita de los rasgos visibles en la foto (esa descripción servirá de criterio cuando la foto no esté a mano).
+- **CON LINK (preferido).** Angie da el **link exacto** del producto. Es la identidad más fuerte: la ficha sale por extracción de la fuente, completa y verificable. Guárdalo en `entrada_original.link_producto`.
+- **SIN LINK (respaldo).** Solo **nombre dado + foto de referencia**. La foto no es opcional: sin ella no hay verificación visual posible y el piloto demostró que identificar por nombre solo es poco confiable. Si falta la foto, pídela antes de investigar.
 
-## Fase 1 — Identificación
+**Política: siempre intenta conseguir el link.** Aunque Angie entre con nombre+foto, el primer trabajo de la Fase 1 es producir un link antes de caer a la inferencia. El camino de respaldo es la **red de seguridad**, no el plan.
 
-Objetivo: encontrar la **página del producto exacto** en el importador o fabricante.
+Registra en `entrada_original` el nombre exacto que dio Angie, el código de proveedor tal cual (con sufijos), el link si lo hay, y una descripción escrita de los rasgos visibles en la foto (esa descripción servirá de criterio cuando la foto no esté a mano).
 
-1. Busca el código de proveedor entre comillas + palabras del producto. El código debe coincidir **EXACTAMENTE, sufijos incluidos**: 9060C ≠ 9060 — en el piloto eran dos máquinas distintas y el error contaminó la ficha entera. Trata cualquier diferencia de código como producto distinto.
-2. Prioriza fuentes en este orden: página del importador colombiano → fabricante/OEM → distribuidores serios. La búsqueda por imagen (Google Lens o equivalente) es herramienta central cuando el nombre no rinde.
-3. **Alibaba no es fuente confiable automática**: bloquea la extracción y sus listados desaparecen. MercadoLibre solo sirve como referencia de mercado, nunca como fuente de especificaciones (suele ser otra variante del producto).
-4. Cuidado con denominaciones genéricas chinas (tipo "NBC-250"): varios fabricantes las usan con especificaciones distintas. Solo valen datos de la página del producto con el código exacto.
-5. Compara la página encontrada contra la foto de referencia por **rasgos estructurales** (panel, displays, perillas, conectores, disposición) — nunca por color. Si algo no cuadra, marca `resultado: IDENTIFICACION_DUDOSA`, presenta a Angie la evidencia (foto de referencia vs. foto encontrada, señalando los rasgos) y **detente hasta que confirme**. Es más barato preguntar que rehacer una ficha contaminada.
+## Fase 1 — Identificación (dos caminos)
+
+Objetivo: encontrar la **página del producto exacto** en el importador o fabricante. Termina SIEMPRE marcando **cómo** lo lograste en `identificacion_del_producto.origen_identificacion` (`link` | `busqueda_imagen` | `inferencia`): esa etiqueta le dice a Angie cuánto confiar en la revisión.
+
+### Camino A — con link (dado, o ya conseguido por el puente)
+
+Extrae directo de la fuente. Marca `origen_identificacion: link`.
+
+- Links **NO-Alibaba** (importador / fabricante / retail serio): se leen solos con extracción web, sin trabas.
+- Links de **Alibaba**: la extracción automática a ciegas está **bloqueada** (devuelve vacío). Se leen desde el navegador con la sesión de Angie, que pide **un CAPTCHA por sesión, no por producto** (resuelto una vez, varias fichas de Alibaba cargan en fila). Alibaba es fuente de datos válida cuando el link es el del producto exacto; lo que no sirve es el grab ciego.
+
+### Camino B — sin link
+
+**B1 — Puente foto→link (intentar SIEMPRE primero).** Antes de inferir, intenta **producir un link** por búsqueda por imagen: pega la foto de referencia en Alibaba Lens (en el Chrome de Angie), entra a los proveedores que devuelve y verifica cada candidato contra los rasgos estructurales de la foto. Si uno coincide, **ya tienes link → vuelve al Camino A** y marca `origen_identificacion: busqueda_imagen`.
+
+**B2 — Inferencia (solo si el puente no dio link).** Arma la búsqueda **desde la visión primero** (los rasgos que ves en la foto guían las palabras, no al revés) y pasa cada resultado por el **gate visual** (compáralo con la foto antes de creerle). La ficha que sale es **nivel-familia** y va marcada de **menor confianza**: `origen_identificacion: inferencia`. Esta es la red de seguridad, no el objetivo.
+
+### Reglas que valen en los dos caminos
+
+1. El **código de proveedor** debe coincidir **EXACTAMENTE, sufijos incluidos**: 9060C ≠ 9060 — en el piloto eran dos máquinas distintas y el error contaminó la ficha entera. Trata cualquier diferencia de código como producto distinto.
+2. Prioriza fuentes: página del importador colombiano → fabricante/OEM → distribuidores serios. **MercadoLibre** solo sirve como referencia de mercado, nunca como fuente de especificaciones (suele ser otra variante del producto).
+3. Cuidado con denominaciones genéricas chinas (tipo "NBC-250"): varios fabricantes las usan con especificaciones distintas. Solo valen datos de la página del producto con el código exacto.
+4. Compara la página encontrada contra la foto de referencia por **rasgos estructurales** (panel, displays, perillas, conectores, disposición) — nunca por color. Si algo no cuadra, marca `resultado: IDENTIFICACION_DUDOSA`, presenta a Angie la evidencia (foto de referencia vs. foto encontrada, señalando los rasgos) y **detente hasta que confirme**. Es más barato preguntar que rehacer una ficha contaminada.
 
 ## Fase 2 — Criterio de verificación visual
 
