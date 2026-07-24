@@ -87,6 +87,9 @@ function ekipon_estilos_una_vez() {
 		. '.ekipon-banner img{max-width:100%;height:auto;display:block}'
 		. '.ekipon-video{position:relative;padding-top:56.25%}'
 		. '.ekipon-video iframe{position:absolute;inset:0;width:100%;height:100%}'
+		. '.ekipon-bloque{margin:2rem 0}'
+		. '.ekipon-cols{display:flex;gap:2rem;flex-wrap:wrap;align-items:flex-start}'
+		. '.ekipon-cols>.ekipon-col{flex:1 1 320px;min-width:0}'
 		. '</style>';
 }
 
@@ -176,3 +179,44 @@ function ekipon_sc_video( $atts ) {
 		. '" target="_blank" rel="noopener noreferrer">Ver video del producto</a></p>';
 }
 add_shortcode( 'video_ekipon', 'ekipon_sc_video' );
+
+/**
+ * ENGANCHE AUTOMÁTICO — coloca el bloque Ekipon (ficha técnica + banner +
+ * características + video) en CADA producto, sin aplicar plantilla a mano.
+ *
+ * - Se dibuja solo si el producto tiene datos (meta ekipon_*); si no, no
+ *   aparece nada (degrada, no ensucia).
+ * - No duplica: si el producto ya trae su propia plantilla Elementor con las
+ *   piezas Ekipon (revisa _elementor_data), el enganche se salta. Así los
+ *   productos hechos a mano (4212, picadora) no se repiten.
+ *
+ * Posición: debajo del resumen del producto, antes de las pestañas. Para
+ * moverlo, cambiar el gancho o la prioridad de la última línea.
+ */
+function ekipon_bloque_automatico() {
+	$pid = get_the_ID();
+	// Si el producto ya trae su propia plantilla Elementor con las piezas
+	// Ekipon, esa plantilla las dibuja: no duplicar.
+	$elementor = get_post_meta( $pid, '_elementor_data', true );
+	if ( is_string( $elementor ) && false !== strpos( $elementor, 'ekipon' ) ) {
+		return;
+	}
+	$ficha          = do_shortcode( '[ficha_tecnica_ekipon]' );
+	$banner         = do_shortcode( '[banner_ekipon]' );
+	$caracteristicas = do_shortcode( '[caracteristicas_ekipon]' );
+	$video          = do_shortcode( '[video_ekipon]' );
+
+	if ( '' === trim( $ficha . $banner . $caracteristicas . $video ) ) {
+		return; // Producto sin datos Ekipon: no se dibuja nada.
+	}
+
+	echo '<div class="ekipon-bloque">'
+		. '<div class="ekipon-cols">'
+		. '<div class="ekipon-col">' . $ficha . '</div>'
+		. '<div class="ekipon-col">' . $banner . '</div>'
+		. '</div>'
+		. $caracteristicas
+		. $video
+		. '</div>';
+}
+add_action( 'woocommerce_after_single_product_summary', 'ekipon_bloque_automatico', 8 );
