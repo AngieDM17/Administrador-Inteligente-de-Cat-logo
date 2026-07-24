@@ -81,7 +81,8 @@ function ekipon_estilos_una_vez() {
 		. '.ekipon-ficha-tecnica th,.ekipon-ficha-tecnica td{padding:8px 12px;'
 		. 'border-bottom:1px solid rgba(0,0,0,.08);text-align:left;vertical-align:top}'
 		. '.ekipon-ficha-tecnica th{white-space:nowrap;width:38%;font-weight:600}'
-		. '.ekipon-caracteristicas{margin:0;padding-left:1.2em}'
+		. '.ekipon-caracteristicas-titulo{color:#ff4e03;font-weight:700;margin:0 0 .5em;font-size:1.2em;line-height:1.25}'
+			. '.ekipon-caracteristicas{margin:0;padding-left:1.2em}'
 		. '.ekipon-caracteristicas li{margin:.25em 0}'
 		. '.ekipon-banner img{max-width:100%;height:auto;display:block}'
 		. '.ekipon-video{position:relative;padding-top:56.25%}'
@@ -136,7 +137,12 @@ function ekipon_sc_caracteristicas( $atts ) {
 	if ( empty( $items ) ) {
 		return '';
 	}
-	$html = '<ul class="ekipon-caracteristicas">';
+	$titulo = get_the_title( $id );
+	$html   = '';
+	if ( '' !== $titulo ) {
+		$html .= '<h3 class="ekipon-caracteristicas-titulo">' . esc_html( $titulo ) . '</h3>';
+	}
+	$html .= '<ul class="ekipon-caracteristicas">';
 	foreach ( $items as $item ) {
 		if ( ! is_scalar( $item ) ) {
 			continue; // Solo valores simples: nunca "Array" ni warnings de PHP.
