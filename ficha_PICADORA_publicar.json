@@ -1,17 +1,15 @@
 {
   "_version_ficha": "1.4",
   "_uso": "Ficha generada por el Investigador de dos caminos (Camino A — link). Corrida de prueba end-to-end del 2026-07-24. TODO campo lleva su origen.",
-
   "modo_entrada": "investigacion_web",
   "entrada_original": {
     "nombre_dado": "picadora de frutas y verduras tipo balde",
-    "codigo_proveedor": "",
+    "codigo_proveedor": "PICADORA-BALDE-PRUEBA",
     "foto_referencia": "Dos máquinas rojas (dos tamaños) de cuerpo cilíndrico vertical tipo tambor/balde, boca ancha abierta arriba, motor eléctrico al costado con caja de control, canaleta de descarga lateral inclinada y tres patas en trípode con tacos negros.",
     "link_producto": "https://www.alibaba.com/product-detail/_1601400059975.html"
   },
   "fecha_investigacion": "2026-07-24",
   "estado": "pendiente_revision",
-
   "identificacion_del_producto": {
     "resultado": "IDENTIFICADO — producto exacto de la fuente (Alibaba, producto 1601400059975)",
     "detalle": "Extracción directa de la página del producto exacto. Gate visual PASA: el tambor rojo vertical con patas trípode, motor lateral y canaleta de descarga de la página coincide con la foto de referencia por rasgos estructurales. Categoría del proveedor: Feed Processing Machines (procesamiento de alimento animal), no cocina.",
@@ -23,18 +21,22 @@
     "estado_en_proveedor": "Publicado activo al 2026-07-24: COP 131.615, MOQ 10 unidades, 2 vendidos, sin reseñas de producto (tienda 4.2/5 sobre 415 reseñas).",
     "origen_identificacion": "link"
   },
-
   "producto": {
     "nombre_propuesto": "PICADORA DE FRUTAS Y VERDURAS – PROCESADORA DE ALIMENTO PARA AVES Y GANADO 300-1000 KG/H",
     "nombre_origen": "generado_ia (formato de nombres Ekipon)",
     "modelo": "400 / 500 (dos tamaños)",
     "sku": "AUTOMATICO",
-    "categoria_propuesta": "Agroindustria y ganadería > Procesamiento de alimento para animales",
+    "categoria_propuesta": "Picadoras y trituradoras",
     "categoria_confianza": "PENDIENTE_ANGIE — el árbol de categorías debe leerse EN VIVO desde WooCommerce; esta rama es una propuesta, no está confirmada.",
-    "etiquetas_propuestas": ["procesadora de frutas y verduras", "alimento para aves", "alimento para ganado", "agroindustria", "trituradora de forraje"],
+    "etiquetas_propuestas": [
+      "procesadora de frutas y verduras",
+      "alimento para aves",
+      "alimento para ganado",
+      "agroindustria",
+      "trituradora de forraje"
+    ],
     "garantia": "1 año (política fija de la tienda)"
   },
-
   "precios": {
     "precio": 1168000,
     "precio_origen": "confirmado_por_angie (2026-07-24)",
@@ -50,10 +52,8 @@
     "nota_envio": "El precio suele incluir ~$100.000 de envío; se publica 'Envío GRATIS a todo el país' + pago contra entrega",
     "moneda": "COP"
   },
-
   "descripcion_principal": "Máquina eléctrica para procesar frutas y verduras destinada a la alimentación de aves de corral (pollos, patos, gansos) y ganado. Cuerpo cilíndrico vertical con tolva de carga amplia, motor de 2.2 kW a 220V y descarga lateral. Procesa entre 300 y 1000 kg por hora y se ofrece en dos tamaños (modelos 400 y 500). Ideal para granjas y criaderos que preparan su propio alimento.",
   "descripcion_origen": "generado_ia (a partir de datos verificados de la ficha técnica)",
-
   "caracteristicas": [
     "Procesa frutas y verduras para alimento de aves y ganado",
     "Capacidad de 300 a 1000 kg/h",
@@ -64,7 +64,6 @@
     "Garantía de 1 año"
   ],
   "caracteristicas_origen": "encontrado_web (Alibaba, producto 1601400059975, 2026-07-24)",
-
   "ficha_tecnica": {
     "_origen_global": "encontrado_web — Alibaba, producto exacto 1601400059975, extraído 2026-07-24",
     "_nota": "Claves en MAYÚSCULAS. Todo dato estimado lleva 'aprox.' y marca [generado_ia_sin_verificar] en el valor.",
@@ -79,7 +78,6 @@
     "ORIGEN": "Hunan, China",
     "MARCA_FABRICANTE": "xiangdong (Shuangfeng Xiangdong)"
   },
-
   "criterio_verificacion_visual": {
     "definido_por": "propuesto por el sistema — PENDIENTE_ANGIE",
     "SI_es": "Cuerpo cilíndrico vertical tipo tambor/balde, boca/tolva ancha abierta arriba, motor eléctrico montado al costado con caja de control, canaleta de descarga lateral inclinada, tres patas en trípode.",
@@ -87,23 +85,67 @@
     "rasgo_decisivo": "NUNCA el color — vale la forma (tambor vertical + trípode + motor lateral + descarga), no que sea roja.",
     "uso": "criterio para aceptar/rechazar imágenes; revisión final siempre humana"
   },
-
   "multimedia": {
-    "imagenes_galeria_confirmadas": [],
+    "imagenes_galeria_confirmadas": [
+      {
+        "url": "Imagenes/PICADORA/galeria/01-producto_limpio.webp",
+        "nota": "Portada: la picadora recortada sobre fondo limpio."
+      },
+      {
+        "url": "Imagenes/PICADORA/picadora_00_estudio.webp",
+        "nota": "Los dos tamaños disponibles (modelos 400 y 500)."
+      },
+      {
+        "url": "Imagenes/PICADORA/picadora_01_limpia.jpg",
+        "nota": "La picadora completa, vista frontal."
+      },
+      {
+        "url": "Imagenes/PICADORA/picadora_02_frutas.png",
+        "nota": "El equipo con frutas y verduras: muestra qué procesa."
+      },
+      {
+        "url": "Imagenes/PICADORA/galeria/05-partes_senaladas.webp",
+        "nota": "Partes principales señaladas: tolva, descarga y patas."
+      },
+      {
+        "url": "Imagenes/PICADORA/galeria/06-medidas.webp",
+        "nota": "Medidas del producto: 40 x 40 x 81 cm, 20 kg."
+      }
+    ],
     "imagenes_nota": "Solo se cargó la foto de referencia. La galería completa (más fotos reales del producto exacto + banner + medidas) es trabajo de la ETAPA DE IMÁGENES, con su gate de verificación visual.",
     "briefs_generacion_ia": [],
     "regla_generacion": "PROHIBIDO inventar textos, etiquetas, modelos o conectores que no estén en las fotos reales. Ante duda, la toma se descarta. Sufijo _IA en el archivo.",
     "formato_destino": "WebP 1080x1080 (estándar de la tienda)",
     "video_youtube": null,
     "video_nota": "Fase 5. Se sube a YouTube y el enlace va en la plantilla Elementor.",
-
     "galeria_tomas": {
       "_comentario": "Datos que alimentan las tomas GENERADAS de la galería. Lo que no esté verificado se OMITE.",
       "callouts": [
-        {"label": "Tolva de carga", "point": [0.5, 0.07]},
-        {"label": "Motor eléctrico lateral", "point": null},
-        {"label": "Canaleta de descarga", "point": [0.5, 0.55]},
-        {"label": "Patas en trípode", "point": [0.13, 0.9]}
+        {
+          "label": "Tolva de carga",
+          "point": [
+            0.5,
+            0.07
+          ]
+        },
+        {
+          "label": "Motor eléctrico lateral",
+          "point": null
+        },
+        {
+          "label": "Canaleta de descarga",
+          "point": [
+            0.5,
+            0.55
+          ]
+        },
+        {
+          "label": "Patas en trípode",
+          "point": [
+            0.13,
+            0.9
+          ]
+        }
       ],
       "callouts_origen": "encontrado_web (partes visibles en la foto de referencia y la página del producto)",
       "dimensiones": {
@@ -114,7 +156,6 @@
       },
       "dimensiones_origen": "encontrado_web (Alibaba, producto 1601400059975, 2026-07-24)"
     },
-
     "plan_galeria": {
       "_slots_omitidos_y_por_que": [
         "persona_escala / escena_funcionamiento / otro_angulo_ia: generadores todavía no construidos.",
@@ -124,31 +165,70 @@
       "imagen_base": "Imagenes/PICADORA/picadora_01_limpia.jpg",
       "imagen_base_origen": "encontrado_web",
       "slots": [
-        {"tipo": "producto_limpio", "fuente": "generado_motor", "nota": "Portada: la picadora recortada sobre fondo limpio."},
-        {"tipo": "foto_real", "fuente": "foto_real", "origen": "encontrado_web", "archivo": "Imagenes/PICADORA/picadora_00_estudio.webp", "nota": "Los dos tamaños disponibles (modelos 400 y 500)."},
-        {"tipo": "foto_real", "fuente": "foto_real", "origen": "encontrado_web", "archivo": "Imagenes/PICADORA/picadora_01_limpia.jpg", "nota": "La picadora completa, vista frontal."},
-        {"tipo": "foto_real", "fuente": "foto_real", "origen": "encontrado_web", "archivo": "Imagenes/PICADORA/picadora_02_frutas.png", "nota": "El equipo con frutas y verduras: muestra qué procesa."},
-        {"tipo": "partes_senaladas", "fuente": "generado_motor", "nota": "Partes principales señaladas: tolva, descarga y patas."},
-        {"tipo": "medidas", "fuente": "generado_motor", "nota": "Medidas del producto: 40 x 40 x 81 cm, 20 kg."}
+        {
+          "tipo": "producto_limpio",
+          "fuente": "generado_motor",
+          "nota": "Portada: la picadora recortada sobre fondo limpio.",
+          "archivo": "Imagenes/PICADORA/galeria/01-producto_limpio.webp",
+          "origen": "encontrado_web"
+        },
+        {
+          "tipo": "foto_real",
+          "fuente": "foto_real",
+          "origen": "encontrado_web",
+          "archivo": "Imagenes/PICADORA/picadora_00_estudio.webp",
+          "nota": "Los dos tamaños disponibles (modelos 400 y 500)."
+        },
+        {
+          "tipo": "foto_real",
+          "fuente": "foto_real",
+          "origen": "encontrado_web",
+          "archivo": "Imagenes/PICADORA/picadora_01_limpia.jpg",
+          "nota": "La picadora completa, vista frontal."
+        },
+        {
+          "tipo": "foto_real",
+          "fuente": "foto_real",
+          "origen": "encontrado_web",
+          "archivo": "Imagenes/PICADORA/picadora_02_frutas.png",
+          "nota": "El equipo con frutas y verduras: muestra qué procesa."
+        },
+        {
+          "tipo": "partes_senaladas",
+          "fuente": "generado_motor",
+          "nota": "Partes principales señaladas: tolva, descarga y patas.",
+          "archivo": "Imagenes/PICADORA/galeria/05-partes_senaladas.webp",
+          "origen": "encontrado_web (partes visibles en la foto de referencia y la página del producto)"
+        },
+        {
+          "tipo": "medidas",
+          "fuente": "generado_motor",
+          "nota": "Medidas del producto: 40 x 40 x 81 cm, 20 kg.",
+          "archivo": "Imagenes/PICADORA/galeria/06-medidas.webp",
+          "origen": "encontrado_web (Alibaba, producto 1601400059975, 2026-07-24)"
+        }
       ]
     }
   },
-
   "seo": {
     "meta_titulo": "Picadora de Frutas y Verduras para Alimento Animal | Ekipon",
     "meta_descripcion": "Procesadora de frutas y verduras para alimento de aves y ganado, 300-1000 kg/h, motor 2.2kW 220V. Envío GRATIS a todo el país y pago contra entrega.",
-    "palabras_clave": ["picadora de frutas y verduras", "procesadora de alimento para aves", "trituradora para ganado", "máquina de alimento animal", "picadora forraje Colombia"],
+    "palabras_clave": [
+      "picadora de frutas y verduras",
+      "procesadora de alimento para aves",
+      "trituradora para ganado",
+      "máquina de alimento animal",
+      "picadora forraje Colombia"
+    ],
     "texto_alt_base": "Picadora de frutas y verduras de cuerpo vertical rojo con tolva de carga, motor lateral, canaleta de descarga y patas en trípode",
     "origen": "generado_ia"
   },
-
   "campos_por_confirmar": [
     "Categoría en el árbol EN VIVO de WooCommerce (la rama propuesta no está confirmada).",
     "Material de construcción del cuerpo: la página no lo especifica; no se infiere.",
     "Accesorios incluidos: la página no los menciona; verificado negativo al 2026-07-24.",
     "Diferencia exacta entre modelos 400 y 500 (la página lista ambos como tamaños, sin detallar specs por modelo)."
   ],
-
   "fuentes_consultadas": [
     {
       "fuente": "Alibaba — producto 1601400059975 (Shuangfeng Xiangdong)",
