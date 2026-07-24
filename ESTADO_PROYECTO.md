@@ -56,6 +56,15 @@ modificados `motor_galeria.py`, `publicador.py`, `test_motor_galeria.py`, `test_
    Prioridad A pasa a ser el #2: medir la tasa de error del Investigador.** Detalle en `ETAPA_IMAGENES.md`.
 
 2. **Medir la tasa de error del Investigador — con un lote CHICO primero.**
+   *RESULTADO 23-jul (lote de 5):* identificación de TIPO por visión **5/5**; la búsqueda de TEXTO
+   **contamina** (1/5 claro: picadora → cocina) y casi nunca pincha el modelo exacto sin código.
+   **DECISIÓN tomada:** rediseñar el Investigador con **dos caminos de entrada — LINK (preferido:
+   extracción completa y verificada, probado) + nombre+foto de respaldo** (inferencia con
+   visión-primero + gate visual). Política: siempre intentar conseguir el link. Alibaba pide 1
+   CAPTCHA por **sesión**, no por producto; links no-Alibaba = cero. Dos añadidos confirmados:
+   **puente foto→link** (buscar un link vía imagen antes de caer a inferencia) y **etiqueta de
+   método** por ficha (`origen_identificacion`). Detalle en la memoria
+   `decision-investigador-dos-caminos` y en Engram.
    ⚠️ Ojo: el Investigador es una **skill, no código**, así que 100-200 productos no se pueden
    correr sin niñera. Empezar con 20-30 a mano: es el experimento más barato capaz de
    invalidar la apuesta. Si la tasa es mala, se evitó construir un motor de lotes para algo
