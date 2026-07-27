@@ -174,7 +174,9 @@ def generar_descripcion_html(datos: dict, banner: dict | None = None) -> str:
     filas = ficha_tecnica_publica(datos)
     caracteristicas = [c.strip() for c in (datos.get("caracteristicas") or [])
                        if isinstance(c, str) and c.strip()]
+    video_url = (datos.get("multimedia") or {}).get("video_youtube") or ""
 
+    # Ficha tecnica (columna izquierda, arriba).
     tabla = ""
     if filas:
         cuerpo = ""
@@ -190,22 +192,22 @@ def generar_descripcion_html(datos: dict, banner: dict | None = None) -> str:
         tabla = ('<table style="width:100%;border-collapse:collapse">'
                  '<tbody>' + cuerpo + '</tbody></table>')
 
+    # Video (columna izquierda, debajo de la ficha).
+    video = ""
+    if isinstance(video_url, str) and video_url.strip():
+        video = ('<p style="margin-top:16px"><a href="'
+                 + html.escape(video_url.strip(), quote=True)
+                 + '" target="_blank" rel="noopener noreferrer">'
+                 'Ver video del producto</a></p>')
+
+    # Banner (columna derecha, arriba).
     img = ""
     if banner and banner.get("url"):
         img = ('<img src="' + html.escape(str(banner["url"]), quote=True)
                + '" alt="' + html.escape(titulo, quote=True)
                + '" style="max-width:100%;height:auto;display:block" />')
 
-    dos_columnas = ""
-    if tabla or img:
-        dos_columnas = (
-            '<div style="display:flex;flex-wrap:wrap;gap:24px;'
-            'align-items:flex-start;margin:0 0 24px">'
-            '<div style="flex:1 1 320px;min-width:280px">' + tabla + '</div>'
-            '<div style="flex:1 1 320px;min-width:280px">' + img + '</div>'
-            '</div>'
-        )
-
+    # Caracteristicas (columna derecha, debajo del banner).
     lista = ""
     if caracteristicas:
         items = "".join('<li style="margin:.25em 0">' + html.escape(c) + '</li>'
@@ -215,10 +217,21 @@ def generar_descripcion_html(datos: dict, banner: dict | None = None) -> str:
             encabezado = ('<h3 style="color:#ff4e03;font-weight:700;'
                           'margin:0 0 .5em;font-size:1.2em;line-height:1.25">'
                           + html.escape(titulo) + '</h3>')
-        lista = (encabezado
-                 + '<ul style="margin:0;padding-left:1.2em">' + items + '</ul>')
+        lista = ('<div style="margin-top:16px">' + encabezado
+                 + '<ul style="margin:0;padding-left:1.2em">' + items
+                 + '</ul></div>')
 
-    return dos_columnas + lista
+    # Layout 2x2: izquierda = ficha + video; derecha = banner + caracteristicas.
+    izquierda = tabla + video
+    derecha = img + lista
+    if not (izquierda or derecha):
+        return ""
+    return (
+        '<div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start">'
+        '<div style="flex:1 1 320px;min-width:280px">' + izquierda + '</div>'
+        '<div style="flex:1 1 320px;min-width:280px">' + derecha + '</div>'
+        '</div>'
+    )
 
 
 def construir_payload(datos: dict, codigo: str, slug: str, categoria_id,

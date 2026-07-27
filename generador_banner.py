@@ -50,7 +50,7 @@ CONFIG_BANNER = {
     "fuente_titulo": RUTA_FUENTE,
     "fuente_descripcion": RUTA_FUENTE,
     "titulo": {
-        "caja": (0.06, 0.06, 0.62, 0.30),
+        "caja": (0.06, 0.06, 0.55, 0.30),
         "color": "#FF4E03",
         "mayusculas": True,
         "tam_max_frac": 0.090,   # fraccion de la ALTURA del lienzo
@@ -60,7 +60,7 @@ CONFIG_BANNER = {
         "alineacion": "left",
     },
     "descripcion": {
-        "caja": (0.06, 0.32, 0.60, 0.64),
+        "caja": (0.06, 0.32, 0.54, 0.66),
         "color": "#FFFFFF",
         "mayusculas": False,
         "tam_max_frac": 0.038,
@@ -71,7 +71,7 @@ CONFIG_BANNER = {
         "cerrar_frases": True,   # nunca cortar a mitad de oracion
     },
     "imagen": {
-        "caja": (0.46, 0.26, 0.98, 0.82),
+        "caja": (0.58, 0.24, 0.99, 0.84),
         "anclaje": "center",     # centro de la caja
     },
 }
