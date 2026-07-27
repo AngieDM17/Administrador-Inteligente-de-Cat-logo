@@ -1,0 +1,161 @@
+{
+  "_version_ficha": "1.4",
+  "_uso": "Ficha generada por el Investigador de dos caminos (Camino B — inferencia, sin link). Corrida de prueba del 2026-07-24. TODO campo lleva su origen.",
+
+  "modo_entrada": "investigacion_web",
+  "entrada_original": {
+    "nombre_dado": "taladro de árbol",
+    "codigo_proveedor": "",
+    "foto_referencia": "Taladro de banco/columna gris. Cabezal con mandril y broca, palancas de avance de tres brazos con perillas, caja de interruptor con tabla de velocidades al costado, tapa superior con placa ('5 SPEED DRILL PRESS', capacidad husillo 16 mm), columna redonda, mesa de trabajo con ranuras y base con ranuras.",
+    "link_producto": ""
+  },
+  "fecha_investigacion": "2026-07-24",
+  "estado": "pendiente_revision",
+
+  "identificacion_del_producto": {
+    "resultado": "IDENTIFICADO — taladro de banco/árbol, familia 5 velocidades · mandril 5/8\" (16 mm) · ~500W. Modelo exacto SIN confirmar (no había link).",
+    "detalle": "Camino B (inferencia visión-primero + gate). La placa visible en la foto ancla las specs clave: '5 SPEED DRILL PRESS', capacidad de husillo 16 mm, ~500W, 470-2020 rpm. Coincide con la familia de taladros de banco 500W del mercado colombiano (Elite TB500, Ferton). No se identificó el modelo/marca exacto: eso queda para confirmar.",
+    "fuente_principal": "La placa del propio equipo (foto) + listados de referencia del mercado colombiano (Homecenter, Maquitec, tuferreteria).",
+    "advertencias": [
+      "Ficha NIVEL-FAMILIA: las specs vienen de la placa visible y de la familia de mercado, no de la página del producto exacto. El modelo/marca puntual está por confirmar.",
+      "Sin link, la identificación es por inferencia (origen_identificacion = inferencia): confiar menos que en una ficha con link."
+    ],
+    "estado_en_proveedor": "No consultado en la fuente exacta (sin link). Referencias de mercado en 'precios.referencias_mercado'.",
+    "origen_identificacion": "inferencia"
+  },
+
+  "producto": {
+    "nombre_propuesto": "TALADRO DE ÁRBOL DE BANCO – 5 VELOCIDADES MANDRIL 5/8\" 500W",
+    "nombre_origen": "generado_ia (formato de nombres Ekipon)",
+    "modelo": "por confirmar (familia taladro de banco 500W / 16 mm)",
+    "sku": "AUTOMATICO",
+    "categoria_propuesta": "Industria",
+    "categoria_confianza": "PENDIENTE_ANGIE — no hay categoría de taladros de banco en el árbol; se propone 'Industria' y se resuelve en vivo contra la tienda.",
+    "etiquetas_propuestas": ["taladro de árbol", "taladro de banco", "taladro de columna", "herramienta de taller", "taladro 5 velocidades"],
+    "garantia": "1 año (política fija de la tienda)"
+  },
+
+  "precios": {
+    "precio": null,
+    "precio_origen": "PENDIENTE_ANGIE — REGLA FIJA: el precio SIEMPRE lo define Angie manualmente. El sistema solo aporta referencias.",
+    "referencias_mercado": [
+      {
+        "fuente": "Mercado Colombia (taladro de banco 500W 16 mm, clase Elite TB500 / Ferton)",
+        "precio": "rango de referencia; confirmar con proveedor",
+        "condicion": "familia de mercado, no el modelo exacto",
+        "fecha": "2026-07-24",
+        "origen": "encontrado_web"
+      }
+    ],
+    "nota_envio": "El precio suele incluir ~$100.000 de envío; se publica 'Envío GRATIS a todo el país' + pago contra entrega",
+    "moneda": "COP"
+  },
+
+  "descripcion_principal": "Taladro de árbol de banco para taller: perfora con precisión madera, metal y otros materiales gracias a su columna robusta y su mesa de trabajo ajustable. Cuenta con 5 velocidades, mandril de 5/8\" (16 mm) y motor de aproximadamente 500W. La mesa se sube, baja e inclina para trabajar piezas de distinto tamaño y en ángulo.",
+  "descripcion_origen": "generado_ia (a partir de la placa del equipo y specs de familia verificadas)",
+
+  "caracteristicas": [
+    "5 velocidades (rango aprox. 470-2020 rpm)",
+    "Mandril de 5/8\" (16 mm)",
+    "Motor de aproximadamente 500W",
+    "Columna robusta con mesa de trabajo ajustable e inclinable",
+    "Base con ranuras para fijar la pieza",
+    "Ideal para taller: perfora madera y metal con precisión",
+    "Garantía de 1 año"
+  ],
+  "caracteristicas_origen": "encontrado_web (placa del equipo + familia de mercado, 2026-07-24)",
+
+  "ficha_tecnica": {
+    "_origen_global": "encontrado_web — placa visible del equipo + familia de mercado colombiano (2026-07-24). NIVEL-FAMILIA: modelo exacto por confirmar.",
+    "_nota": "Claves en MAYÚSCULAS. Todo dato estimado lleva 'aprox.' y marca [generado_ia_sin_verificar] en el valor.",
+    "TIPO": "Taladro de árbol / de banco (columna)",
+    "VELOCIDADES": "5",
+    "RANGO DE VELOCIDAD": "aprox. 470-2020 rpm",
+    "MANDRIL": "5/8\" (16 mm)",
+    "POTENCIA": "aprox. 500W",
+    "VOLTAJE": "110V / 60Hz",
+    "MESA": "ajustable en altura e inclinable"
+  },
+
+  "criterio_verificacion_visual": {
+    "definido_por": "propuesto por el sistema — PENDIENTE_ANGIE",
+    "SI_es": "Taladro de banco de columna: cabezal con mandril y palancas de avance de tres brazos, tapa/carcasa superior del motor, columna redonda vertical, mesa de trabajo con ranuras que sube por la columna, base pesada con ranuras.",
+    "NO_es": "Taladros de MANO (portátiles, tipo pistola) ni taladros de plantar árboles (barrenas de jardín). No es un taladro demoledor.",
+    "rasgo_decisivo": "NUNCA el color — vale la forma (columna + cabezal con mandril + mesa + base), no el gris.",
+    "uso": "criterio para aceptar/rechazar imágenes; revisión final siempre humana"
+  },
+
+  "multimedia": {
+    "imagenes_galeria_confirmadas": [],
+    "imagenes_nota": "Camino B con una sola foto: la galería se apoya en la foto real + las piezas generadas. Más fotos reales requieren sourcing (link o Alibaba Lens).",
+    "briefs_generacion_ia": [],
+    "regla_generacion": "PROHIBIDO inventar textos, etiquetas, modelos o conectores que no estén en las fotos reales. Ante duda, la toma se descarta. Sufijo _IA en el archivo.",
+    "formato_destino": "WebP 1080x1080 (estándar de la tienda)",
+    "video_youtube": null,
+    "video_nota": "Fase 5. Se sube a YouTube y el enlace va en la plantilla Elementor.",
+
+    "galeria_tomas": {
+      "_comentario": "Datos que alimentan las tomas GENERADAS de la galería.",
+      "callouts": [
+        {"label": "Mandril (5/8\")", "point": [0.19, 0.46]},
+        {"label": "Palancas de avance", "point": [0.40, 0.42]},
+        {"label": "Mesa de trabajo", "point": [0.30, 0.63]},
+        {"label": "Columna", "point": [0.50, 0.66]},
+        {"label": "Base con ranuras", "point": [0.45, 0.86]}
+      ],
+      "callouts_origen": "encontrado_web (partes visibles en la foto y la placa del equipo)",
+      "dimensiones": {
+        "alto": null,
+        "ancho": null,
+        "fondo": null,
+        "peso": null
+      },
+      "dimensiones_origen": null
+    },
+
+    "plan_galeria": {
+      "_slots_omitidos_y_por_que": [
+        "medidas: la ficha no trae dimensiones verificadas (el modelo exacto está por confirmar); no se estima.",
+        "persona_escala / escena_funcionamiento / otro_angulo_ia: generadores todavía no construidos.",
+        "portada_variantes: no hay variantes de motor.",
+        "accesorios: no se identificaron accesorios incluidos."
+      ],
+      "imagen_base": "Imagenes/TALADRO/taladro_00.webp",
+      "imagen_base_origen": "encontrado_web",
+      "slots": [
+        {"tipo": "producto_limpio", "fuente": "generado_motor", "nota": "Portada: el taladro recortado sobre fondo limpio."},
+        {"tipo": "foto_real", "fuente": "foto_real", "origen": "encontrado_web", "archivo": "Imagenes/TALADRO/taladro_00.webp", "nota": "El taladro de banco completo, vista de tres cuartos."},
+        {"tipo": "partes_senaladas", "fuente": "generado_motor", "nota": "Partes principales señaladas: mandril, palancas, mesa, columna y base."}
+      ]
+    }
+  },
+
+  "seo": {
+    "meta_titulo": "Taladro de Árbol de Banco 5 Velocidades 5/8\" | Ekipon",
+    "meta_descripcion": "Taladro de árbol de banco, 5 velocidades, mandril 5/8\" (16 mm), motor ~500W. Perfora madera y metal con precisión. Envío GRATIS a todo el país y pago contra entrega.",
+    "palabras_clave": ["taladro de árbol", "taladro de banco", "taladro de columna", "taladro 5 velocidades", "taladro mandril 5/8 Colombia"],
+    "texto_alt_base": "Taladro de árbol de banco gris con cabezal, mandril, palancas de avance, columna, mesa de trabajo y base con ranuras",
+    "origen": "generado_ia"
+  },
+
+  "campos_por_confirmar": [
+    "Modelo y marca exactos (la placa no se lee con claridad; sin link).",
+    "Precio de venta Ekipon (lo define Angie).",
+    "Categoría en el árbol EN VIVO de WooCommerce (no hay 'taladros de banco'; se propone Industria).",
+    "Dimensiones y peso exactos (por eso se omitió la toma de medidas).",
+    "Voltaje/frecuencia exactos del modelo que maneje el proveedor."
+  ],
+
+  "fuentes_consultadas": [
+    {
+      "fuente": "Placa visible en la foto del equipo",
+      "uso": "Ancla las specs clave: 5 velocidades, husillo 16 mm, ~500W, 470-2020 rpm.",
+      "acceso": "Lectura de la imagen (recorte ampliado)"
+    },
+    {
+      "fuente": "Listados de mercado Colombia (Homecenter, Maquitec, tuferreteria — Elite TB500, Ferton)",
+      "uso": "Confirman la familia (taladro de banco 500W, 5 vel, mandril 5/8\").",
+      "acceso": "WebSearch"
+    }
+  ]
+}
