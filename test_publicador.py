@@ -755,6 +755,21 @@ class PruebasCorreccionesReview(unittest.TestCase):
             preparar_imagenes(datos, RAIZ)
         self.assertEqual(ctx.exception.code, 1)
 
+    def test_titulo_de_imagen_lleva_el_codigo_para_no_colisionar(self):
+        # subir_imagen deduplica por TITULO, y el motor nombra las piezas igual
+        # para todos (01-producto_limpio.webp). Sin el codigo adelante, la
+        # portada de un producto reutilizaba la de otro ya subido (bug 50268:
+        # el taladro tomo la portada de la picadora). El titulo debe ser unico.
+        datos = {
+            "entrada_original": {"codigo_proveedor": "TALADRO-X"},
+            "seo": {"texto_alt_base": "alt"},
+            "multimedia": {"imagenes_galeria_confirmadas": [
+                {"url": "4212_imagenes/4212-sistema-01-conjunto.webp", "nota": "x"}
+            ]},
+        }
+        prep = preparar_imagenes(datos, RAIZ)
+        self.assertEqual(prep[0]["titulo"], "TALADRO-X-4212-sistema-01-conjunto")
+
     def test_subida_reutiliza_por_titulo_sin_volver_a_subir(self):
         # Un medio ya subido (mismo titulo, que WordPress fija en la subida) se
         # reutiliza aunque su segunda llamada haya fallado antes: cero duplicados.

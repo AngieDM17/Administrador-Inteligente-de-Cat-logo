@@ -319,7 +319,13 @@ def preparar_imagenes(datos: dict, carpeta_ficha: Path) -> list[dict]:
         preparadas.append({
             "ruta": ruta,
             "alt": texto_alt_imagen(alt_base, imagen.get("nota")),
-            "titulo": ruta.stem,
+            # El titulo lleva el CODIGO adelante: subir_imagen deduplica por
+            # titulo, y el motor nombra las piezas generadas igual para todos
+            # (01-producto_limpio.webp). Sin el prefijo, la portada de un
+            # producto reutilizaba la de otro ya subido (bug del taladro 50268:
+            # tomo la portada de la picadora). Con el codigo el titulo es unico
+            # por producto, como ya lo era el slug_medio.
+            "titulo": f"{codigo}-{ruta.stem}",
             "slug_medio": generar_slug(codigo, ruta.stem),
         })
     if inseguras:
