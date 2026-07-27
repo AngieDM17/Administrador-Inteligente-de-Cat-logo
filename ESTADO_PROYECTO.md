@@ -1,6 +1,6 @@
 # ESTADO DEL PROYECTO — Administrador Inteligente de Catálogo Ekipon
 
-**Última actualización:** 23-jul-2026.
+**Última actualización:** 27-jul-2026.
 **Para retomar en un chat nuevo:** pídele a Claude que lea PRIMERO este archivo, luego
 `AUDITORIA_ABOGADO_DEL_DIABLO.md` y `ETAPA_IMAGENES.md`.
 **Regla de oro:** ante cualquier discrepancia entre este documento y el código, **gana el código**.
@@ -8,7 +8,49 @@ Verificar antes de afirmar.
 
 ---
 
-## 🟢 DÓNDE ESTAMOS
+## 🔵 ACTUALIZACIÓN 27-jul-2026 (leer esto primero)
+
+Día grande. Cambió la arquitectura de PRESENTACIÓN y se probó el pipeline COMPLETO en varios
+productos. Lo verificado, ejecutando:
+
+**1. Investigador de DOS CAMINOS: implementado, desplegado y MEDIDO.**
+- Contrato extendido (`link_producto`, `origen_identificacion` link|busqueda_imagen|inferencia).
+  Skill instalada en el target de AppData. Ver memoria `implementado-investigador-de-dos-caminos`.
+- **Medición del lote (Prioridad A #2):** 10 links agro (Camino A) → **50% salió limpio, 50%
+  necesita corrección**. El pipeline NO se rompió en ninguno; el "error" es la CALIDAD DE DATOS
+  DEL PROVEEDOR (títulos que contradicen el campo "Tipo", estado "Usado", specs faltantes, números
+  implausibles). **Conclusión: la revisión humana es obligatoria, no opcional.** Con link la ficha
+  sale rica; sin link (Camino B) sale corta.
+
+**2. La ficha ahora sale en el producto por DESCRIPCIÓN HTML NATIVA (no por Elementor).**
+- El intento de inyectar la plantilla Elementor por código NO renderizaba (el 4212 renderiza por
+  otra vía, no desde la meta del producto). Se reemplazó: `publicador.generar_descripcion_html()`
+  arma ficha técnica + banner (2 columnas: ficha+video izq, banner+características der) como HTML
+  con estilos inline en el campo `description`. WooCommerce lo dibuja SIN Elementor, snippet ni
+  trabajo manual. Cada producto sale completo solo → Angie solo revisa y publica. Commit 307f7bb.
+- Se corrigió el banner (el texto ya no pisa el producto) y el layout 2x2 (commit ad4813c).
+
+**3. Bug de colisión de portadas ARREGLADO.** `subir_imagen` deduplica por título y el motor nombra
+las piezas genéricas (`01-producto_limpio.webp`) → un producto reutilizaba la portada de otro (el
+taladro tomó la de la picadora). Fix: el título de la imagen lleva el código adelante. Commit aa70d74.
+
+**4. Pipeline completo corrido en 4 productos (borradores en `pruebas.ekipon.co`):**
+picadora **50264** (Camino A), taladro **50268** (Camino B, ficha corta), estibadora **50283**
+(Camino A, 17 filas), tubo **50290** (Camino A). Falta la mezcladora (sin link aún).
+
+**5. Seguridad (Prioridad A #3) casi cumplida:** `.env` fuera del repo (verificado), y el candado
+`TIENDAS_PERMITIDAS = {"pruebas.ekipon.co"}` impide publicar por error en la tienda real.
+
+**PRÓXIMO PASO: producción (tienda real).** Es una decisión de encender, no una tarea: (a) ampliar
+el candado a `ekipon.co` (código), (b) credenciales reales de la tienda (tarea de Angie — Claude no
+toca credenciales). Se hace cuando Angie diga "ahora sí".
+
+**Detalle completo de la jornada:** memorias de Engram del 24 y 27-jul (buscar "descripción HTML",
+"medición de lote", "colisión de portada").
+
+---
+
+## 🟢 DÓNDE ESTAMOS (histórico previo — 23-jul; ver actualización de arriba)
 
 **Fase de VIABILIDAD TÉCNICA: cerrada.** El pipeline corre de punta a punta y eliminó la carga
 manual (60-90 min) **para un producto revisado a mano**: el 4212, publicado como borrador en
