@@ -1,0 +1,169 @@
+{
+  "_version_ficha": "1.4",
+  "_uso": "Ficha generada por el Investigador de dos caminos (Camino A — link). Corrida del 2026-07-27. TODO campo lleva su origen.",
+
+  "modo_entrada": "investigacion_web",
+  "entrada_original": {
+    "nombre_dado": "estibadora eléctrica",
+    "codigo_proveedor": "",
+    "foto_referencia": "Apilador de palés semieléctrico ROJO: mástil vertical de doble canal con carro elevador, dos horquillas al frente, caja plástica amarilla en la base (batería/bomba), timón de dirección con manija, ruedas pequeñas.",
+    "link_producto": "https://www.alibaba.com/product-detail/Semi-Electric-Lifter-Reach-Pallet-Stacker_1600203870447.html"
+  },
+  "fecha_investigacion": "2026-07-27",
+  "estado": "pendiente_revision",
+
+  "identificacion_del_producto": {
+    "resultado": "IDENTIFICADO — producto exacto de la fuente (Alibaba, producto 1600203870447, marca HUGO)",
+    "detalle": "Extracción directa de la página del producto exacto que dio Angie. Gate visual: la estructura coincide con la foto de referencia (apilador semieléctrico: mástil, horquillas, timón, caja de batería). OJO de color: el link muestra la unidad AMARILLA y la foto de referencia es ROJA — confirmar que es el mismo modelo/variante de color.",
+    "fuente_principal": "Alibaba — Hebei Hugo Machinery Crane Group Co., Ltd. (Baoding, Hebei, CN; 9 años; verificado SGS). Producto 1600203870447, marca HUGO.",
+    "advertencias": [
+      "Discrepancia de color: link = amarillo, foto de referencia = rojo. Confirmar que es el mismo producto.",
+      "Capacidad: el encabezado dice 3000 kg (clasificada), pero la tabla de detalle muestra rango 1000-2500 kg. Confirmar la del modelo que se venderá.",
+      "El precio publicado es FOB de fábrica china, NO precio de venta Ekipon."
+    ],
+    "estado_en_proveedor": "Publicado activo al 2026-07-27: COP 5.302.439 (1-499 conjuntos), baja por volumen; MOQ 1; 1 vendido; tienda 4.7/5 (76 reseñas).",
+    "origen_identificacion": "link"
+  },
+
+  "producto": {
+    "nombre_propuesto": "ESTIBADORA SEMIELÉCTRICA – APILADORA DE PALÉS 3000 KG ELEVACIÓN 3 M",
+    "nombre_origen": "generado_ia (formato de nombres Ekipon)",
+    "modelo": "HUGO (apilador semieléctrico); variante por confirmar",
+    "sku": "AUTOMATICO",
+    "categoria_propuesta": "Estibadoras",
+    "categoria_confianza": "PENDIENTE_ANGIE — se propone 'Estibadoras' (existe en Industria > Estibadoras, id 116); se resuelve en vivo.",
+    "etiquetas_propuestas": ["estibadora", "apiladora de palés", "montacargas semieléctrico", "apilador eléctrico", "equipo de bodega"],
+    "garantia": "1 año (política fija de la tienda)"
+  },
+
+  "precios": {
+    "precio": null,
+    "precio_origen": "PENDIENTE_ANGIE — REGLA FIJA: el precio SIEMPRE lo define Angie manualmente. El sistema solo aporta referencias.",
+    "referencias_mercado": [
+      {
+        "fuente": "Alibaba — Hebei Hugo (fabricante, Hebei CN), marca HUGO",
+        "precio": "COP 5.302.439 (FOB fábrica, 1-499 conjuntos)",
+        "condicion": "baja por volumen; MOQ 1; no incluye envío ni nacionalización",
+        "fecha": "2026-07-27",
+        "origen": "encontrado_web"
+      }
+    ],
+    "nota_envio": "El precio suele incluir ~$100.000 de envío; se publica 'Envío GRATIS a todo el país' + pago contra entrega",
+    "moneda": "COP"
+  },
+
+  "descripcion_principal": "Estibadora (apiladora de palés) semieléctrica marca HUGO para bodega y logística: eleva y apila paletas de hasta 3000 kg a una altura máxima de 3 metros. La elevación es eléctrica (motor de 1.6 kW, batería de plomo-ácido) y el desplazamiento se hace a pie con el timón. Trae horquillas ajustables, neumáticos sólidos antipinchazos y desplazador lateral hidráulico. Certificación CE. Ideal para almacenes, fábricas y obras.",
+  "descripcion_origen": "generado_ia (a partir de datos verificados de la ficha técnica)",
+
+  "caracteristicas": [
+    "Apilador de palés semieléctrico: elevación eléctrica, avance a pie",
+    "Capacidad de carga hasta 3000 kg",
+    "Altura de elevación máxima 3000 mm (3 metros)",
+    "Motor de elevación de 1.6 kW, batería de plomo-ácido",
+    "Horquillas ajustables (ancho 550/685 mm, largo 1150/1220 mm)",
+    "Neumáticos sólidos antipinchazos",
+    "Desplazador lateral (side shifter) hidráulico",
+    "Certificación CE (cumple normas de la UE)",
+    "Garantía de 1 año"
+  ],
+  "caracteristicas_origen": "encontrado_web (Alibaba, producto 1600203870447, 2026-07-27)",
+
+  "ficha_tecnica": {
+    "_origen_global": "encontrado_web — Alibaba, producto exacto 1600203870447 (marca HUGO), extraído 2026-07-27",
+    "_nota": "Claves en MAYÚSCULAS. Todo dato estimado lleva 'aprox.' y marca [generado_ia_sin_verificar] en el valor.",
+    "TIPO": "Apiladora de palés semieléctrica (stacker)",
+    "MARCA": "HUGO",
+    "CAPACIDAD DE CARGA": "3000 kg (clasificada)",
+    "ALTURA DE ELEVACIÓN MÁXIMA": "3000 mm",
+    "MOTOR DE ELEVACIÓN": "1.6 kW",
+    "BATERÍA": "Plomo-ácido",
+    "NEUMÁTICOS": "Sólidos",
+    "HORQUILLAS - ANCHO": "550 / 685 mm",
+    "HORQUILLAS - LARGO": "1150 / 1220 mm",
+    "HORQUILLAS - GROSOR": "60 mm",
+    "MODO DE OPERACIÓN": "Peatón (a pie)",
+    "SIDE SHIFTER": "Hidráulico",
+    "RUEDAS": "Cuatro ruedas",
+    "VELOCIDAD DE ELEVACIÓN": "10 / 15",
+    "CERTIFICACIÓN": "CE (normas UE)",
+    "PESO BRUTO (embalado)": "320 kg",
+    "ORIGEN": "Hebei, China"
+  },
+
+  "criterio_verificacion_visual": {
+    "definido_por": "propuesto por el sistema — PENDIENTE_ANGIE",
+    "SI_es": "Apilador de palés semieléctrico: mástil vertical de doble canal con carro elevador, dos horquillas al frente, caja de batería/bomba en la base, timón de dirección con manija, ruedas de carga y dirección.",
+    "NO_es": "Transpaleta manual (sin mástil, no eleva en altura) ni montacargas contrapesado con cabina. No es un apilador totalmente eléctrico con plataforma para el operario.",
+    "rasgo_decisivo": "NUNCA el color — vale la forma (mástil + horquillas + timón + caja de batería); el link es amarillo y la foto de referencia roja.",
+    "uso": "criterio para aceptar/rechazar imágenes; revisión final siempre humana"
+  },
+
+  "multimedia": {
+    "imagenes_galeria_confirmadas": [],
+    "imagenes_nota": "La galería usa la foto de referencia (roja) que dio Angie + las piezas generadas. El link muestra la unidad amarilla; no se mezclan colores.",
+    "briefs_generacion_ia": [],
+    "regla_generacion": "PROHIBIDO inventar textos, etiquetas, modelos o conectores que no estén en las fotos reales. Ante duda, la toma se descarta. Sufijo _IA en el archivo.",
+    "formato_destino": "WebP 1080x1080 (estándar de la tienda)",
+    "video_youtube": null,
+    "video_nota": "Fase 5. Se sube a YouTube y el enlace va en la plantilla Elementor.",
+
+    "galeria_tomas": {
+      "_comentario": "Datos que alimentan las tomas GENERADAS de la galería.",
+      "callouts": [
+        {"label": "Mástil de elevación", "point": [0.45, 0.25]},
+        {"label": "Horquillas", "point": [0.18, 0.80]},
+        {"label": "Caja de batería", "point": [0.55, 0.62]},
+        {"label": "Timón de dirección", "point": [0.82, 0.42]},
+        {"label": "Ruedas", "point": [0.5, 0.9]}
+      ],
+      "callouts_origen": "encontrado_web (partes visibles en la foto de referencia y la página del producto)",
+      "dimensiones": {
+        "alto": null,
+        "ancho": null,
+        "fondo": null,
+        "peso": null
+      },
+      "dimensiones_origen": null
+    },
+
+    "plan_galeria": {
+      "_slots_omitidos_y_por_que": [
+        "medidas: las dimensiones de la máquina (alto/ancho/fondo) no están claras en la página (solo el embalaje 189x89x210 cm); no se estima.",
+        "persona_escala / escena_funcionamiento / otro_angulo_ia: generadores todavía no construidos.",
+        "portada_variantes: no aplica.",
+        "accesorios: no se identificaron accesorios incluidos."
+      ],
+      "imagen_base": "Imagenes/ESTIBADORA/estibadora_00.webp",
+      "imagen_base_origen": "encontrado_web",
+      "slots": [
+        {"tipo": "producto_limpio", "fuente": "generado_motor", "nota": "Portada: la estibadora recortada sobre fondo limpio."},
+        {"tipo": "foto_real", "fuente": "foto_real", "origen": "encontrado_web", "archivo": "Imagenes/ESTIBADORA/estibadora_00.webp", "nota": "La estibadora completa, vista de tres cuartos."},
+        {"tipo": "partes_senaladas", "fuente": "generado_motor", "nota": "Partes principales señaladas: mástil, horquillas, caja de batería, timón y ruedas."}
+      ]
+    }
+  },
+
+  "seo": {
+    "meta_titulo": "Estibadora Semieléctrica 3000 kg Elevación 3 m | Ekipon",
+    "meta_descripcion": "Estibadora (apiladora de palés) semieléctrica HUGO, capacidad 3000 kg, elevación 3 m, motor 1.6 kW, CE. Envío GRATIS a todo el país y pago contra entrega.",
+    "palabras_clave": ["estibadora", "apiladora de palés", "montacargas semieléctrico", "apilador eléctrico", "estibadora Colombia"],
+    "texto_alt_base": "Estibadora semieléctrica de apilado de palés, con mástil de elevación, horquillas, caja de batería y timón de dirección",
+    "origen": "generado_ia"
+  },
+
+  "campos_por_confirmar": [
+    "Color/modelo exacto: el link es amarillo, la foto de referencia es roja — confirmar que es el mismo producto.",
+    "Capacidad real del modelo a vender (3000 kg clasificada vs rango 1000-2500 kg de la tabla).",
+    "Precio de venta Ekipon (lo define Angie).",
+    "Categoría en el árbol EN VIVO (se propone Estibadoras, id 116).",
+    "Voltaje/carga de la batería (no explícito en la página)."
+  ],
+
+  "fuentes_consultadas": [
+    {
+      "fuente": "Alibaba — producto 1600203870447 (Hebei Hugo, marca HUGO)",
+      "uso": "FUENTE PRINCIPAL — extracción completa de ficha técnica y precio de referencia.",
+      "acceso": "Navegador con sesión de Angie (sin CAPTCHA en esta corrida)."
+    }
+  ]
+}
