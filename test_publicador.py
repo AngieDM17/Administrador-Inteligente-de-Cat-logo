@@ -167,10 +167,15 @@ class PruebasPayloadFichaReal(unittest.TestCase):
             self.payload["tags"][0], {"name": "sistema de aire comprimido"}
         )
 
-    def test_descripcion_queda_vacia(self):
-        # La plantilla Elementor arma la descripcion desde los meta_data
-        # ekipon_*: el campo 'description' viaja vacio para no duplicarla.
-        self.assertEqual(self.payload["description"], "")
+    def test_descripcion_lleva_ficha_y_caracteristicas(self):
+        # La descripcion es HTML NATIVO (ficha tecnica + caracteristicas): el
+        # tema la renderiza en la pestaña Descripcion sin depender de Elementor.
+        desc = self.payload["description"]
+        self.assertIn("600 L", desc)          # una fila real de la ficha tecnica
+        self.assertIn("<table", desc)
+        self.assertIn("#ff4e03", desc)        # titulo de caracteristicas en naranja
+        self.assertIn("<ul", desc)
+        self.assertIn("<li", desc)
 
     def test_meta_ficha_tecnica_lleva_filas_limpias(self):
         meta = {m["key"]: m["value"] for m in self.payload["meta_data"]}
@@ -208,13 +213,12 @@ class PruebasPayloadFichaReal(unittest.TestCase):
     def test_imagenes_en_orden(self):
         self.assertEqual(self.payload["images"], self.imagenes)
 
-    def test_aplica_plantilla_elementor_al_crear(self):
-        # El producto se crea CON la plantilla Elementor (shortcodes ekipon_*)
-        # para mostrar la ficha sin armarla a mano en Elementor.
-        claves = {m["key"]: m["value"] for m in self.payload["meta_data"]}
-        self.assertIn("ficha_tecnica_ekipon", claves["_elementor_data"])
-        self.assertEqual(claves["_elementor_edit_mode"], "builder")
-        self.assertEqual(claves["_elementor_template_type"], "product-post")
+    def test_no_inyecta_elementor(self):
+        # La descripcion nativa reemplaza la inyeccion de plantilla Elementor
+        # (que no renderizaba de forma confiable). No debe viajar _elementor_*.
+        claves = {m["key"] for m in self.payload["meta_data"]}
+        self.assertNotIn("_elementor_data", claves)
+        self.assertNotIn("_elementor_edit_mode", claves)
 
 
 class PruebasPayloadActualizacion(unittest.TestCase):
@@ -236,11 +240,9 @@ class PruebasPayloadActualizacion(unittest.TestCase):
         self.assertNotIn("slug", self.payload)
         self.assertNotIn("status", self.payload)
 
-    def test_no_toca_la_plantilla_al_actualizar(self):
-        # Actualizar toca texto/meta, NO el diseño: no re-aplica _elementor_data
-        # para no pisar un ajuste manual de Elementor en un producto ya creado.
-        claves = {m["key"] for m in self.payload["meta_data"]}
-        self.assertNotIn("_elementor_data", claves)
+    def test_actualizar_refresca_la_descripcion_html(self):
+        # Actualizar tambien refresca la descripcion nativa (ficha tecnica).
+        self.assertIn("<table", self.payload["description"])
 
     def test_contenido_textual_coincide_con_la_ficha(self):
         self.assertEqual(
@@ -248,7 +250,7 @@ class PruebasPayloadActualizacion(unittest.TestCase):
         )
         self.assertEqual(self.payload["regular_price"], "16434999")
         self.assertEqual(self.payload["categories"], [{"id": 428}])
-        self.assertEqual(self.payload["description"], "")
+        self.assertIn("<table", self.payload["description"])
 
     def test_con_imagenes_explicitas_si_lleva_images(self):
         # Unica forma de que una actualizacion toque la galeria: pedirlo.
@@ -391,11 +393,12 @@ class PruebasIdempotencia(unittest.TestCase):
         payload = cliente.creaciones[0]
         self.assertEqual(payload["status"], "draft")
         self.assertEqual(payload["categories"], [{"id": 428}])
-        # El banner viaja SOLO como meta (la plantilla lo renderiza); la
-        # descripcion queda vacia para no duplicar el contenido.
+        # El banner viaja como meta Y como <img> dentro de la descripcion HTML,
+        # que el tema renderiza en la pestaña Descripcion sin Elementor.
         metas = {m["key"]: m["value"] for m in payload["meta_data"]}
         self.assertIn("ekipon_banner_url", metas)
-        self.assertEqual(payload["description"], "")
+        self.assertIn("<table", payload["description"])
+        self.assertIn("<img", payload["description"])
         self.assertEqual(len(payload["images"]), 8)  # el banner NO va en la galeria
         fila = registro.obtener_publicacion("4212", self.ruta_db)
         self.assertEqual(fila["product_id"], 9001)
@@ -411,7 +414,9 @@ class PruebasIdempotencia(unittest.TestCase):
         self.assertEqual(len(cliente.subidas), 8)  # solo galeria, sin banner
         metas = {m["key"]: m["value"] for m in cliente.creaciones[0]["meta_data"]}
         self.assertNotIn("ekipon_banner_url", metas)
-        self.assertEqual(cliente.creaciones[0]["description"], "")
+        desc = cliente.creaciones[0]["description"]
+        self.assertIn("<table", desc)   # la ficha tecnica sigue en la descripcion
+        self.assertNotIn("<img", desc)  # pero sin banner (no hay recorte)
 
     def test_banner_corrupto_se_publica_sin_banner(self):
         # Un recorte existente pero corrupto no debe abortar: se degrada a None.
@@ -486,11 +491,10 @@ class PruebasActualizacion(unittest.TestCase):
         self.assertEqual(product_id, 555)
         self.assertNotIn("images", payload)  # la galeria no se toca ni borra
         self.assertEqual(payload["status"], "draft")
-        # El banner viaja como meta (la plantilla lo renderiza); la descripcion
-        # queda vacia.
+        # El banner viaja como meta Y como <img> en la descripcion HTML.
         metas = {m["key"]: m["value"] for m in payload["meta_data"]}
         self.assertIn("ekipon_banner_url", metas)
-        self.assertEqual(payload["description"], "")
+        self.assertIn("<img", payload["description"])
         fila = registro.obtener_publicacion("4212", self.ruta_db)
         self.assertEqual(fila["product_id"], 555)
         self.assertEqual(fila["estado"], "borrador_actualizado")

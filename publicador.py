@@ -32,6 +32,7 @@ con el archivo (via cargar_json).
 
 import argparse
 import difflib
+import html
 import json
 import sys
 import tempfile
@@ -159,24 +160,69 @@ def ficha_tecnica_publica(datos: dict) -> dict:
     }
 
 
-def cargar_plantilla_elementor() -> str:
-    """Lee la plantilla Elementor del producto (el JSON de _elementor_data).
+def generar_descripcion_html(datos: dict, banner: dict | None = None) -> str:
+    """Arma el HTML de la descripcion: ficha tecnica + banner (2 columnas) +
+    caracteristicas, con estilos EN LINEA.
 
-    Es la maqueta de 2 columnas con los shortcodes ekipon_* (sin id: leen el
-    producto actual). Se aplica al crear para que el producto muestre la ficha
-    SIN armarla a mano en Elementor. Devuelve '' si el archivo no esta: en ese
-    caso el producto se publica sin plantilla (degrada, no falla).
+    Va en el campo 'description' de WooCommerce, que el tema renderiza en la
+    pestana Descripcion SIN depender de Elementor, ningun shortcode ni snippet.
+    Asi cada producto sale completo solo: la duenia solo revisa y publica. Los
+    estilos son inline a proposito: no dependen de que ningun CSS externo cargue.
     """
-    ruta = Path(__file__).resolve().parent / "plantilla_producto_elementor.json"
-    try:
-        return ruta.read_text(encoding="utf-8").strip()
-    except OSError:
-        return ""
+    producto = datos.get("producto") or {}
+    titulo = str(producto.get("nombre_propuesto") or "").strip()
+    filas = ficha_tecnica_publica(datos)
+    caracteristicas = [c.strip() for c in (datos.get("caracteristicas") or [])
+                       if isinstance(c, str) and c.strip()]
+
+    tabla = ""
+    if filas:
+        cuerpo = ""
+        for clave, valor in filas.items():
+            cuerpo += (
+                '<tr><th style="text-align:left;padding:8px 12px;border-bottom:'
+                '1px solid rgba(0,0,0,.08);width:40%;white-space:nowrap;'
+                'vertical-align:top">' + html.escape(str(clave)) + '</th>'
+                '<td style="padding:8px 12px;border-bottom:1px solid '
+                'rgba(0,0,0,.08);vertical-align:top">'
+                + html.escape(str(valor)) + '</td></tr>'
+            )
+        tabla = ('<table style="width:100%;border-collapse:collapse">'
+                 '<tbody>' + cuerpo + '</tbody></table>')
+
+    img = ""
+    if banner and banner.get("url"):
+        img = ('<img src="' + html.escape(str(banner["url"]), quote=True)
+               + '" alt="' + html.escape(titulo, quote=True)
+               + '" style="max-width:100%;height:auto;display:block" />')
+
+    dos_columnas = ""
+    if tabla or img:
+        dos_columnas = (
+            '<div style="display:flex;flex-wrap:wrap;gap:24px;'
+            'align-items:flex-start;margin:0 0 24px">'
+            '<div style="flex:1 1 320px;min-width:280px">' + tabla + '</div>'
+            '<div style="flex:1 1 320px;min-width:280px">' + img + '</div>'
+            '</div>'
+        )
+
+    lista = ""
+    if caracteristicas:
+        items = "".join('<li style="margin:.25em 0">' + html.escape(c) + '</li>'
+                        for c in caracteristicas)
+        encabezado = ""
+        if titulo:
+            encabezado = ('<h3 style="color:#ff4e03;font-weight:700;'
+                          'margin:0 0 .5em;font-size:1.2em;line-height:1.25">'
+                          + html.escape(titulo) + '</h3>')
+        lista = (encabezado
+                 + '<ul style="margin:0;padding-left:1.2em">' + items + '</ul>')
+
+    return dos_columnas + lista
 
 
 def construir_payload(datos: dict, codigo: str, slug: str, categoria_id,
-                      imagenes: list, banner: dict | None = None,
-                      incluir_plantilla: bool = True) -> dict:
+                      imagenes: list, banner: dict | None = None) -> dict:
     """Arma el payload de creacion del producto WooCommerce.
 
     Es una funcion pura: recibe la ficha (dict crudo), el id de categoria ya
@@ -204,16 +250,6 @@ def construir_payload(datos: dict, codigo: str, slug: str, categoria_id,
         meta_data.append({"key": "ekipon_banner_id", "value": banner.get("id") or ""})
         meta_data.append({"key": "ekipon_banner_url", "value": banner["url"]})
 
-    # Plantilla Elementor: se aplica al CREAR para que el producto muestre la
-    # ficha (los shortcodes que leen la meta ekipon_*) sin armarla a mano. Los
-    # shortcodes van sin id: leen el producto actual. Si falta el archivo de
-    # plantilla, se publica sin ella (degrada, no falla).
-    plantilla = cargar_plantilla_elementor() if incluir_plantilla else ""
-    if plantilla:
-        meta_data.append({"key": "_elementor_data", "value": plantilla})
-        meta_data.append({"key": "_elementor_edit_mode", "value": "builder"})
-        meta_data.append({"key": "_elementor_template_type", "value": "product-post"})
-
     return {
         "name": producto["nombre_propuesto"],
         "slug": slug,
@@ -226,10 +262,11 @@ def construir_payload(datos: dict, codigo: str, slug: str, categoria_id,
         "short_description": limpiar_valor_publico(
             datos.get("descripcion_principal") or ""
         ),
-        # La plantilla Elementor arma la descripcion (ficha tecnica + banner +
-        # caracteristicas + video) leyendo los meta_data ekipon_*. El campo queda
-        # vacio para no duplicar ese contenido en la pestaña Descripcion.
-        "description": "",
+        # La descripcion lleva la ficha tecnica + banner + caracteristicas como
+        # HTML nativo (estilos inline): WooCommerce la renderiza en la pestaña
+        # Descripcion sin depender de Elementor. Asi el producto sale completo
+        # solo, sin armar nada a mano.
+        "description": generar_descripcion_html(datos, banner),
         "images": [{"id": img["id"], "alt": img["alt"]} for img in imagenes],
         "meta_data": meta_data,
     }
@@ -256,8 +293,7 @@ def construir_payload_actualizacion(datos: dict, codigo: str,
     `sin_galeria_para_refrescar`; aqui no se adivina la intencion.
     """
     completo = construir_payload(datos, codigo, slug="", categoria_id=categoria_id,
-                                 imagenes=imagenes or [], banner=banner,
-                                 incluir_plantilla=False)
+                                 imagenes=imagenes or [], banner=banner)
     campos_textuales = (
         "name", "regular_price", "categories", "tags",
         "short_description", "description", "meta_data",
