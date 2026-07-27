@@ -1,0 +1,208 @@
+{
+  "_version_ficha": "1.4",
+  "_uso": "Ficha generada por el Investigador de dos caminos (Camino A — link). Corrida del 2026-07-27. TODO campo lleva su origen.",
+  "modo_entrada": "investigacion_web",
+  "entrada_original": {
+    "nombre_dado": "tubo transportador de alimentos",
+    "codigo_proveedor": "TUBO-SINFIN-PRUEBA",
+    "foto_referencia": "Transportador de tornillo sinfín (auger) inclinado: tubo galvanizado en diagonal, tolva de carga en el extremo inferior, montaje de motor en el extremo superior, soporte tipo trípode con dos ruedas. La foto trae además una imagen suelta de un motor eléctrico arriba a la derecha.",
+    "link_producto": "https://www.alibaba.com/product-detail/New-Auger-Elevator-with-1-Year_1601618371568.html"
+  },
+  "fecha_investigacion": "2026-07-27",
+  "estado": "pendiente_revision",
+  "identificacion_del_producto": {
+    "resultado": "IDENTIFICADO — producto exacto de la fuente (Alibaba, producto 1601618371568, marca Bigchina)",
+    "detalle": "Extracción directa de la página del producto exacto que dio Angie. Gate visual: la estructura coincide con la foto de referencia (tornillo sinfín inclinado con tolva, motor y soporte con ruedas). Categoría del proveedor: Agricultural & Food Processing Machinery / Animal Husbandry.",
+    "fuente_principal": "Alibaba — Big china (cangzhou) Agricultural Equipment Co., Ltd. (Cangzhou, Hebei, CN; 2 años; verificado TÜV Rheinland). Producto 1601618371568, marca Bigchina.",
+    "advertencias": [
+      "Ficha corta: la página del proveedor trae pocos datos técnicos (es un producto simple).",
+      "El '200 kg' aparece como capacidad (título) y como peso (tabla) — confirmar cuál es.",
+      "El precio publicado es FOB de fábrica china, NO precio de venta Ekipon."
+    ],
+    "estado_en_proveedor": "Publicado activo al 2026-07-27: COP 563.385, MOQ 1 conjunto, sin reseñas de producto; tienda 4.8/5 (67 reseñas).",
+    "origen_identificacion": "link"
+  },
+  "producto": {
+    "nombre_propuesto": "TRANSPORTADOR DE TORNILLO SINFÍN – AUGER GALVANIZADO 170 MM X 3.5 M",
+    "nombre_origen": "generado_ia (formato de nombres Ekipon)",
+    "modelo": "170*3500 mm (Bigchina)",
+    "sku": "AUTOMATICO",
+    "categoria_propuesta": "Agrícola",
+    "categoria_confianza": "PENDIENTE_ANGIE — no hay categoría exacta de transportadores; se propone 'Agrícola' y se resuelve en vivo (posible línea de alimentación / bandas transportadoras).",
+    "etiquetas_propuestas": [
+      "transportador de tornillo sinfín",
+      "auger",
+      "transportador de granos",
+      "línea de alimentación",
+      "sinfín agrícola"
+    ],
+    "garantia": "1 año (política fija de la tienda)"
+  },
+  "precios": {
+    "precio": null,
+    "precio_origen": "PENDIENTE_ANGIE — REGLA FIJA: el precio SIEMPRE lo define Angie manualmente. El sistema solo aporta referencias.",
+    "referencias_mercado": [
+      {
+        "fuente": "Alibaba — Big china (cangzhou), marca Bigchina",
+        "precio": "COP 563.385 (FOB fábrica)",
+        "condicion": "MOQ 1 conjunto; no incluye envío ni nacionalización",
+        "fecha": "2026-07-27",
+        "origen": "encontrado_web"
+      }
+    ],
+    "nota_envio": "El precio suele incluir ~$100.000 de envío; se publica 'Envío GRATIS a todo el país' + pago contra entrega",
+    "moneda": "COP"
+  },
+  "descripcion_principal": "Transportador de tornillo sinfín (auger) galvanizado en caliente para mover granos y alimento en la granja. Modelo de 170 mm de diámetro y 3.5 metros de largo, se instala inclinado con la tolva de carga en la parte baja y descarga en la parte alta. Sirve para alimentar cerdos, vacas, pollos y otros animales, y para trasladar granos entre puntos. Estructura galvanizada resistente a la intemperie, con soporte y ruedas para moverlo.",
+  "descripcion_origen": "generado_ia (a partir de datos verificados de la ficha técnica)",
+  "caracteristicas": [
+    "Transportador de tornillo sinfín (auger) inclinado",
+    "Diámetro 170 mm, largo 3.5 metros (modelo 170*3500)",
+    "Construcción galvanizada en caliente (resistente a la intemperie)",
+    "Para granos y alimento animal (cerdos, vacas, pollos, etc.)",
+    "Tolva de carga y soporte con ruedas para moverlo",
+    "Garantía de 1 año"
+  ],
+  "caracteristicas_origen": "encontrado_web (Alibaba, producto 1601618371568, 2026-07-27)",
+  "ficha_tecnica": {
+    "_origen_global": "encontrado_web — Alibaba, producto exacto 1601618371568 (marca Bigchina), extraído 2026-07-27",
+    "_nota": "Claves en MAYÚSCULAS. Todo dato estimado lleva 'aprox.' y marca [generado_ia_sin_verificar] en el valor.",
+    "TIPO": "Transportador / elevador de tornillo sinfín (auger)",
+    "MARCA": "Bigchina",
+    "MODELO": "170 x 3500 mm (Ø 170 mm, largo 3.5 m)",
+    "MATERIAL": "Galvanizado en caliente (entero)",
+    "CAPACIDAD": "200 kg (según la ficha del proveedor)",
+    "APLICACIÓN": "Alimentación de cerdos, vacas, pollos, conejos, apicultura",
+    "ORIGEN": "Hebei, China"
+  },
+  "criterio_verificacion_visual": {
+    "definido_por": "propuesto por el sistema — PENDIENTE_ANGIE",
+    "SI_es": "Tornillo sinfín (auger) inclinado: tubo metálico largo en diagonal, tolva de carga en un extremo, montaje de motor en el otro, soporte tipo trípode con ruedas.",
+    "NO_es": "Banda transportadora de caucho, transportador neumático (por tubería cerrada sin tornillo) ni transportador de empuje. No es un tubo de PVC de alimentación.",
+    "rasgo_decisivo": "NUNCA el color — vale la forma (tubo diagonal + tornillo + tolva + soporte con ruedas).",
+    "uso": "criterio para aceptar/rechazar imágenes; revisión final siempre humana"
+  },
+  "multimedia": {
+    "imagenes_galeria_confirmadas": [
+      {
+        "url": "Imagenes/TUBO/galeria/01-producto_limpio.webp",
+        "nota": "Portada: el transportador de tornillo sinfín recortado sobre fondo limpio."
+      },
+      {
+        "url": "Imagenes/TUBO/tubo_00.webp",
+        "nota": "El transportador de tornillo sinfín completo, inclinado."
+      },
+      {
+        "url": "Imagenes/TUBO/galeria/03-partes_senaladas.webp",
+        "nota": "Partes principales señaladas: tolva, tubo con sinfín, motor y soporte."
+      }
+    ],
+    "imagenes_nota": "Camino A con una foto: galería con foto real + piezas generadas. La foto de referencia trae un motor suelto arriba a la derecha (se recorta solo el equipo).",
+    "briefs_generacion_ia": [],
+    "regla_generacion": "PROHIBIDO inventar textos, etiquetas, modelos o conectores que no estén en las fotos reales. Ante duda, la toma se descarta. Sufijo _IA en el archivo.",
+    "formato_destino": "WebP 1080x1080 (estándar de la tienda)",
+    "video_youtube": null,
+    "video_nota": "Fase 5. Se sube a YouTube y el enlace va en la plantilla Elementor.",
+    "galeria_tomas": {
+      "_comentario": "Datos que alimentan las tomas GENERADAS de la galería.",
+      "callouts": [
+        {
+          "label": "Tolva de carga",
+          "point": [
+            0.85,
+            0.8
+          ]
+        },
+        {
+          "label": "Tubo con tornillo sinfín",
+          "point": [
+            0.45,
+            0.45
+          ]
+        },
+        {
+          "label": "Motor",
+          "point": [
+            0.12,
+            0.13
+          ]
+        },
+        {
+          "label": "Soporte con ruedas",
+          "point": [
+            0.28,
+            0.78
+          ]
+        }
+      ],
+      "callouts_origen": "encontrado_web (partes visibles en la foto de referencia y la página del producto)",
+      "dimensiones": {
+        "alto": null,
+        "ancho": null,
+        "fondo": null,
+        "peso": null
+      },
+      "dimensiones_origen": null
+    },
+    "plan_galeria": {
+      "_slots_omitidos_y_por_que": [
+        "medidas: la página no da alto/ancho/fondo del equipo montado (solo el modelo 170x3500 mm); no se estima.",
+        "persona_escala / escena_funcionamiento / otro_angulo_ia: generadores todavía no construidos.",
+        "portada_variantes: no aplica.",
+        "accesorios: no se identificaron accesorios incluidos."
+      ],
+      "imagen_base": "Imagenes/TUBO/tubo_00.webp",
+      "imagen_base_origen": "encontrado_web",
+      "slots": [
+        {
+          "tipo": "producto_limpio",
+          "fuente": "generado_motor",
+          "nota": "Portada: el transportador de tornillo sinfín recortado sobre fondo limpio.",
+          "archivo": "Imagenes/TUBO/galeria/01-producto_limpio.webp",
+          "origen": "encontrado_web"
+        },
+        {
+          "tipo": "foto_real",
+          "fuente": "foto_real",
+          "origen": "encontrado_web",
+          "archivo": "Imagenes/TUBO/tubo_00.webp",
+          "nota": "El transportador de tornillo sinfín completo, inclinado."
+        },
+        {
+          "tipo": "partes_senaladas",
+          "fuente": "generado_motor",
+          "nota": "Partes principales señaladas: tolva, tubo con sinfín, motor y soporte.",
+          "archivo": "Imagenes/TUBO/galeria/03-partes_senaladas.webp",
+          "origen": "encontrado_web (partes visibles en la foto de referencia y la página del producto)"
+        }
+      ]
+    }
+  },
+  "seo": {
+    "meta_titulo": "Transportador de Tornillo Sinfín Auger 170mm x 3.5m | Ekipon",
+    "meta_descripcion": "Transportador de tornillo sinfín (auger) galvanizado, 170 mm x 3.5 m, para granos y alimento animal. Envío GRATIS a todo el país y pago contra entrega.",
+    "palabras_clave": [
+      "transportador de tornillo sinfín",
+      "auger agrícola",
+      "transportador de granos",
+      "sinfín galvanizado",
+      "transportador alimento animal"
+    ],
+    "texto_alt_base": "Transportador de tornillo sinfín inclinado, galvanizado, con tolva de carga, motor y soporte con ruedas",
+    "origen": "generado_ia"
+  },
+  "campos_por_confirmar": [
+    "Aclarar el '200 kg': ¿capacidad de transporte o peso del equipo? (aparece como ambos).",
+    "Potencia/voltaje del motor (no está en la página).",
+    "Precio de venta Ekipon (lo define Angie).",
+    "Categoría en el árbol EN VIVO (se propone Agrícola; no hay categoría exacta de transportadores).",
+    "Ángulo/altura de trabajo y caudal (no publicados)."
+  ],
+  "fuentes_consultadas": [
+    {
+      "fuente": "Alibaba — producto 1601618371568 (Big china cangzhou, marca Bigchina)",
+      "uso": "FUENTE PRINCIPAL — extracción de ficha técnica y precio de referencia.",
+      "acceso": "Navegador con sesión de Angie (sin CAPTCHA en esta corrida)."
+    }
+  ]
+}
