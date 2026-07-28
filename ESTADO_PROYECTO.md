@@ -1,6 +1,6 @@
 # ESTADO DEL PROYECTO — Administrador Inteligente de Catálogo Ekipon
 
-**Última actualización:** 27-jul-2026.
+**Última actualización:** 28-jul-2026.
 **Para retomar en un chat nuevo:** pídele a Claude que lea PRIMERO este archivo, luego
 `AUDITORIA_ABOGADO_DEL_DIABLO.md` y `ETAPA_IMAGENES.md`.
 **Regla de oro:** ante cualquier discrepancia entre este documento y el código, **gana el código**.
@@ -8,7 +8,44 @@ Verificar antes de afirmar.
 
 ---
 
-## 🔵 ACTUALIZACIÓN 27-jul-2026 (leer esto primero)
+## 🔵 ACTUALIZACIÓN 28-jul-2026 (leer esto primero)
+
+Empezó la fase de ESCALA. Lo verificado, ejecutando:
+
+**1. Se midió la tasa de error del Investigador — DOS lotes de links de Alibaba (Prioridad A #2, HECHA).**
+- Lote 1 (10 links agro, 27-jul): **50% necesita corrección**.
+- Lote 2 (10 links MIXTOS —agro, construcción, bombeo, izaje, movilidad—, 28-jul): **30% limpio /
+  70% corrección**. Método: navegar cada link + extraer specs + juzgar calidad de ficha; NO se
+  publicó ninguno.
+- **Hallazgo clave:** el pipeline NO se rompió en ninguno (10/10 extraídos, sin CAPTCHA en el
+  navegador interno). El "error" es **calidad de la fuente**, no del Investigador: campos "Tipo"
+  autollenados que contradicen el nombre, listings que son familias configurables (varios
+  motores/combustibles) y specs delgadas. **Conclusión medida: la revisión humana es obligatoria,
+  no opcional.** Con listings crudos de Alibaba, "cero intervención humana" no es alcanzable.
+
+**2. Construido el COLADOR de listo-para-publicar (`revisor_publicacion.py`, commit `1d171c6`).**
+- Separa fichas que pueden fluir solas (**LISTO**) de las que necesitan los ojos de Angie
+  (**REVISAR**). No re-hace el juicio del Investigador: **lee las notas que este ya deja en la
+  ficha** (`identificacion_del_producto.advertencias`, `campos_por_confirmar`) y les suma chequeos
+  mecánicos (falta potencia, faltan dimensiones, estado "usado"). Sesgo: ante duda, MARCA.
+- **14 tests nuevos; suite total 251 en verde.**
+- Corrido sobre las 7 fichas reales existentes: **7 rojas, 0 verdes** — porque todas tienen ≥1 cosa
+  real por confirmar. Hoy NO recorta el número que Angie revisa; cambia el CÓMO (cada ficha llega
+  pre-etiquetada con qué mirar). El verde —el ahorro real— aparece cuando entren fichas más limpias.
+- **Límite honesto:** el colador es tan fino como las notas del Investigador. Un problema que el
+  Investigador no anote solo se atrapa si cae en un chequeo mecánico. Es colador, no muro.
+
+**PRÓXIMO PASO (Prioridad A restante):** (a) cerrar el círculo end-to-end del colador —tomar 1 de
+los 10 links, que el Investigador arme la ficha y el colador la revise de una sola pasada (aún no
+hecho: el colador se probó contra fichas ya existentes)—; (b) decisión de Angie: ¿"sin dimensiones"
+manda a revisión o es solo un aviso?; (c) producción tienda real = decisión de encender (candado a
+`ekipon.co` + credenciales reales de Angie).
+
+**Detalle:** memorias de Engram `medici-n-lote-2` y `construido-revisor-publicacion`.
+
+---
+
+## 🔵 ACTUALIZACIÓN 27-jul-2026
 
 Día grande. Cambió la arquitectura de PRESENTACIÓN y se probó el pipeline COMPLETO en varios
 productos. Lo verificado, ejecutando:
@@ -70,21 +107,20 @@ Estamos exactamente en la bisagra entre "probé que se puede" y "lo hago aguanta
 |---|---|---|
 | **Investigador v0.3** | Skill de Claude (`investigador_v0.3/`), no código | ✅ probado en NBC 250 y 4212 |
 | **Inspector / validación** | `esquema_ficha.py` + `validar_ficha.py` (contrato v1.4) | ✅ |
-| **Publicador** | `publicador.py` — crea BORRADOR vía API REST, idempotente (`--actualizar`) | ✅ 4212 = ID 50238 |
-| **Dinamización Elementor** | `snippets/shortcodes_ekipon.php` vía Code Snippets | ✅ la plantilla se llena sola desde la meta `ekipon_*` |
+| **Colador (listo-para-publicar)** | `revisor_publicacion.py` — marca cada ficha LISTO/REVISAR | ✅ **NUEVO (28-jul)**, 14 tests |
+| **Publicador** | `publicador.py` — crea BORRADOR vía API REST, idempotente (`--actualizar`) | ✅ 4212 = ID 50238 + 4 borradores más |
+| **Presentación de la ficha** | Descripción HTML nativa (`publicador.generar_descripcion_html`) | ✅ **27-jul**: ficha+banner salen solos, sin Elementor ni trabajo manual |
 | **Imágenes (galería)** | Motor propio Pillow — ver `ETAPA_IMAGENES.md` | ✅ **CERRADA end-to-end** (23-jul: borrador 50255 con galería de 8). Mejoras pendientes: generadores escala/escena/otro-ángulo |
 | **Banner** | `generador_banner.py` (motor propio, ya no Canva) | ✅ integrado al Publicador |
 | **Video** | — | ⬜ última fase, no empezada |
 | **Orquestador** | — | ⬜ no empezado |
 
-**Tests:** 226, todos en verde (`python -m unittest discover -p "test_*.py"`, corrido el 23-jul).
+**Tests:** 251, todos en verde (`python -m pytest`, corrido el 28-jul).
 
 **Estado en git:** el repo es `AngieDM17/Administrador-Inteligente-de-Cat-logo`, rama `main`.
-Último commit (HEAD) al 23-jul: `e13d251`. ⚠️ **Sigue sin commitear trabajo real de imágenes:**
-modificados `motor_galeria.py`, `publicador.py`, `test_motor_galeria.py`, `test_publicador.py`,
-`ETAPA_IMAGENES.md`, los archivos del Investigador y `.claude/CLAUDE.md`; sin trackear `Imagenes/`
-(fotos reales del molino + galería generada) y `molino_imagenes/ficha_investigada_MOLINO.json` /
-`ficha_molino_corrida.json`. Trabajo real fuera de git = trabajo que se puede perder.
+Último commit (HEAD) al 28-jul: `1d171c6` (feat: colador listo-para-publicar). **Árbol limpio** —
+todo el trabajo de imágenes, dos caminos, descripción HTML, los 4 borradores y el colador está
+commiteado y pusheado a GitHub.
 
 ---
 

@@ -13,8 +13,9 @@ próximos pasos para no perderlos.
 
 - **Cerrada:** la fase de *viabilidad técnica*. El pipeline completo funciona y mató la carga
   manual **para un producto revisado a mano**. Terreno ganado real.
-- **No empezada:** la fase de *escala y producción*. "Funciona en 1" y "escala a 100k" son
-  afirmaciones distintas; solo está demostrada la primera.
+- **Empezada (27-28 jul):** la fase de *escala*. Se midió la tasa de error del Investigador en dos
+  lotes chicos y se construyó el colador de listo-para-publicar. "Escala a 100k" sigue sin probarse
+  a gran escala (el Investigador es skill, no código), pero ya no estamos en cero.
 - **Ubicación:** bisagra entre "probé que se puede" y "lo hago aguantar de verdad".
 
 ---
@@ -23,15 +24,16 @@ próximos pasos para no perderlos.
 
 | # | Grieta | Por qué es letal | Estado |
 |---|--------|------------------|--------|
-| 1 | **La prueba de escala no existe.** Solo se validó 1 producto, revisado a mano. Regla "borrador siempre" + precio manual = el humano sigue siendo filtro obligatorio. | Si el Investigador falla el 5-10%, a 100k son miles de fichas a corregir a mano. La tesis "mínima intervención humana" se cae. | ⬜ Abierta |
-| 2 | **Credenciales en texto plano** y allowlist `TIENDAS_PERMITIDAS` pendiente, justo antes de apuntar a la tienda real. | Una API key de WooCommerce filtrada = acceso de escritura al catálogo real (precios, borrado). | ⬜ Abierta |
+| 1 | **La prueba de escala no existe.** Solo se validó 1 producto, revisado a mano. Regla "borrador siempre" + precio manual = el humano sigue siendo filtro obligatorio. | Si el Investigador falla el 5-10%, a 100k son miles de fichas a corregir a mano. La tesis "mínima intervención humana" se cae. | 🟡 Parcial (27-28 jul): medida en dos lotes chicos (10 agro → 50% corrección; 10 mixtos → 30% limpio / 70% corrección). El pipeline NO se rompe; el cuello de botella es la **calidad de la fuente** (Alibaba), no el Investigador. Se construyó el colador `revisor_publicacion.py` (marca LISTO/REVISAR). **Falta:** la prueba a gran escala sin niñera (el Investigador es skill, no código) y cerrar el círculo link→ficha→colador de una pasada. |
+| 2 | **Credenciales en texto plano** y allowlist `TIENDAS_PERMITIDAS` pendiente, justo antes de apuntar a la tienda real. | Una API key de WooCommerce filtrada = acceso de escritura al catálogo real (precios, borrado). | 🟡 Parcial: el candado `TIENDAS_PERMITIDAS = {"pruebas.ekipon.co"}` YA está en `cliente_tienda.py` (verificado 28-jul) y `.env` está fuera del repo. **Falta:** rotar las claves reales antes de apuntar a producción. |
 | 3 | **El recorte de imagen sigue manual (Canva).** `rembg` marcado "opcional". | La velocidad del sistema = la de su paso más lento. A 100k, un humano recortando fondos es el techo real. | 🟡 Parcial (22-jul): `recortar_producto.py` automatiza el recorte con `rembg`. **Falta medir su tasa de acierto sobre un lote** y fijar el umbral de caída a revisión manual. |
 | 4 | **Riesgo centralizado en la dinamización.** Todo depende de Elementor Pro + Woodmart + Code Snippets + meta `ekipon_*`. Una plantilla única. | Una actualización de Woodmart/Elementor puede romper los 100k productos a la vez. Sin staging ni rollback. | ⬜ Abierta |
 | 5 | **Bus factor = 1**, y esa persona no programa. Mantenimiento con Claude en el loop. | Un incidente en producción sin dev disponible = paro total hasta la próxima sesión. | ⬜ Abierta |
 | 6 | **Contenido templado a escala = riesgo SEO.** Google añadió "scaled content abuse" como spam explícito (2025), con desindexación masiva de sitios. | Si el catálogo masivo se marca como contenido de bajo valor, se puede perder el dominio, no un producto. | ⬜ Abierta |
 
-**La que más mata:** la #1. Todo el proyecto se justifica con "elimina 60-90 min por producto",
-y eso está probado sobre exactamente un producto revisado a mano.
+**La que más mata:** la #1 — aunque ya no está en cero. Se midió la tasa de error sobre ~20
+productos (dos lotes) y se construyó el colador; lo que falta es la prueba a **gran escala** sin
+niñera, imposible hoy porque el Investigador es una skill, no código ejecutable en lote.
 
 **Calibración honesta:** el diagnóstico es correcto; el pronóstico del abogado del diablo está
 inflado. Esto **no** es una startup quemando capital con runway contado — es un negocio que ya
@@ -53,6 +55,12 @@ de pasar a la siguiente. No se avanza a producción con etapas a medias.
    ficha del Investigador.
    *Terminado cuando:* hay un número de tasa de error medido. Umbral de decisión: si >5% sale mal,
    no es automatización, es asistente con niñera → primero se mejora el Investigador.
+
+   *Actualización 27-28 jul:* HECHA en versión chica (dos lotes de 10 links: 50% y 30/70). El dato
+   grande enseñó que el problema NO es el Investigador sino la calidad de la fuente (Alibaba), así
+   que la respuesta no fue "mejorar el Investigador" sino construir el **colador de listo-para-
+   publicar** (`revisor_publicacion.py`): humano solo sobre lo marcado, no sobre todo. Queda la
+   prueba a gran escala y cerrar el círculo link→ficha→colador de una pasada.
 
 2. **Endurecer seguridad (grieta #2).**
    Rotar las credenciales de WooCommerce/WordPress, confirmar que `.env` está fuera del repo
@@ -102,6 +110,6 @@ de pasar a la siguiente. No se avanza a producción con etapas a medias.
 - Dinamización por shortcodes probada: la carga manual de datos por producto está muerta.
 - De-duplicación resuelta (`description=""`; el template renderiza desde la meta).
 - Idempotencia del Publicador (`--actualizar`), banner generado+subido, meta `ekipon_*` guardada.
-- Suite de tests: **136 en verde** al 22-jul-2026 (Publicador, Inspector, banner y etapa Imágenes).
+- Suite de tests: **251 en verde** al 28-jul-2026 (Publicador, Inspector, banner, etapa Imágenes y colador).
 - Etapa Imágenes: motor propio determinista (recorte `rembg`, dimensiones, callouts, hero) con su
   contrato de ficha `multimedia.galeria_tomas` validado por el esquema.
