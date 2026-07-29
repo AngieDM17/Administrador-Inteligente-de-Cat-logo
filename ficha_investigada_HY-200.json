@@ -1,0 +1,146 @@
+{
+  "_version_ficha": "1.4",
+  "_uso": "Ficha investigada por Camino A (link exacto de Alibaba). Extracción de la fuente, 2026-07-28. Producida en la pasada end-to-end del colador.",
+
+  "modo_entrada": "investigacion_web",
+  "entrada_original": {
+    "nombre_dado": "Mezcladora de concreto 200L mini portátil (2026)",
+    "codigo_proveedor": "HY-200",
+    "foto_referencia": "No hubo foto de referencia aparte: la entrada fue el link exacto del producto (Camino A). La identidad la define el link.",
+    "link_producto": "https://www.alibaba.com/product-detail/2026-New-Mini-Portable-High-Power_1601669956976.html"
+  },
+  "fecha_investigacion": "2026-07-28",
+  "estado": "pendiente_revision",
+
+  "identificacion_del_producto": {
+    "resultado": "IDENTIFICADO",
+    "detalle": "Mezcladora de concreto de tambor, 200L, modelo HY-200, marca Xingye. Fabricante Ningdu Xingye Machinery Manufacturing Co., Ltd. (Jiangxi, China). Extraído del listing exacto en Alibaba, modelo HY-200 coincidente.",
+    "fuente_principal": "Alibaba — Ningdu Xingye Machinery Manufacturing Co., Ltd. (producto 1601669956976), consultado 2026-07-28.",
+    "advertencias": [
+      "Potencia contradictoria en la propia fuente: 'Potencia de mezcla' = 4 kW pero 'Energía del motor' = 15 kW. 15 kW es implausible para una mini de 200L (típico 3-4 kW); parece campo autollenado de Alibaba. Confirmar la potencia real con el proveedor antes de publicar.",
+      "Tipo de motor ambiguo: las palabras clave dicen 'Hormigonera diésel pequeña', pero la potencia viene en kW y el suministro de agua es por 'bomba de agua', lo que sugiere ELÉCTRICA. La fuente no resuelve si es eléctrica o diésel. Confirmar."
+    ],
+    "estado_en_proveedor": "Nuevo (modelo 2026). Publicado con precio COP 1.051.596 (1-4 conjuntos) y COP 657.248 (≥5 conjuntos). Sin reseñas. Consultado 2026-07-28.",
+    "origen_identificacion": "link"
+  },
+
+  "producto": {
+    "nombre_propuesto": "MEZCLADORA DE CONCRETO 200L – MINI PORTÁTIL DE TAMBOR",
+    "nombre_origen": "generado_ia (formato de nombres Ekipon)",
+    "modelo": "HY-200",
+    "sku": "AUTOMATICO — lo asigna el sistema de la tienda, no se muestra al público",
+    "es_motorizado": true,
+    "categoria_propuesta": "Maquinaria de construcción / Mezcladoras de concreto",
+    "categoria_confianza": "PENDIENTE_ANGIE — el árbol de categorías debe leerse EN VIVO desde WooCommerce; en esta pasada no se leyó en vivo.",
+    "etiquetas_propuestas": ["mezcladora de concreto", "hormigonera", "200 litros", "mini portátil", "construcción"],
+    "garantia": "1 año (política fija de la tienda)"
+  },
+
+  "precios": {
+    "precio": null,
+    "precio_origen": "PENDIENTE_ANGIE — REGLA FIJA: el precio SIEMPRE lo define Angie manualmente. El sistema solo aporta referencias.",
+    "referencias_mercado": [
+      {
+        "fuente": "Alibaba — Ningdu Xingye Machinery (producto 1601669956976)",
+        "precio": "COP 1.051.596 (1-4 conjuntos) / COP 657.248 (≥5 conjuntos)",
+        "fecha": "2026-07-28",
+        "existencias": "Disponible; MOQ 1 conjunto"
+      }
+    ],
+    "nota_envio": "El precio suele incluir ~$100.000 de envío; se publica 'Envío GRATIS a todo el país' + pago contra entrega",
+    "moneda": "COP"
+  },
+
+  "descripcion_principal": "Mezcladora de concreto compacta de tambor, capacidad 200 L, pensada para obra pequeña y uso doméstico. Tambor giratorio a 54 r/min, productividad aproximada 2 m³/h y ciclo de trabajo de 30-45 s. Diseño móvil sobre ruedas para desplazarla en obra.",
+  "descripcion_origen": "encontrado_web (redactado a partir de las specs del listing)",
+
+  "caracteristicas": [
+    "Capacidad de tambor 200 L",
+    "Velocidad del tambor 54 r/min",
+    "Productividad aprox. 2 m³/h",
+    "Ciclo de trabajo 30-45 s",
+    "Tamaño máximo de árido 60 mm",
+    "Móvil sobre ruedas"
+  ],
+  "caracteristicas_origen": "encontrado_web",
+
+  "ficha_tecnica": {
+    "_origen_global": "encontrado_web — Alibaba, listing HY-200, 2026-07-28",
+    "_nota": "Claves en MAYÚSCULAS. Datos extraídos de la fuente. La POTENCIA queda anotada como contradictoria (ver advertencias).",
+    "MODELO": "HY-200",
+    "MARCA": "Xingye",
+    "CAPACIDAD DE TAMBOR": "200 L",
+    "POTENCIA DE MEZCLA": "4 kW (la fuente también lista 'Energía del motor 15 kW'; contradictorio, ver advertencias)",
+    "VELOCIDAD DEL TAMBOR": "54 r/min",
+    "PRODUCTIVIDAD": "2 m³/h",
+    "CICLO DE TRABAJO": "30-45 s",
+    "TAMAÑO MAXIMO DE ARIDO": "60 mm",
+    "PESO": "330 kg",
+    "DIMENSIONES": "1800 x 1050 x 1450 mm",
+    "SUMINISTRO DE AGUA": "Bomba de agua",
+    "MODO DE DESCARGA": "Autocargable (según la fuente)",
+    "LUGAR DE ORIGEN": "Jiangxi, China"
+  },
+
+  "criterio_verificacion_visual": {
+    "definido_por": "Investigador (Camino A); pendiente de confirmación de Angie",
+    "SI_es": "Mezcladora de tambor troncocónico basculante sobre bastidor con dos ruedas, motor lateral con caja de engranajes, volante/manija para bascular el tambor.",
+    "NO_es": "Mezcladoras de eje horizontal tipo JS/JZC (batea cerrada), mezcladoras planetarias de laboratorio, o bombas de concreto — son otro tipo de máquina.",
+    "rasgo_decisivo": "Tambor cónico basculante sobre dos ruedas (no batea cerrada). NUNCA el color.",
+    "uso": "criterio para aceptar/rechazar imágenes; revisión final siempre humana"
+  },
+
+  "multimedia": {
+    "imagenes_galeria_confirmadas": [],
+    "imagenes_nota": "PENDIENTE: en esta pasada (end-to-end del colador) NO se reunieron ni verificaron las fotos reales (Fase 4.1). El plan de galería queda mínimo y honesto; hay que bajar y verificar las fotos del listing antes de producir la galería.",
+    "briefs_generacion_ia": [],
+    "regla_generacion": "PROHIBIDO inventar textos, etiquetas, modelos o conectores que no estén en las fotos reales. Ante duda, la toma se descarta. Sufijo _IA en el archivo.",
+    "formato_destino": "WebP 1080x1080 (estándar de la tienda)",
+    "video_youtube": null,
+    "video_nota": "Fase 5. El listing tiene un video del proveedor; no se descargó en esta pasada.",
+
+    "galeria_tomas": {
+      "_comentario": "Datos que alimentan las tomas GENERADAS de la galería. Extraídos de la fuente.",
+      "callouts": [],
+      "callouts_origen": null,
+      "dimensiones": {
+        "alto": "1450 mm",
+        "ancho": "1050 mm",
+        "fondo": "1800 mm",
+        "peso": "330 kg"
+      },
+      "dimensiones_origen": "encontrado_web — 'Dimensión del esquema' 1800 x 1050 x 1450 mm y 'Peso' 330 kg, Alibaba 2026-07-28. Mapeo largo/ancho/alto -> fondo/ancho/alto."
+    },
+
+    "plan_galeria": {
+      "_slots_omitidos_y_por_que": [
+        "plan_galeria completo: en esta pasada no se reunió material real verificado (Fase 4.1 no ejecutada); el objeto era la pasada end-to-end del colador, no la galería."
+      ],
+      "imagen_base": null,
+      "imagen_base_origen": null,
+      "slots": []
+    }
+  },
+
+  "seo": {
+    "meta_titulo": "Mezcladora de Concreto 200L Mini Portátil | Ekipon",
+    "meta_descripcion": "Mezcladora de concreto 200L de tambor, mini y portátil para obra. Envío GRATIS a todo el país y pago contra entrega",
+    "palabras_clave": ["mezcladora de concreto 200l", "hormigonera portátil", "mezcladora de cemento", "mini mezcladora obra", "comprar hormigonera colombia"],
+    "texto_alt_base": "Mezcladora de concreto de tambor 200 litros, mini portátil sobre ruedas, color naranja",
+    "origen": "generado_ia"
+  },
+
+  "campos_por_confirmar": [
+    "Precio (lo define Angie — regla fija)",
+    "Categoría (leer el árbol EN VIVO desde WooCommerce)",
+    "Potencia real del motor: 4 kW vs 15 kW en la fuente (contradictorio)",
+    "Tipo de motor: eléctrico vs diésel (la fuente se contradice)"
+  ],
+  "fuentes_consultadas": [
+    {
+      "fuente": "Alibaba — Ningdu Xingye Machinery Manufacturing Co., Ltd., producto 1601669956976 (HY-200)",
+      "uso": "Fuente principal: identificación y ficha técnica completa.",
+      "fecha": "2026-07-28"
+    }
+  ]
+}

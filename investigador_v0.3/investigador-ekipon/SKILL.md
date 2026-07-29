@@ -57,6 +57,7 @@ Copia `assets/plantilla_ficha_v1.4.json` como `ficha_investigada_<CODIGO>.json` 
 - **Categoría**: si hay conexión a WooCommerce, lee el árbol EN VIVO y propone una rama real. Si no hay conexión, propón la categoría y déjala explícitamente como no confirmada. Nunca uses un árbol copiado de fichas anteriores.
 - Datos estimados (peso, dimensiones) siempre con "aprox." y marcados `[generado_ia_sin_verificar]` dentro del valor.
 - El nombre propuesto va en MAYÚSCULAS con formato "PRODUCTO CARACTERÍSTICA – DETALLE". Sin marcas.
+- **`producto.es_motorizado` (SIEMPRE):** `true` si el producto lleva motor (maquinaria eléctrica/combustión), `false` si no (escalera, silla, gimnasio, herramienta manual). El revisor de listo-para-publicar exige "potencia del motor" solo a los motorizados; si lo dejas sin definir, asume que sí lleva motor y lo pedirá. Un producto sin motor sin este campo en `false` genera un falso "falta la potencia".
 - **Accesorios incluidos**: antes de darlos por pendientes, revisa la ficha técnica y la descripción completa del proveedor — algunos SÍ publican qué incluye la caja (antorcha, pinza tierra, portaelectrodo). Registra el resultado aunque sea negativo ("verificado: la página no los menciona, fecha") para que nadie repita la búsqueda. Solo entonces va a `campos_por_confirmar`.
 - Todo lo demás que quede sin resolver va a `campos_por_confirmar`.
 - Registra TODAS las fuentes en `fuentes_consultadas`, incluidas las descartadas y por qué — las fuentes descartadas del piloto evitaron repetir el mismo error en la corrección.

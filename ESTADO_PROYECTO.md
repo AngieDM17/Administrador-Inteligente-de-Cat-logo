@@ -1,6 +1,6 @@
 # ESTADO DEL PROYECTO — Administrador Inteligente de Catálogo Ekipon
 
-**Última actualización:** 28-jul-2026.
+**Última actualización:** 29-jul-2026.
 **Para retomar en un chat nuevo:** pídele a Claude que lea PRIMERO este archivo, luego
 `AUDITORIA_ABOGADO_DEL_DIABLO.md` y `ETAPA_IMAGENES.md`.
 **Regla de oro:** ante cualquier discrepancia entre este documento y el código, **gana el código**.
@@ -8,7 +8,51 @@ Verificar antes de afirmar.
 
 ---
 
-## 🔵 ACTUALIZACIÓN 28-jul-2026 (leer esto primero)
+## 🔵 ACTUALIZACIÓN 29-jul-2026 (leer esto primero)
+
+Se cerró el círculo end-to-end del colador y se arregló su primer sesgo, todo verificado ejecutando.
+**Suite: 251 → 255 tests en verde** (+4).
+
+**1. Círculo end-to-end del colador: CERRADO en vivo.** Hasta ahora el colador solo se había
+probado contra fichas ya existentes. Se hizo la pasada VIVA de un solo tiro: un link real →
+el Investigador arma la ficha → el colador la revisa.
+- **Mezcladora HY-200** (Alibaba, uno de los "limpios" del lote 2): al extraerla campo por campo
+  aparecieron DOS contradicciones que el skim rápido de la medición no vio (potencia 4kW vs 15kW;
+  motor "diésel" vs eléctrico). El colador marcó REVISAR por esos dos motivos reales. Hallazgo:
+  **el "3/10 limpio" del lote 2 está inflado** — una extracción a fondo destapa autofills de
+  Alibaba que el vistazo no ve. La revisión humana queda aún más confirmada.
+
+**2. Bug del colador (ceguera de categoría) ENCONTRADO y ARREGLADO.** Con una fuente seria
+(importador colombiano IO Company, escalera 5525) la ficha salió limpísima, pero el colador dio un
+**falso positivo**: "falta la potencia del motor"… en una ESCALERA. El colador exigía potencia a
+TODO producto. El catálogo trae categorías sin motor (gimnasio, sillas, escaleras, herramienta
+manual).
+- **Fix:** campo nuevo `producto.es_motorizado` (sí/no) que llena el Investigador. El colador exige
+  potencia SALVO que la ficha diga explícitamente que no lleva motor. Sesgo conservado "ante duda,
+  marca": si el campo falta, se asume motorizado (las 7 fichas viejas, todas máquinas, siguen igual).
+- **Tocó 4 piezas:** `revisor_publicacion.py` (guarda + helper `_es_no_motorizado`), `esquema_ficha.py`
+  (campo en el contrato), `test_revisor_publicacion.py` (+4 tests), y el skill del Investigador
+  (`SKILL.md` + `plantilla_ficha_v1.4.json`).
+- **Verificado:** la escalera 5525 con `es_motorizado:false` pasó de 2 motivos (uno falso) a 1
+  legítimo (la fuente no publica capacidad de carga ni peso). Falso positivo eliminado.
+
+**3. Deploy del skill: las 3 copias durables al día.** El repo NO refresca la copia instalada que
+corre. Se copió `SKILL.md` + plantilla al target instalado (diff final vacío) y se reempacó el
+artefacto `.skill`. La próxima corrida del Investigador en vivo llenará `es_motorizado` sola.
+
+**Sigue sin verse un VERDE limpio (LISTO):** la escalera queda REVISAR por un dato real que la fuente
+no trae (capacidad de carga). Para un verde hace falta una fuente sin contradicciones y con potencia
+(si aplica) + dimensiones + capacidad. Puede ser raro con listings crudos.
+
+**PRÓXIMO PASO:** decidir si "sin dimensiones/capacidad" bloquea o solo avisa; y producción tienda
+real = decisión de encender (candado a `ekipon.co` + credenciales reales de Angie).
+
+**Detalle:** memorias de Engram `cerrado-el-c-rculo-end-to-end-del-colador-hy-200`,
+`arreglado-el-falso-positivo-sin-potencia-del-colador`, `deploy-cerrado-es-motorizado`.
+
+---
+
+## 🔵 ACTUALIZACIÓN 28-jul-2026
 
 Empezó la fase de ESCALA. Lo verificado, ejecutando:
 

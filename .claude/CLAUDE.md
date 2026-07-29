@@ -11,7 +11,7 @@
 
 **Precedencia ante conflicto:** manda el **REPO** (código y reglas vigentes) por encima de la memoria. La memoria puede quedar vieja; el código no. Verificá contra el código antes de afirmar.
 
-**Estado a 28-jul-2026:** 251 tests OK (verificado corriendo la suite). HEAD `1d171c6`, árbol limpio. Cerrado end-to-end el **camino texto** (Investigador → Inspector → Publicador → **ficha en descripción HTML nativa**), verificado en vivo sobre el 4212 / ID 50238 y 4 borradores más (picadora 50264, taladro 50268, estibadora 50283, tubo 50290).
+**Estado a 29-jul-2026:** 255 tests OK (verificado corriendo la suite). Cerrado end-to-end el **camino texto** (Investigador → Inspector → Publicador → **ficha en descripción HTML nativa**), verificado en vivo sobre el 4212 / ID 50238 y 4 borradores más (picadora 50264, taladro 50268, estibadora 50283, tubo 50290). **29-jul:** cerrado el círculo end-to-end del **colador** (link real → Investigador → colador, en vivo, sobre la mezcladora HY-200 y la escalera 5525) y arreglado su primer sesgo: el campo `producto.es_motorizado` evita el falso "falta la potencia" en productos sin motor (gimnasio, sillas, escaleras). Ver `ESTADO_PROYECTO.md`.
 
 **La ficha sale sola en la descripción HTML nativa** (ya NO por Elementor): `publicador.generar_descripcion_html()` arma ficha técnica + banner y WooCommerce lo dibuja sin trabajo manual (commit 307f7bb). El intento previo de inyectar `_elementor_data` no renderizaba.
 

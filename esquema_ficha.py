@@ -179,6 +179,11 @@ class Producto(ModeloBase):
     categoria_confianza: str
     etiquetas_propuestas: Optional[list] = None
     garantia: str
+    # True si el producto lleva motor (maquinaria electrica/combustion), False si
+    # no (escalera, silla, gimnasio, herramienta manual). Opcional por tolerancia
+    # con fichas previas; el colador solo salta la exigencia de potencia cuando es
+    # explicitamente False (ante ausencia se asume motorizado).
+    es_motorizado: Optional[bool] = None
 
     @field_validator("nombre_propuesto")
     @classmethod

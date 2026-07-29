@@ -47,6 +47,14 @@ _CONFIRMACIONES_ESPERADAS = ("precio", "categor")
 # MOTOR, etc.).
 _CLAVES_POTENCIA = ("POTENCIA", "MOTOR")
 
+# La exigencia de potencia SOLO aplica a productos motorizados. El catalogo tiene
+# productos sin motor (escaleras, sillas, equipo de gimnasio, herramienta manual):
+# pedirles "la potencia del motor" es un falso positivo. El Investigador declara en
+# la ficha si el producto lleva motor (producto.es_motorizado). Sesgo: ante AUSENCIA
+# o duda se asume motorizado y se exige potencia (coherente con "ante duda, marca");
+# el chequeo se salta SOLO cuando la ficha dice explicitamente que no lleva motor.
+_VALORES_SIN_MOTOR = ("false", "no", "0")
+
 # Marca que el propio Investigador pone en un valor estimado, no verificado
 # (ver _nota de ficha_tecnica en las fichas reales).
 _MARCA_SIN_VERIFICAR = "generado_ia_sin_verificar"
@@ -148,6 +156,19 @@ def _revisar_campos_por_confirmar(datos: dict) -> list[Motivo]:
     )]
 
 
+def _es_no_motorizado(datos: dict) -> bool:
+    """True SOLO si la ficha declara explicitamente que el producto no lleva
+    motor (producto.es_motorizado == False, o el texto 'false'/'no'/'0'). Ante
+    ausencia o cualquier otro valor -> False: se asume motorizado y se exige la
+    potencia, en linea con el sesgo 'ante duda, marca'."""
+    valor = _seccion(datos, "producto").get("es_motorizado")
+    if isinstance(valor, bool):
+        return valor is False
+    if isinstance(valor, str):
+        return valor.strip().lower() in _VALORES_SIN_MOTOR
+    return False
+
+
 def _revisar_ficha_tecnica(datos: dict) -> list[Motivo]:
     ficha_tecnica = _seccion(datos, "ficha_tecnica")
     motivos: list[Motivo] = []
@@ -158,7 +179,9 @@ def _revisar_ficha_tecnica(datos: dict) -> list[Motivo]:
     tiene_potencia = any(
         any(marca in clave.upper() for marca in _CLAVES_POTENCIA) for clave in claves
     )
-    if claves and not tiene_potencia:
+    # Solo se exige potencia a productos motorizados. Un producto declarado sin
+    # motor (escalera, silla, gimnasio) no la lleva: pedirsela seria falso positivo.
+    if claves and not tiene_potencia and not _es_no_motorizado(datos):
         motivos.append(Motivo(
             "sin_potencia",
             "Falta la potencia del motor en la ficha tecnica.",

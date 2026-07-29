@@ -29,7 +29,8 @@
     "categoria_propuesta": "",
     "categoria_confianza": "PENDIENTE_ANGIE — el árbol de categorías debe leerse EN VIVO desde WooCommerce, nunca de una copia",
     "etiquetas_propuestas": [],
-    "garantia": "1 año (política fija de la tienda)"
+    "garantia": "1 año (política fija de la tienda)",
+    "es_motorizado": "true si el producto lleva motor (maquinaria eléctrica/combustión), false si no (escalera, silla, gimnasio, herramienta manual). SIEMPRE se llena: el revisor exige potencia solo a los motorizados."
   },
 
   "precios": {

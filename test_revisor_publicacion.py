@@ -130,6 +130,37 @@ class PruebasChequeos(unittest.TestCase):
         datos["ficha_tecnica"]["MOTOR DE ELEVACION"] = "1.6 kW"
         self.assertNotIn("sin_potencia", _codigos(datos))
 
+    def test_no_motorizado_no_exige_potencia(self):
+        # Producto SIN motor (escalera, silla, gimnasio): declarar es_motorizado
+        # False libra del chequeo de potencia. Sin esto, todo producto manual
+        # daba falso positivo 'sin_potencia'.
+        datos = _ficha_limpia()
+        del datos["ficha_tecnica"]["POTENCIA"]
+        datos["producto"] = {"es_motorizado": False}
+        self.assertNotIn("sin_potencia", _codigos(datos))
+
+    def test_no_motorizado_ficha_limpia_pasa(self):
+        # El verde: una ficha de producto sin motor, sin pendientes reales y con
+        # dimensiones, debe salir LISTO.
+        datos = _ficha_limpia()
+        del datos["ficha_tecnica"]["POTENCIA"]
+        datos["producto"] = {"es_motorizado": False}
+        resultado = revisar_listo_para_publicar(datos)
+        self.assertTrue(resultado.listo, [m.mensaje for m in resultado.motivos])
+
+    def test_motorizado_true_sin_potencia_marca(self):
+        # Declarado motorizado y sin potencia -> sigue marcando.
+        datos = _ficha_limpia()
+        del datos["ficha_tecnica"]["POTENCIA"]
+        datos["producto"] = {"es_motorizado": True}
+        self.assertIn("sin_potencia", _codigos(datos))
+
+    def test_sin_campo_motor_asume_motorizado(self):
+        # Ausencia del campo -> se asume motorizado (fichas viejas): exige potencia.
+        datos = _ficha_limpia()
+        del datos["ficha_tecnica"]["POTENCIA"]
+        self.assertIn("sin_potencia", _codigos(datos))
+
     def test_specs_estimadas_marca(self):
         datos = _ficha_limpia()
         datos["ficha_tecnica"]["CAPACIDAD"] = "150 kg/h [generado_ia_sin_verificar]"

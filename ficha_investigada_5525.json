@@ -1,0 +1,136 @@
+{
+  "_version_ficha": "1.4",
+  "_uso": "Ficha investigada por Camino A (link exacto de importador colombiano, no-Alibaba). Extracción de la fuente, 2026-07-28. Segunda pasada end-to-end del colador: fuente seria para intentar un verde.",
+
+  "modo_entrada": "investigacion_web",
+  "entrada_original": {
+    "nombre_dado": "Escalera 4,4 mts desplegable doble 6 niveles",
+    "codigo_proveedor": "5525",
+    "foto_referencia": "No hubo foto de referencia aparte: la entrada fue el link exacto del producto (Camino A).",
+    "link_producto": "https://www.iocompanysas.com.co/product/5525-escalera-44-mts-desplegable-doble-6-niveles/"
+  },
+  "fecha_investigacion": "2026-07-28",
+  "estado": "pendiente_revision",
+
+  "identificacion_del_producto": {
+    "resultado": "IDENTIFICADO",
+    "detalle": "Escalera de aluminio desplegable doble, altura máxima 4.4 m, 6 niveles, código 5525, marca IO Tools. Extraído del listing exacto del importador IO Company (Importadores Orientales), 24 años en el mercado colombiano.",
+    "fuente_principal": "IO Company — iocompanysas.com.co, producto 5525, consultado 2026-07-28.",
+    "advertencias": [],
+    "estado_en_proveedor": "Nuevo. Publicado a $640.000 COP, 30 disponibles. Consultado 2026-07-28.",
+    "origen_identificacion": "link"
+  },
+
+  "producto": {
+    "nombre_propuesto": "ESCALERA DE ALUMINIO 4.4 M – DESPLEGABLE DOBLE 6 NIVELES",
+    "nombre_origen": "generado_ia (formato de nombres Ekipon)",
+    "modelo": "5525",
+    "sku": "AUTOMATICO — lo asigna el sistema de la tienda, no se muestra al público",
+    "es_motorizado": false,
+    "categoria_propuesta": "Escaleras",
+    "categoria_confianza": "PENDIENTE_ANGIE — el árbol de categorías debe leerse EN VIVO desde WooCommerce; en esta pasada no se leyó en vivo.",
+    "etiquetas_propuestas": ["escalera", "aluminio", "desplegable", "4.4 metros", "6 niveles"],
+    "garantia": "1 año (política fija de la tienda)"
+  },
+
+  "precios": {
+    "precio": null,
+    "precio_origen": "PENDIENTE_ANGIE — REGLA FIJA: el precio SIEMPRE lo define Angie manualmente. El sistema solo aporta referencias.",
+    "referencias_mercado": [
+      {
+        "fuente": "IO Company — iocompanysas.com.co, producto 5525",
+        "precio": "$640.000 COP",
+        "fecha": "2026-07-28",
+        "existencias": "30 disponibles"
+      }
+    ],
+    "nota_envio": "El precio suele incluir ~$100.000 de envío; se publica 'Envío GRATIS a todo el país' + pago contra entrega",
+    "moneda": "COP"
+  },
+
+  "descripcion_principal": "Escalera de aluminio desplegable doble con altura máxima de 4.4 m y 6 niveles. Estructura liviana en aluminio con tacones plásticos antiderrapes para mayor estabilidad. Práctica para trabajos en altura en el hogar, mantenimiento y obra ligera.",
+  "descripcion_origen": "encontrado_web (redactado a partir de las características del listing)",
+
+  "caracteristicas": [
+    "Material: aluminio",
+    "Altura máxima: 4.4 m",
+    "6 niveles",
+    "Desplegable doble",
+    "Tacones plásticos antiderrapes"
+  ],
+  "caracteristicas_origen": "encontrado_web",
+
+  "ficha_tecnica": {
+    "_origen_global": "encontrado_web — IO Company, listing 5525, 2026-07-28",
+    "_nota": "Claves en MAYÚSCULAS. Producto SIN motor (no aplica potencia). Datos extraídos de la fuente.",
+    "MODELO": "5525",
+    "MARCA": "IO Tools",
+    "MATERIAL": "Aluminio",
+    "ALTURA MAXIMA": "4.4 m",
+    "NIVELES": "6",
+    "TIPO": "Desplegable doble",
+    "TACONES": "Plásticos antiderrapes"
+  },
+
+  "criterio_verificacion_visual": {
+    "definido_por": "Investigador (Camino A); pendiente de confirmación de Angie",
+    "SI_es": "Escalera de aluminio desplegable/telescópica de dos cuerpos, peldaños anchos, tacones plásticos en las bases.",
+    "NO_es": "Escaleras sencillas (un solo cuerpo), escaleras multipropósito tipo tijera 4x3, o escaleras de tijera de pocos pasos — son otros modelos del mismo catálogo.",
+    "rasgo_decisivo": "Doble cuerpo desplegable de 6 niveles. NUNCA el color.",
+    "uso": "criterio para aceptar/rechazar imágenes; revisión final siempre humana"
+  },
+
+  "multimedia": {
+    "imagenes_galeria_confirmadas": [],
+    "imagenes_nota": "PENDIENTE: en esta pasada (end-to-end del colador) NO se reunieron ni verificaron las fotos reales (Fase 4.1). El objeto era la pasada del colador, no la galería.",
+    "briefs_generacion_ia": [],
+    "regla_generacion": "PROHIBIDO inventar textos, etiquetas, modelos o conectores que no estén en las fotos reales. Ante duda, la toma se descarta. Sufijo _IA en el archivo.",
+    "formato_destino": "WebP 1080x1080 (estándar de la tienda)",
+    "video_youtube": null,
+    "video_nota": "Fase 5. No se descargó en esta pasada.",
+
+    "galeria_tomas": {
+      "_comentario": "Datos que alimentan las tomas GENERADAS de la galería. Solo se cargó lo verificado de la fuente.",
+      "callouts": [],
+      "callouts_origen": null,
+      "dimensiones": {
+        "alto": "4.4 m (altura máxima desplegada)",
+        "ancho": null,
+        "fondo": null,
+        "peso": null
+      },
+      "dimensiones_origen": "encontrado_web — 'Altura máxima 4.4 m', IO Company 2026-07-28. Ancho/fondo/peso no publicados."
+    },
+
+    "plan_galeria": {
+      "_slots_omitidos_y_por_que": [
+        "plan_galeria completo: en esta pasada no se reunió material real verificado (Fase 4.1 no ejecutada); el objeto era la pasada end-to-end del colador."
+      ],
+      "imagen_base": null,
+      "imagen_base_origen": null,
+      "slots": []
+    }
+  },
+
+  "seo": {
+    "meta_titulo": "Escalera Aluminio 4.4 m Desplegable Doble | Ekipon",
+    "meta_descripcion": "Escalera de aluminio 4.4 m, desplegable doble de 6 niveles. Envío GRATIS a todo el país y pago contra entrega",
+    "palabras_clave": ["escalera aluminio 4.4 metros", "escalera desplegable doble", "escalera 6 niveles", "comprar escalera colombia", "escalera telescópica aluminio"],
+    "texto_alt_base": "Escalera de aluminio desplegable doble de 6 niveles, altura 4.4 metros, con tacones plásticos",
+    "origen": "generado_ia"
+  },
+
+  "campos_por_confirmar": [
+    "Precio (lo define Angie — regla fija)",
+    "Categoría (leer el árbol EN VIVO desde WooCommerce)",
+    "Capacidad de carga máxima (kg): no publicada en la fuente y es dato relevante para una escalera",
+    "Peso y dimensiones plegada: no publicados"
+  ],
+  "fuentes_consultadas": [
+    {
+      "fuente": "IO Company (Importadores Orientales) — iocompanysas.com.co, producto 5525",
+      "uso": "Fuente principal: identificación y ficha técnica.",
+      "fecha": "2026-07-28"
+    }
+  ]
+}
