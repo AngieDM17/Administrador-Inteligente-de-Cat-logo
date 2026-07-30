@@ -38,8 +38,11 @@ warm-up + reintentos, pero el Publicador NO tiene reintentos internos — agrega
 Todos a borrador en Gimnasio. **Colador: 3 VERDES** (leg curl 50300, Smith 50304, banco 50308) /
 **3 REVISAR** (squat rack 50313 sin dimensiones, barra 50317 sin peso, set 50321 combo sin specs) —
 50/50, todos los amarillos por dato faltante REAL, ninguno por bug. Findings de escala: (a) **el DNS
-intermitente es el cuello operativo** — cada producto ~35s por warm-up+reintentos; el Publicador/
-`cliente_tienda` NO tienen reintentos internos → **próximo paso: agregárselos antes de los 35**; (b)
+intermitente era el cuello operativo** — cada producto tardaba ~35s por warm-up manual. **RESUELTO
+(30-jul):** `cliente_tienda._solicitar` ahora reintenta la conexión con espera creciente (el
+Publicador lo hereda); un fallo de DNS se reintenta aun en POST porque ocurre antes de enviar el
+pedido; un corte no-DNS solo se reintenta en lecturas (para no duplicar). 6 tests nuevos, verificado
+en vivo sin warm-up manual. Ya se puede correr un lote de corrido; (b)
 el gate visual atrapó que el "set de 8 piezas" mezcla agarres + un rack en sus fotos; (c) la
 validación frenó una ficha malformada antes de la tienda. **El pipeline es sólido (6/6 llegaron); los
 cuellos para 35 son operativos (DNS) + tu revisión sobre el ~50%, no el sistema.**

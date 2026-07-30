@@ -21,7 +21,9 @@ verifica el estado en la tienda antes de enviar nada).
 
 import base64
 import json
+import socket
 import sys
+import time
 import unicodedata
 import urllib.error
 import urllib.request
@@ -33,6 +35,12 @@ from urllib.parse import quote, urlparse
 TIENDAS_PERMITIDAS = {"pruebas.ekipon.co"}
 
 TIMEOUT_SEGUNDOS = 30
+
+# El DNS de la tienda de pruebas resuelve de forma intermitente (getaddrinfo
+# falla y resuelve a ratos). Se reintenta la conexion con espera creciente para
+# que un lote no se caiga por un hipo de DNS. Ver test_cliente_tienda.py.
+INTENTOS_CONEXION = 5
+_ESPERA_BASE_SEG = 1.5
 
 # Tipo de contenido para subir imagenes; el estandar de la tienda es WebP.
 _TIPOS_IMAGEN = {
@@ -202,41 +210,56 @@ class ClienteTienda:
         peticion = urllib.request.Request(
             url_final, data=datos, headers=cabeceras, method=metodo
         )
-        try:
-            with _ABRIDOR.open(peticion, timeout=TIMEOUT_SEGUNDOS) as respuesta:
-                return json.loads(respuesta.read().decode("utf-8"))
-        except urllib.error.HTTPError as error:
-            if error.code == 401:
+        # Un GET no tiene efectos; un POST/PUT si. Importa para decidir que es
+        # seguro reintentar cuando la conexion falla a mitad de camino.
+        es_lectura = datos is None and metodo is None
+        for intento in range(1, INTENTOS_CONEXION + 1):
+            try:
+                with _ABRIDOR.open(peticion, timeout=TIMEOUT_SEGUNDOS) as respuesta:
+                    return json.loads(respuesta.read().decode("utf-8"))
+            except urllib.error.HTTPError as error:
+                # Una respuesta HTTP real (auth, 404, etc.) NUNCA se reintenta:
+                # el servidor contesto, el problema no es transitorio.
+                if error.code == 401:
+                    raise ErrorTienda(
+                        "FALLO (401): la tienda rechazo el acceso. Revisar en el .env "
+                        "el candado (SITE_LOCK_USER/PASS), las claves API "
+                        "(WC_CONSUMER_KEY/SECRET) o la contraseña de aplicacion "
+                        "(WP_USER/WP_APP_PASSWORD) segun el endpoint.",
+                        codigo_http=401,
+                    ) from error
+                if error.code == 403:
+                    raise ErrorTienda(
+                        "FALLO (403): acceso prohibido. Puede ser el candado del "
+                        "sitio o permisos de la clave API.",
+                        codigo_http=403,
+                    ) from error
+                if error.code in (301, 302, 303, 307, 308):
+                    raise ErrorTienda(
+                        f"FALLO: {error.reason}. No se reenviaron credenciales.",
+                        codigo_http=error.code,
+                    ) from error
                 raise ErrorTienda(
-                    "FALLO (401): la tienda rechazo el acceso. Revisar en el .env "
-                    "el candado (SITE_LOCK_USER/PASS), las claves API "
-                    "(WC_CONSUMER_KEY/SECRET) o la contraseña de aplicacion "
-                    "(WP_USER/WP_APP_PASSWORD) segun el endpoint.",
-                    codigo_http=401,
-                ) from error
-            if error.code == 403:
-                raise ErrorTienda(
-                    "FALLO (403): acceso prohibido. Puede ser el candado del "
-                    "sitio o permisos de la clave API.",
-                    codigo_http=403,
-                ) from error
-            if error.code in (301, 302, 303, 307, 308):
-                raise ErrorTienda(
-                    f"FALLO: {error.reason}. No se reenviaron credenciales.",
+                    f"FALLO (HTTP {error.code}): {error.reason}",
                     codigo_http=error.code,
                 ) from error
-            raise ErrorTienda(
-                f"FALLO (HTTP {error.code}): {error.reason}",
-                codigo_http=error.code,
-            ) from error
-        except (urllib.error.URLError, TimeoutError) as error:
-            # TimeoutError puede saltar durante respuesta.read() (no solo al
-            # abrir la conexion); ambos casos se informan igual, en español.
-            razon = getattr(error, "reason", error)
-            raise ErrorTienda(
-                f"FALLO de conexion: {razon}. Revisar internet o el "
-                "dominio en WC_STORE_URL."
-            ) from error
+            except (urllib.error.URLError, TimeoutError) as error:
+                # TimeoutError puede saltar durante respuesta.read() (no solo al
+                # abrir la conexion); ambos casos se informan igual, en español.
+                razon = getattr(error, "reason", error)
+                # Un fallo de DNS (getaddrinfo) ocurre ANTES de enviar el pedido:
+                # el servidor no vio nada, asi que reintentar es seguro aunque sea
+                # un POST. Otros cortes de conexion solo se reintentan en lecturas:
+                # un POST/PUT pudo haberse aplicado en el servidor aunque falle la
+                # respuesta, y reintentarlo duplicaria.
+                es_dns = isinstance(razon, socket.gaierror)
+                if (es_dns or es_lectura) and intento < INTENTOS_CONEXION:
+                    time.sleep(_ESPERA_BASE_SEG * intento)
+                    continue
+                raise ErrorTienda(
+                    f"FALLO de conexion tras {intento} intento(s): {razon}. "
+                    "Revisar internet o el dominio en WC_STORE_URL."
+                ) from error
 
     # ------------------------------------------------------------------
     # Operaciones permitidas. NO hay borrar, NO hay publicar: a proposito.
