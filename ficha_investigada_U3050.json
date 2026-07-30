@@ -1,0 +1,139 @@
+{
+  "_version_ficha": "1.4",
+  "_uso": "Ficha del lote de muestra gym (Camino A, link Fitness Market). Extracción 2026-07-30.",
+  "modo_entrada": "investigacion_web",
+  "entrada_original": {
+    "nombre_dado": "Squat Rack",
+    "codigo_proveedor": "U3050",
+    "foto_referencia": "Entrada por link exacto (Camino A); 1 foto de portada verificada por gate visual.",
+    "link_producto": "https://www.fitnessmarket.com.co/products/squat-rack"
+  },
+  "fecha_investigacion": "2026-07-30",
+  "estado": "pendiente_revision",
+  "identificacion_del_producto": {
+    "resultado": "IDENTIFICADO",
+    "detalle": "SQUAT RACK – SOPORTE DE SENTADILLA. Extraído del listing exacto de Fitness Market Colombia (SKU U3050).",
+    "fuente_principal": "Fitness Market — fitnessmarket.com.co/squat-rack (SKU U3050), 2026-07-30.",
+    "advertencias": [],
+    "estado_en_proveedor": "Nuevo. Publicado a $2.999.000 COP. Consultado 2026-07-30.",
+    "origen_identificacion": "link"
+  },
+  "producto": {
+    "nombre_propuesto": "SQUAT RACK – SOPORTE DE SENTADILLA",
+    "nombre_origen": "generado_ia (formato Ekipon)",
+    "modelo": "U3050",
+    "sku": "AUTOMATICO — lo asigna el sistema de la tienda, no se muestra al público",
+    "es_motorizado": false,
+    "categoria_propuesta": "Gimnasio",
+    "categoria_confianza": "confirmado_por_angie — categoría 'Gimnasio' creada en la tienda de pruebas (id 465).",
+    "etiquetas_propuestas": [
+      "squat rack",
+      "soporte de sentadilla",
+      "rack de barra",
+      "sentadilla",
+      "gimnasio"
+    ],
+    "garantia": "1 año (política fija de la tienda)"
+  },
+  "precios": {
+    "precio": null,
+    "precio_origen": "PENDIENTE_ANGIE — REGLA FIJA: el precio SIEMPRE lo define Angie manualmente.",
+    "referencias_mercado": [
+      {
+        "fuente": "Fitness Market (U3050)",
+        "precio": "$2.999.000 COP",
+        "fecha": "2026-07-30",
+        "existencias": "publicado"
+      }
+    ],
+    "nota_envio": "El precio suele incluir ~$100.000 de envío; se publica 'Envío GRATIS a todo el país' + pago contra entrega",
+    "moneda": "COP"
+  },
+  "descripcion_principal": "Squat rack robusto para sentadillas, press de hombros y otros levantamientos con barra de forma segura. Construcción resistente con opciones de almacenamiento de discos.",
+  "descripcion_origen": "encontrado_web (redactado desde el listing)",
+  "caracteristicas": [
+    "Soportes ajustables para barra",
+    "Para sentadilla y press con barra",
+    "Postes para almacenar discos",
+    "Construcción robusta"
+  ],
+  "caracteristicas_origen": "encontrado_web",
+  "ficha_tecnica": {
+    "_origen_global": "encontrado_web — Fitness Market, listing U3050, 2026-07-30",
+    "_nota": "Claves en MAYÚSCULAS. Producto SIN motor. Datos extraídos de la fuente.",
+    "MODELO": "U3050",
+    "MARCA": "Fitness Market",
+    "TIPO": "Squat rack (soporte de sentadilla)",
+    "PESO": "35 kg"
+  },
+  "criterio_verificacion_visual": {
+    "definido_por": "Investigador (Camino A); pendiente confirmación de Angie",
+    "SI_es": "Dos torres con ganchos (J-hooks) ajustables y postes para discos.",
+    "NO_es": "Jaula de potencia cerrada (power cage) o máquina Smith con guía.",
+    "rasgo_decisivo": "Rasgos estructurales, NUNCA el color.",
+    "uso": "criterio para aceptar/rechazar imágenes; revisión final siempre humana"
+  },
+  "multimedia": {
+    "imagenes_galeria_confirmadas": [
+      {
+        "url": "U3050_recorte.png",
+        "nota": "Portada: recorte transparente (rembg), verificado a ojo."
+      },
+      {
+        "url": "Imagenes/gym_U3050/foto_01.webp",
+        "nota": "Foto de estudio, fuente Fitness Market, verificada por gate visual."
+      }
+    ],
+    "imagenes_nota": "Galería mínima honesta: 1 foto real de la fuente + su recorte. La fuente publica 1 foto útil del producto.",
+    "briefs_generacion_ia": [],
+    "regla_generacion": "PROHIBIDO inventar textos, etiquetas o modelos que no estén en las fotos reales.",
+    "formato_destino": "WebP 1080x1080 (estándar de la tienda)",
+    "video_youtube": null,
+    "video_nota": "Fase 5. No se descargó en esta pasada.",
+    "galeria_tomas": {
+      "_comentario": "Datos para las tomas generadas. Solo lo verificado.",
+      "callouts": [],
+      "callouts_origen": null,
+      "dimensiones": {
+        "alto": null,
+        "ancho": null,
+        "fondo": null,
+        "peso": "35 kg"
+      },
+      "dimensiones_origen": "encontrado_web — Fitness Market 2026-07-30."
+    },
+    "plan_galeria": {
+      "_slots_omitidos_y_por_que": [
+        "plan_galeria completo: no se reunió más material real (Fase 4.1); objeto = lote de medición."
+      ],
+      "imagen_base": null,
+      "imagen_base_origen": null,
+      "slots": []
+    }
+  },
+  "seo": {
+    "meta_titulo": "Squat Rack | Ekipon",
+    "meta_descripcion": "Squat rack robusto para sentadillas, press de hombros y otros levantamientos con barra de forma segura. Construcción res Envío GRATIS a todo el país y pago",
+    "palabras_clave": [
+      "squat rack",
+      "soporte de sentadilla",
+      "rack de barra",
+      "sentadilla",
+      "gimnasio"
+    ],
+    "texto_alt_base": "Squat Rack – Soporte De Sentadilla",
+    "origen": "generado_ia"
+  },
+  "campos_por_confirmar": [
+    "Precio (lo define Angie — regla fija)",
+    "Categoría (leer el árbol EN VIVO desde WooCommerce)",
+    "Dimensiones (alto/ancho/fondo): no publicadas en la fuente."
+  ],
+  "fuentes_consultadas": [
+    {
+      "fuente": "Fitness Market — squat-rack (SKU U3050)",
+      "uso": "Fuente principal.",
+      "fecha": "2026-07-30"
+    }
+  ]
+}

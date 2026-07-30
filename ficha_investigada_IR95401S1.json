@@ -1,0 +1,140 @@
+{
+  "_version_ficha": "1.4",
+  "_uso": "Ficha del lote de muestra gym (Camino A, link Fitness Market). Extracción 2026-07-30.",
+  "modo_entrada": "investigacion_web",
+  "entrada_original": {
+    "nombre_dado": "Set De 8 Agarres De Polea",
+    "codigo_proveedor": "IR95401S1",
+    "foto_referencia": "Entrada por link exacto (Camino A); 1 foto de portada verificada por gate visual.",
+    "link_producto": "https://www.fitnessmarket.com.co/products/one-set-with-8-different-piece"
+  },
+  "fecha_investigacion": "2026-07-30",
+  "estado": "pendiente_revision",
+  "identificacion_del_producto": {
+    "resultado": "IDENTIFICADO",
+    "detalle": "SET DE 8 AGARRES DE POLEA – PARA ENTRENAMIENTO. Extraído del listing exacto de Fitness Market Colombia (SKU IR95401S1).",
+    "fuente_principal": "Fitness Market — fitnessmarket.com.co/one-set-with-8-different-piece (SKU IR95401S1), 2026-07-30.",
+    "advertencias": [
+      "Es un COMBO de 8 agarres, no un producto único: el listing no publica specs (dimensiones, peso, material). Además sus fotos MEZCLAN los 8 agarres con un rack de poleas (otro producto): solo se usó la foto de los 8 agarres."
+    ],
+    "estado_en_proveedor": "Nuevo. Publicado a $801.900 COP. Consultado 2026-07-30.",
+    "origen_identificacion": "link"
+  },
+  "producto": {
+    "nombre_propuesto": "SET DE 8 AGARRES DE POLEA – PARA ENTRENAMIENTO",
+    "nombre_origen": "generado_ia (formato Ekipon)",
+    "modelo": "IR95401S1",
+    "sku": "AUTOMATICO — lo asigna el sistema de la tienda, no se muestra al público",
+    "es_motorizado": false,
+    "categoria_propuesta": "Gimnasio",
+    "categoria_confianza": "confirmado_por_angie — categoría 'Gimnasio' creada en la tienda de pruebas (id 465).",
+    "etiquetas_propuestas": [
+      "agarres de polea",
+      "accesorios de cable",
+      "set de agarres",
+      "tríceps",
+      "gimnasio"
+    ],
+    "garantia": "1 año (política fija de la tienda)"
+  },
+  "precios": {
+    "precio": null,
+    "precio_origen": "PENDIENTE_ANGIE — REGLA FIJA: el precio SIEMPRE lo define Angie manualmente.",
+    "referencias_mercado": [
+      {
+        "fuente": "Fitness Market (IR95401S1)",
+        "precio": "$801.900 COP",
+        "fecha": "2026-07-30",
+        "existencias": "publicado"
+      }
+    ],
+    "nota_envio": "El precio suele incluir ~$100.000 de envío; se publica 'Envío GRATIS a todo el país' + pago contra entrega",
+    "moneda": "COP"
+  },
+  "descripcion_principal": "Set de 8 agarres de polea para trabajar distintos grupos musculares en máquinas de cable: barras, manijas en V y agarres de tríceps/espalda. Variedad para ampliar la rutina.",
+  "descripcion_origen": "encontrado_web (redactado desde el listing)",
+  "caracteristicas": [
+    "8 agarres de polea distintos",
+    "Compatibles con máquinas de cable",
+    "Para espalda, tríceps y más"
+  ],
+  "caracteristicas_origen": "encontrado_web",
+  "ficha_tecnica": {
+    "_origen_global": "encontrado_web — Fitness Market, listing IR95401S1, 2026-07-30",
+    "_nota": "Claves en MAYÚSCULAS. Producto SIN motor. Datos extraídos de la fuente.",
+    "MODELO": "IR95401S1",
+    "MARCA": "Fitness Market",
+    "TIPO": "Set de 8 agarres/accesorios de polea"
+  },
+  "criterio_verificacion_visual": {
+    "definido_por": "Investigador (Camino A); pendiente confirmación de Angie",
+    "SI_es": "Conjunto de agarres/manijas metálicos para cable (barras en V, tríceps, etc.).",
+    "NO_es": "El RACK de adaptaciones (soporte) que aparece en otras fotos del mismo listing: es otro producto.",
+    "rasgo_decisivo": "Rasgos estructurales, NUNCA el color.",
+    "uso": "criterio para aceptar/rechazar imágenes; revisión final siempre humana"
+  },
+  "multimedia": {
+    "imagenes_galeria_confirmadas": [
+      {
+        "url": "IR95401S1_recorte.png",
+        "nota": "Portada: recorte transparente (rembg), verificado a ojo."
+      },
+      {
+        "url": "Imagenes/gym_IR95401S1/foto_01.webp",
+        "nota": "Foto de estudio, fuente Fitness Market, verificada por gate visual."
+      }
+    ],
+    "imagenes_nota": "Galería mínima honesta: 1 foto real de la fuente + su recorte. La fuente publica 1 foto útil del producto.",
+    "briefs_generacion_ia": [],
+    "regla_generacion": "PROHIBIDO inventar textos, etiquetas o modelos que no estén en las fotos reales.",
+    "formato_destino": "WebP 1080x1080 (estándar de la tienda)",
+    "video_youtube": null,
+    "video_nota": "Fase 5. No se descargó en esta pasada.",
+    "galeria_tomas": {
+      "_comentario": "Datos para las tomas generadas. Solo lo verificado.",
+      "callouts": [],
+      "callouts_origen": null,
+      "dimensiones": {
+        "alto": null,
+        "ancho": null,
+        "fondo": null,
+        "peso": null
+      },
+      "dimensiones_origen": null
+    },
+    "plan_galeria": {
+      "_slots_omitidos_y_por_que": [
+        "plan_galeria completo: no se reunió más material real (Fase 4.1); objeto = lote de medición."
+      ],
+      "imagen_base": null,
+      "imagen_base_origen": null,
+      "slots": []
+    }
+  },
+  "seo": {
+    "meta_titulo": "Set De 8 Agarres De Polea | Ekipon",
+    "meta_descripcion": "Set de 8 agarres de polea para trabajar distintos grupos musculares en máquinas de cable: barras, manijas en V y agarres Envío GRATIS a todo el país y pago",
+    "palabras_clave": [
+      "agarres de polea",
+      "accesorios de cable",
+      "set de agarres",
+      "tríceps",
+      "gimnasio"
+    ],
+    "texto_alt_base": "Set De 8 Agarres De Polea – Para Entrenamiento",
+    "origen": "generado_ia"
+  },
+  "campos_por_confirmar": [
+    "Precio (lo define Angie — regla fija)",
+    "Categoría (leer el árbol EN VIVO desde WooCommerce)",
+    "Composición exacta del set (qué 8 agarres)",
+    "Dimensiones y peso: no publicados"
+  ],
+  "fuentes_consultadas": [
+    {
+      "fuente": "Fitness Market — one-set-with-8-different-piece (SKU IR95401S1)",
+      "uso": "Fuente principal.",
+      "fecha": "2026-07-30"
+    }
+  ]
+}

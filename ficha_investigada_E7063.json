@@ -1,0 +1,140 @@
+{
+  "_version_ficha": "1.4",
+  "_uso": "Ficha del lote de muestra gym (Camino A, link Fitness Market). Extracción 2026-07-30.",
+  "modo_entrada": "investigacion_web",
+  "entrada_original": {
+    "nombre_dado": "Máquina Smith",
+    "codigo_proveedor": "E7063",
+    "foto_referencia": "Entrada por link exacto (Camino A); 1 foto de portada verificada por gate visual.",
+    "link_producto": "https://www.fitnessmarket.com.co/products/smith-machine-1"
+  },
+  "fecha_investigacion": "2026-07-30",
+  "estado": "pendiente_revision",
+  "identificacion_del_producto": {
+    "resultado": "IDENTIFICADO",
+    "detalle": "MÁQUINA SMITH – GUÍA VERTICAL 218 KG. Extraído del listing exacto de Fitness Market Colombia (SKU E7063).",
+    "fuente_principal": "Fitness Market — fitnessmarket.com.co/smith-machine-1 (SKU E7063), 2026-07-30.",
+    "advertencias": [],
+    "estado_en_proveedor": "Nuevo. Publicado a $7.990.900 COP. Consultado 2026-07-30.",
+    "origen_identificacion": "link"
+  },
+  "producto": {
+    "nombre_propuesto": "MÁQUINA SMITH – GUÍA VERTICAL 218 KG",
+    "nombre_origen": "generado_ia (formato Ekipon)",
+    "modelo": "E7063",
+    "sku": "AUTOMATICO — lo asigna el sistema de la tienda, no se muestra al público",
+    "es_motorizado": false,
+    "categoria_propuesta": "Gimnasio",
+    "categoria_confianza": "confirmado_por_angie — categoría 'Gimnasio' creada en la tienda de pruebas (id 465).",
+    "etiquetas_propuestas": [
+      "máquina smith",
+      "smith machine",
+      "guía vertical",
+      "sentadilla",
+      "gimnasio"
+    ],
+    "garantia": "1 año (política fija de la tienda)"
+  },
+  "precios": {
+    "precio": null,
+    "precio_origen": "PENDIENTE_ANGIE — REGLA FIJA: el precio SIEMPRE lo define Angie manualmente.",
+    "referencias_mercado": [
+      {
+        "fuente": "Fitness Market (E7063)",
+        "precio": "$7.990.900 COP",
+        "fecha": "2026-07-30",
+        "existencias": "publicado"
+      }
+    ],
+    "nota_envio": "El precio suele incluir ~$100.000 de envío; se publica 'Envío GRATIS a todo el país' + pago contra entrega",
+    "moneda": "COP"
+  },
+  "descripcion_principal": "Máquina Smith con guía vertical de barra para un movimiento controlado y estable. Con paradas de seguridad integradas, mejora la seguridad en sentadillas, press y otros ejercicios compuestos. Ideal para principiantes y avanzados.",
+  "descripcion_origen": "encontrado_web (redactado desde el listing)",
+  "caracteristicas": [
+    "Guía vertical de barra",
+    "Paradas de seguridad integradas",
+    "Para sentadilla, press y compuestos",
+    "Estructura robusta"
+  ],
+  "caracteristicas_origen": "encontrado_web",
+  "ficha_tecnica": {
+    "_origen_global": "encontrado_web — Fitness Market, listing E7063, 2026-07-30",
+    "_nota": "Claves en MAYÚSCULAS. Producto SIN motor. Datos extraídos de la fuente.",
+    "MODELO": "E7063",
+    "MARCA": "Fitness Market",
+    "TIPO": "Máquina Smith (guía vertical de barra)",
+    "MUSCULOS TRABAJADOS": "Compuestos (sentadilla, press)",
+    "DIMENSIONES": "1090 x 2180 x 2320 mm",
+    "PESO": "218 kg"
+  },
+  "criterio_verificacion_visual": {
+    "definido_por": "Investigador (Camino A); pendiente confirmación de Angie",
+    "SI_es": "Bastidor con dos rieles verticales que guían una barra, con postes para discos.",
+    "NO_es": "Rack o jaula sin guía de barra; multiestación de poleas.",
+    "rasgo_decisivo": "Rasgos estructurales, NUNCA el color.",
+    "uso": "criterio para aceptar/rechazar imágenes; revisión final siempre humana"
+  },
+  "multimedia": {
+    "imagenes_galeria_confirmadas": [
+      {
+        "url": "E7063_recorte.png",
+        "nota": "Portada: recorte transparente (rembg), verificado a ojo."
+      },
+      {
+        "url": "Imagenes/gym_E7063/foto_01.webp",
+        "nota": "Foto de estudio, fuente Fitness Market, verificada por gate visual."
+      }
+    ],
+    "imagenes_nota": "Galería mínima honesta: 1 foto real de la fuente + su recorte. La fuente publica 1 foto útil del producto.",
+    "briefs_generacion_ia": [],
+    "regla_generacion": "PROHIBIDO inventar textos, etiquetas o modelos que no estén en las fotos reales.",
+    "formato_destino": "WebP 1080x1080 (estándar de la tienda)",
+    "video_youtube": null,
+    "video_nota": "Fase 5. No se descargó en esta pasada.",
+    "galeria_tomas": {
+      "_comentario": "Datos para las tomas generadas. Solo lo verificado.",
+      "callouts": [],
+      "callouts_origen": null,
+      "dimensiones": {
+        "alto": "2320 mm",
+        "ancho": "2180 mm",
+        "fondo": "1090 mm",
+        "peso": "218 kg"
+      },
+      "dimensiones_origen": "encontrado_web — Fitness Market 2026-07-30."
+    },
+    "plan_galeria": {
+      "_slots_omitidos_y_por_que": [
+        "plan_galeria completo: no se reunió más material real (Fase 4.1); objeto = lote de medición."
+      ],
+      "imagen_base": null,
+      "imagen_base_origen": null,
+      "slots": []
+    }
+  },
+  "seo": {
+    "meta_titulo": "Máquina Smith | Ekipon",
+    "meta_descripcion": "Máquina Smith con guía vertical de barra para un movimiento controlado y estable. Con paradas de seguridad integradas, m Envío GRATIS a todo el país y pago",
+    "palabras_clave": [
+      "máquina smith",
+      "smith machine",
+      "guía vertical",
+      "sentadilla",
+      "gimnasio"
+    ],
+    "texto_alt_base": "Máquina Smith – Guía Vertical 218 Kg",
+    "origen": "generado_ia"
+  },
+  "campos_por_confirmar": [
+    "Precio (lo define Angie — regla fija)",
+    "Categoría (leer el árbol EN VIVO desde WooCommerce)"
+  ],
+  "fuentes_consultadas": [
+    {
+      "fuente": "Fitness Market — smith-machine-1 (SKU E7063)",
+      "uso": "Fuente principal.",
+      "fecha": "2026-07-30"
+    }
+  ]
+}

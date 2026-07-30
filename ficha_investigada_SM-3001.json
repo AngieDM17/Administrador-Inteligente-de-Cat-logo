@@ -1,0 +1,138 @@
+{
+  "_version_ficha": "1.4",
+  "_uso": "Ficha del lote de muestra gym (Camino A, link Fitness Market). Extracción 2026-07-30.",
+  "modo_entrada": "investigacion_web",
+  "entrada_original": {
+    "nombre_dado": "Banco Plano",
+    "codigo_proveedor": "SM-3001",
+    "foto_referencia": "Entrada por link exacto (Camino A); 1 foto de portada verificada por gate visual.",
+    "link_producto": "https://www.fitnessmarket.com.co/products/flat-bench"
+  },
+  "fecha_investigacion": "2026-07-30",
+  "estado": "pendiente_revision",
+  "identificacion_del_producto": {
+    "resultado": "IDENTIFICADO",
+    "detalle": "BANCO PLANO – PARA PESO LIBRE 25 KG. Extraído del listing exacto de Fitness Market Colombia (SKU SM-3001).",
+    "fuente_principal": "Fitness Market — fitnessmarket.com.co/flat-bench (SKU SM-3001), 2026-07-30.",
+    "advertencias": [],
+    "estado_en_proveedor": "Nuevo. Publicado a $899.900 COP. Consultado 2026-07-30.",
+    "origen_identificacion": "link"
+  },
+  "producto": {
+    "nombre_propuesto": "BANCO PLANO – PARA PESO LIBRE 25 KG",
+    "nombre_origen": "generado_ia (formato Ekipon)",
+    "modelo": "SM-3001",
+    "sku": "AUTOMATICO — lo asigna el sistema de la tienda, no se muestra al público",
+    "es_motorizado": false,
+    "categoria_propuesta": "Gimnasio",
+    "categoria_confianza": "confirmado_por_angie — categoría 'Gimnasio' creada en la tienda de pruebas (id 465).",
+    "etiquetas_propuestas": [
+      "banco plano",
+      "banco de pesas",
+      "peso libre",
+      "press de banca",
+      "gimnasio"
+    ],
+    "garantia": "1 año (política fija de la tienda)"
+  },
+  "precios": {
+    "precio": null,
+    "precio_origen": "PENDIENTE_ANGIE — REGLA FIJA: el precio SIEMPRE lo define Angie manualmente.",
+    "referencias_mercado": [
+      {
+        "fuente": "Fitness Market (SM-3001)",
+        "precio": "$899.900 COP",
+        "fecha": "2026-07-30",
+        "existencias": "publicado"
+      }
+    ],
+    "nota_envio": "El precio suele incluir ~$100.000 de envío; se publica 'Envío GRATIS a todo el país' + pago contra entrega",
+    "moneda": "COP"
+  },
+  "descripcion_principal": "Banco plano robusto para entrenamiento con peso libre: press de banca, vuelos, remo con mancuernas y otros movimientos esenciales. Superficie estable y materiales resistentes.",
+  "descripcion_origen": "encontrado_web (redactado desde el listing)",
+  "caracteristicas": [
+    "Superficie plana acolchada",
+    "Para press de banca, vuelos y remo",
+    "Estructura estable y resistente"
+  ],
+  "caracteristicas_origen": "encontrado_web",
+  "ficha_tecnica": {
+    "_origen_global": "encontrado_web — Fitness Market, listing SM-3001, 2026-07-30",
+    "_nota": "Claves en MAYÚSCULAS. Producto SIN motor. Datos extraídos de la fuente.",
+    "MODELO": "SM-3001",
+    "MARCA": "Fitness Market",
+    "TIPO": "Banco plano de peso libre",
+    "DIMENSIONES": "1270 x 560 x 410 mm",
+    "PESO": "25 kg"
+  },
+  "criterio_verificacion_visual": {
+    "definido_por": "Investigador (Camino A); pendiente confirmación de Angie",
+    "SI_es": "Banco plano acolchado sobre patas en A, sin respaldo ajustable.",
+    "NO_es": "Banco ajustable/olímpico con soportes de barra.",
+    "rasgo_decisivo": "Rasgos estructurales, NUNCA el color.",
+    "uso": "criterio para aceptar/rechazar imágenes; revisión final siempre humana"
+  },
+  "multimedia": {
+    "imagenes_galeria_confirmadas": [
+      {
+        "url": "SM-3001_recorte.png",
+        "nota": "Portada: recorte transparente (rembg), verificado a ojo."
+      },
+      {
+        "url": "Imagenes/gym_SM-3001/foto_01.webp",
+        "nota": "Foto de estudio, fuente Fitness Market, verificada por gate visual."
+      }
+    ],
+    "imagenes_nota": "Galería mínima honesta: 1 foto real de la fuente + su recorte. La fuente publica 1 foto útil del producto.",
+    "briefs_generacion_ia": [],
+    "regla_generacion": "PROHIBIDO inventar textos, etiquetas o modelos que no estén en las fotos reales.",
+    "formato_destino": "WebP 1080x1080 (estándar de la tienda)",
+    "video_youtube": null,
+    "video_nota": "Fase 5. No se descargó en esta pasada.",
+    "galeria_tomas": {
+      "_comentario": "Datos para las tomas generadas. Solo lo verificado.",
+      "callouts": [],
+      "callouts_origen": null,
+      "dimensiones": {
+        "alto": "410 mm",
+        "ancho": "560 mm",
+        "fondo": "1270 mm",
+        "peso": "25 kg"
+      },
+      "dimensiones_origen": "encontrado_web — Fitness Market 2026-07-30."
+    },
+    "plan_galeria": {
+      "_slots_omitidos_y_por_que": [
+        "plan_galeria completo: no se reunió más material real (Fase 4.1); objeto = lote de medición."
+      ],
+      "imagen_base": null,
+      "imagen_base_origen": null,
+      "slots": []
+    }
+  },
+  "seo": {
+    "meta_titulo": "Banco Plano | Ekipon",
+    "meta_descripcion": "Banco plano robusto para entrenamiento con peso libre: press de banca, vuelos, remo con mancuernas y otros movimientos e Envío GRATIS a todo el país y pago",
+    "palabras_clave": [
+      "banco plano",
+      "banco de pesas",
+      "peso libre",
+      "press de banca",
+      "gimnasio"
+    ],
+    "texto_alt_base": "Banco Plano – Para Peso Libre 25 Kg",
+    "origen": "generado_ia"
+  },
+  "campos_por_confirmar": [
+    "Precio (lo define Angie — regla fija)",
+    "Categoría (leer el árbol EN VIVO desde WooCommerce)"
+  ],
+  "fuentes_consultadas": [
+    {
+      "fuente": "Fitness Market — flat-bench (SKU SM-3001)",
+      "uso": "Fuente principal.",
+      "fecha": "2026-07-30"
+    }
+  ]
+}

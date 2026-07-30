@@ -1,0 +1,141 @@
+{
+  "_version_ficha": "1.4",
+  "_uso": "Ficha del lote de muestra gym (Camino A, link Fitness Market). Extracción 2026-07-30.",
+  "modo_entrada": "investigacion_web",
+  "entrada_original": {
+    "nombre_dado": "Máquina Seated Leg Curl",
+    "codigo_proveedor": "U3023B",
+    "foto_referencia": "Entrada por link exacto (Camino A); 1 foto de portada verificada por gate visual.",
+    "link_producto": "https://www.fitnessmarket.com.co/products/seated-leg-curl"
+  },
+  "fecha_investigacion": "2026-07-30",
+  "estado": "pendiente_revision",
+  "identificacion_del_producto": {
+    "resultado": "IDENTIFICADO",
+    "detalle": "MÁQUINA SEATED LEG CURL – FLEXIÓN DE PIERNA SENTADO 140 KG. Extraído del listing exacto de Fitness Market Colombia (SKU U3023B).",
+    "fuente_principal": "Fitness Market — fitnessmarket.com.co/seated-leg-curl (SKU U3023B), 2026-07-30.",
+    "advertencias": [],
+    "estado_en_proveedor": "Nuevo. Publicado a $6.279.900 COP. Consultado 2026-07-30.",
+    "origen_identificacion": "link"
+  },
+  "producto": {
+    "nombre_propuesto": "MÁQUINA SEATED LEG CURL – FLEXIÓN DE PIERNA SENTADO 140 KG",
+    "nombre_origen": "generado_ia (formato Ekipon)",
+    "modelo": "U3023B",
+    "sku": "AUTOMATICO — lo asigna el sistema de la tienda, no se muestra al público",
+    "es_motorizado": false,
+    "categoria_propuesta": "Gimnasio",
+    "categoria_confianza": "confirmado_por_angie — categoría 'Gimnasio' creada en la tienda de pruebas (id 465).",
+    "etiquetas_propuestas": [
+      "seated leg curl",
+      "flexión de pierna",
+      "isquiotibiales",
+      "máquina de fuerza",
+      "gimnasio"
+    ],
+    "garantia": "1 año (política fija de la tienda)"
+  },
+  "precios": {
+    "precio": null,
+    "precio_origen": "PENDIENTE_ANGIE — REGLA FIJA: el precio SIEMPRE lo define Angie manualmente.",
+    "referencias_mercado": [
+      {
+        "fuente": "Fitness Market (U3023B)",
+        "precio": "$6.279.900 COP",
+        "fecha": "2026-07-30",
+        "existencias": "publicado"
+      }
+    ],
+    "nota_envio": "El precio suele incluir ~$100.000 de envío; se publica 'Envío GRATIS a todo el país' + pago contra entrega",
+    "moneda": "COP"
+  },
+  "descripcion_principal": "Máquina de flexión de pierna sentado, para el entrenamiento aislado de los isquiotibiales. Diseño en posición sentada con respaldo inclinado y rodillos ajustables para una alineación correcta y menor carga articular. Pila de pesas de 140 kg.",
+  "descripcion_origen": "encontrado_web (redactado desde el listing)",
+  "caracteristicas": [
+    "Flexión de pierna en posición sentada",
+    "Aísla los isquiotibiales",
+    "Pila de pesas de 140 kg",
+    "Respaldo inclinado y rodillos ajustables"
+  ],
+  "caracteristicas_origen": "encontrado_web",
+  "ficha_tecnica": {
+    "_origen_global": "encontrado_web — Fitness Market, listing U3023B, 2026-07-30",
+    "_nota": "Claves en MAYÚSCULAS. Producto SIN motor. Datos extraídos de la fuente.",
+    "MODELO": "U3023B",
+    "MARCA": "Fitness Market",
+    "TIPO": "Seated leg curl (flexión de pierna sentado)",
+    "PILA DE PESAS": "140 kg",
+    "MUSCULOS TRABAJADOS": "Isquiotibiales",
+    "DIMENSIONES": "1580 x 1050 x 1500 mm",
+    "PESO": "220 kg"
+  },
+  "criterio_verificacion_visual": {
+    "definido_por": "Investigador (Camino A); pendiente confirmación de Angie",
+    "SI_es": "Máquina sentada con rodillos para la parte posterior de la pierna y pila de pesas seleccionable.",
+    "NO_es": "Prone/standing leg curl, o leg extension (trabaja la parte delantera).",
+    "rasgo_decisivo": "Rasgos estructurales, NUNCA el color.",
+    "uso": "criterio para aceptar/rechazar imágenes; revisión final siempre humana"
+  },
+  "multimedia": {
+    "imagenes_galeria_confirmadas": [
+      {
+        "url": "U3023B_recorte.png",
+        "nota": "Portada: recorte transparente (rembg), verificado a ojo."
+      },
+      {
+        "url": "Imagenes/gym_U3023B/foto_01.webp",
+        "nota": "Foto de estudio, fuente Fitness Market, verificada por gate visual."
+      }
+    ],
+    "imagenes_nota": "Galería mínima honesta: 1 foto real de la fuente + su recorte. La fuente publica 1 foto útil del producto.",
+    "briefs_generacion_ia": [],
+    "regla_generacion": "PROHIBIDO inventar textos, etiquetas o modelos que no estén en las fotos reales.",
+    "formato_destino": "WebP 1080x1080 (estándar de la tienda)",
+    "video_youtube": null,
+    "video_nota": "Fase 5. No se descargó en esta pasada.",
+    "galeria_tomas": {
+      "_comentario": "Datos para las tomas generadas. Solo lo verificado.",
+      "callouts": [],
+      "callouts_origen": null,
+      "dimensiones": {
+        "alto": "1500 mm",
+        "ancho": "1050 mm",
+        "fondo": "1580 mm",
+        "peso": "220 kg"
+      },
+      "dimensiones_origen": "encontrado_web — Fitness Market 2026-07-30."
+    },
+    "plan_galeria": {
+      "_slots_omitidos_y_por_que": [
+        "plan_galeria completo: no se reunió más material real (Fase 4.1); objeto = lote de medición."
+      ],
+      "imagen_base": null,
+      "imagen_base_origen": null,
+      "slots": []
+    }
+  },
+  "seo": {
+    "meta_titulo": "Máquina Seated Leg Curl | Ekipon",
+    "meta_descripcion": "Máquina de flexión de pierna sentado, para el entrenamiento aislado de los isquiotibiales. Diseño en posición sentada co Envío GRATIS a todo el país y pago",
+    "palabras_clave": [
+      "seated leg curl",
+      "flexión de pierna",
+      "isquiotibiales",
+      "máquina de fuerza",
+      "gimnasio"
+    ],
+    "texto_alt_base": "Máquina Seated Leg Curl – Flexión De Pierna Sentado 140 Kg",
+    "origen": "generado_ia"
+  },
+  "campos_por_confirmar": [
+    "Precio (lo define Angie — regla fija)",
+    "Categoría (leer el árbol EN VIVO desde WooCommerce)"
+  ],
+  "fuentes_consultadas": [
+    {
+      "fuente": "Fitness Market — seated-leg-curl (SKU U3023B)",
+      "uso": "Fuente principal.",
+      "fecha": "2026-07-30"
+    }
+  ]
+}

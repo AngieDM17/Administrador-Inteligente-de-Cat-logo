@@ -1,0 +1,142 @@
+{
+  "_version_ficha": "1.4",
+  "_uso": "Ficha del lote de muestra gym (Camino A, link Fitness Market). Extracción 2026-07-30.",
+  "modo_entrada": "investigacion_web",
+  "entrada_original": {
+    "nombre_dado": "Barra Olímpica 220 Cm",
+    "codigo_proveedor": "IR94054",
+    "foto_referencia": "Entrada por link exacto (Camino A); 1 foto de portada verificada por gate visual.",
+    "link_producto": "https://www.fitnessmarket.com.co/products/olympic-bar-220cm-700-lbs-with-4-bearings-dia28mm"
+  },
+  "fecha_investigacion": "2026-07-30",
+  "estado": "pendiente_revision",
+  "identificacion_del_producto": {
+    "resultado": "IDENTIFICADO",
+    "detalle": "BARRA OLÍMPICA 220 CM – 700 LB 4 RODAMIENTOS. Extraído del listing exacto de Fitness Market Colombia (SKU IR94054).",
+    "fuente_principal": "Fitness Market — fitnessmarket.com.co/olympic-bar-220cm-700-lbs-with-4-bearings-dia28mm (SKU IR94054), 2026-07-30.",
+    "advertencias": [],
+    "estado_en_proveedor": "Nuevo. Publicado a $715.900 COP. Consultado 2026-07-30.",
+    "origen_identificacion": "link"
+  },
+  "producto": {
+    "nombre_propuesto": "BARRA OLÍMPICA 220 CM – 700 LB 4 RODAMIENTOS",
+    "nombre_origen": "generado_ia (formato Ekipon)",
+    "modelo": "IR94054",
+    "sku": "AUTOMATICO — lo asigna el sistema de la tienda, no se muestra al público",
+    "es_motorizado": false,
+    "categoria_propuesta": "Gimnasio",
+    "categoria_confianza": "confirmado_por_angie — categoría 'Gimnasio' creada en la tienda de pruebas (id 465).",
+    "etiquetas_propuestas": [
+      "barra olímpica",
+      "olympic bar",
+      "barra 220 cm",
+      "700 lb",
+      "gimnasio"
+    ],
+    "garantia": "1 año (política fija de la tienda)"
+  },
+  "precios": {
+    "precio": null,
+    "precio_origen": "PENDIENTE_ANGIE — REGLA FIJA: el precio SIEMPRE lo define Angie manualmente.",
+    "referencias_mercado": [
+      {
+        "fuente": "Fitness Market (IR94054)",
+        "precio": "$715.900 COP",
+        "fecha": "2026-07-30",
+        "existencias": "publicado"
+      }
+    ],
+    "nota_envio": "El precio suele incluir ~$100.000 de envío; se publica 'Envío GRATIS a todo el país' + pago contra entrega",
+    "moneda": "COP"
+  },
+  "descripcion_principal": "Barra olímpica profesional de 220 cm, diámetro 28 mm y capacidad de 700 lb. Cuatro rodamientos de precisión para una rotación suave, reduciendo el estrés en muñecas y hombros. Construcción robusta para entrenamiento intenso.",
+  "descripcion_origen": "encontrado_web (redactado desde el listing)",
+  "caracteristicas": [
+    "Largo 220 cm, diámetro 28 mm",
+    "Capacidad 700 lb",
+    "4 rodamientos de precisión",
+    "Para sentadilla, cargada y envión"
+  ],
+  "caracteristicas_origen": "encontrado_web",
+  "ficha_tecnica": {
+    "_origen_global": "encontrado_web — Fitness Market, listing IR94054, 2026-07-30",
+    "_nota": "Claves en MAYÚSCULAS. Producto SIN motor. Datos extraídos de la fuente.",
+    "MODELO": "IR94054",
+    "MARCA": "Fitness Market",
+    "TIPO": "Barra olímpica",
+    "LARGO": "220 cm",
+    "DIÁMETRO": "28 mm",
+    "CAPACIDAD": "700 lb",
+    "RODAMIENTOS": "4"
+  },
+  "criterio_verificacion_visual": {
+    "definido_por": "Investigador (Camino A); pendiente confirmación de Angie",
+    "SI_es": "Barra recta cromada con mangas giratorias en los extremos (agarre olímpico 28 mm).",
+    "NO_es": "Barra Z/EZ, barra hexagonal (trap bar) o barra de mancuerna.",
+    "rasgo_decisivo": "Rasgos estructurales, NUNCA el color.",
+    "uso": "criterio para aceptar/rechazar imágenes; revisión final siempre humana"
+  },
+  "multimedia": {
+    "imagenes_galeria_confirmadas": [
+      {
+        "url": "IR94054_recorte.png",
+        "nota": "Portada: recorte transparente (rembg), verificado a ojo."
+      },
+      {
+        "url": "Imagenes/gym_IR94054/foto_01.webp",
+        "nota": "Foto de estudio, fuente Fitness Market, verificada por gate visual."
+      }
+    ],
+    "imagenes_nota": "Galería mínima honesta: 1 foto real de la fuente + su recorte. La fuente publica 1 foto útil del producto.",
+    "briefs_generacion_ia": [],
+    "regla_generacion": "PROHIBIDO inventar textos, etiquetas o modelos que no estén en las fotos reales.",
+    "formato_destino": "WebP 1080x1080 (estándar de la tienda)",
+    "video_youtube": null,
+    "video_nota": "Fase 5. No se descargó en esta pasada.",
+    "galeria_tomas": {
+      "_comentario": "Datos para las tomas generadas. Solo lo verificado.",
+      "callouts": [],
+      "callouts_origen": null,
+      "dimensiones": {
+        "alto": null,
+        "ancho": null,
+        "fondo": "220 cm",
+        "peso": null
+      },
+      "dimensiones_origen": "encontrado_web — Fitness Market 2026-07-30."
+    },
+    "plan_galeria": {
+      "_slots_omitidos_y_por_que": [
+        "plan_galeria completo: no se reunió más material real (Fase 4.1); objeto = lote de medición."
+      ],
+      "imagen_base": null,
+      "imagen_base_origen": null,
+      "slots": []
+    }
+  },
+  "seo": {
+    "meta_titulo": "Barra Olímpica 220 Cm | Ekipon",
+    "meta_descripcion": "Barra olímpica profesional de 220 cm, diámetro 28 mm y capacidad de 700 lb. Cuatro rodamientos de precisión para una rot Envío GRATIS a todo el país y pago",
+    "palabras_clave": [
+      "barra olímpica",
+      "olympic bar",
+      "barra 220 cm",
+      "700 lb",
+      "gimnasio"
+    ],
+    "texto_alt_base": "Barra Olímpica 220 Cm – 700 Lb 4 Rodamientos",
+    "origen": "generado_ia"
+  },
+  "campos_por_confirmar": [
+    "Precio (lo define Angie — regla fija)",
+    "Categoría (leer el árbol EN VIVO desde WooCommerce)",
+    "Peso de la barra (kg): no publicado en la fuente."
+  ],
+  "fuentes_consultadas": [
+    {
+      "fuente": "Fitness Market — olympic-bar-220cm-700-lbs-with-4-bearings-dia28mm (SKU IR94054)",
+      "uso": "Fuente principal.",
+      "fecha": "2026-07-30"
+    }
+  ]
+}

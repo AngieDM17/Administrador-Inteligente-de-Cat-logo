@@ -34,8 +34,18 @@ apagada (candado a `pruebas.ekipon.co`); el precio lo define Angie; falta su rev
 borrador. **DNS de `pruebas.ekipon.co` viene intermitente** (resuelve a ratos); se sorteó con
 warm-up + reintentos, pero el Publicador NO tiene reintentos internos — agregarlos si se automatiza.
 
+**4. Primer LOTE end-to-end (muestra de 6 de la colección Fitness Market marca-propia, de 35).**
+Todos a borrador en Gimnasio. **Colador: 3 VERDES** (leg curl 50300, Smith 50304, banco 50308) /
+**3 REVISAR** (squat rack 50313 sin dimensiones, barra 50317 sin peso, set 50321 combo sin specs) —
+50/50, todos los amarillos por dato faltante REAL, ninguno por bug. Findings de escala: (a) **el DNS
+intermitente es el cuello operativo** — cada producto ~35s por warm-up+reintentos; el Publicador/
+`cliente_tienda` NO tienen reintentos internos → **próximo paso: agregárselos antes de los 35**; (b)
+el gate visual atrapó que el "set de 8 piezas" mezcla agarres + un rack en sus fotos; (c) la
+validación frenó una ficha malformada antes de la tienda. **El pipeline es sólido (6/6 llegaron); los
+cuellos para 35 son operativos (DNS) + tu revisión sobre el ~50%, no el sistema.**
+
 **Detalle:** memorias de Engram `end-to-end-completo-de-un-producto-de-gimnasio`,
-`primer-verde-del-colador`, `la-tienda-de-pruebas-no-tiene-categor-a-de-gimnasio`.
+`primer-verde-del-colador`, `la-tienda-de-pruebas-no-tiene-categor-a-de-gimnasio`, `lote-de-muestra-gym`.
 
 ---
 
