@@ -1,6 +1,6 @@
 # ESTADO DEL PROYECTO — Administrador Inteligente de Catálogo Ekipon
 
-**Última actualización:** 29-jul-2026.
+**Última actualización:** 30-jul-2026.
 **Para retomar en un chat nuevo:** pídele a Claude que lea PRIMERO este archivo, luego
 `AUDITORIA_ABOGADO_DEL_DIABLO.md` y `ETAPA_IMAGENES.md`.
 **Regla de oro:** ante cualquier discrepancia entre este documento y el código, **gana el código**.
@@ -8,7 +8,38 @@ Verificar antes de afirmar.
 
 ---
 
-## 🔵 ACTUALIZACIÓN 29-jul-2026 (leer esto primero)
+## 🔵 ACTUALIZACIÓN 30-jul-2026 (leer esto primero)
+
+**Primer producto de GIMNASIO montado de punta a punta hasta la tienda, y primer VERDE del colador.**
+Todo verificado ejecutando. Producto: Máquina Leg Press (SKU U3003B) de Fitness Market Colombia.
+
+**1. Primer VERDE del colador.** Hasta ayer el colador marcaba el 100% para revisar. El leg press
+—fuente seria, datos limpios, sin motor (`es_motorizado: false`)— salió **LISTO** (cero motivos).
+Confirma que el colador sabe dejar pasar lo bueno, no solo frenar lo malo, y que el cuello de
+botella real es la CALIDAD DE FUENTE (tienda fitness colombiana = limpio; Alibaba = sucio).
+
+**2. Cadena completa hasta la tienda, sobre una categoría NUEVA (gimnasio):**
+link → Investigador → colador (verde) → recorte transparente (rembg) → galería + banner →
+Publicador → **BORRADOR id 50295 en `pruebas.ekipon.co`**. Leído de vuelta de la tienda:
+status=draft, categoría=Gimnasio, precio vacío (lo pone Angie), 2 imágenes, descripción con tabla
+de ficha técnica + banner. **Sin una línea de código especial para gimnasio** — el molde es
+uniforme, como sostuvo Angie.
+
+**3. Se creó la categoría "Gimnasio" (id 465) en la tienda de pruebas.** La tienda no tenía rama de
+gimnasio; Angie autorizó crearla. (El árbol en vivo se lee siempre; Claude no crea/modifica
+categorías sin su ok.)
+
+**Límites honestos:** galería mínima (2 imgs) porque la fuente publica UNA foto; tienda REAL sigue
+apagada (candado a `pruebas.ekipon.co`); el precio lo define Angie; falta su revisión visual del
+borrador. **DNS de `pruebas.ekipon.co` viene intermitente** (resuelve a ratos); se sorteó con
+warm-up + reintentos, pero el Publicador NO tiene reintentos internos — agregarlos si se automatiza.
+
+**Detalle:** memorias de Engram `end-to-end-completo-de-un-producto-de-gimnasio`,
+`primer-verde-del-colador`, `la-tienda-de-pruebas-no-tiene-categor-a-de-gimnasio`.
+
+---
+
+## 🔵 ACTUALIZACIÓN 29-jul-2026
 
 Se cerró el círculo end-to-end del colador y se arregló su primer sesgo, todo verificado ejecutando.
 **Suite: 251 → 255 tests en verde** (+4).
