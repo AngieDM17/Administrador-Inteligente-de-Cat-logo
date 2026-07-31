@@ -51,8 +51,8 @@
     "nota_envio": "El precio suele incluir ~$100.000 de envío; se publica 'Envío GRATIS a todo el país' + pago contra entrega",
     "moneda": "COP"
   },
-  "descripcion_principal": "Set de 8 agarres de polea para trabajar distintos grupos musculares en máquinas de cable: barras, manijas en V y agarres de tríceps/espalda. Variedad para ampliar la rutina.",
-  "descripcion_origen": "encontrado_web (redactado desde el listing)",
+  "descripcion_principal": "Set de 8 piezas versátiles diseñado para maximizar tu rendimiento en cada entrenamiento. Esta colección completa te ofrece todo lo necesario para trabajar diferentes grupos musculares y alcanzar tus objetivos fitness con eficiencia. Cada pieza ha sido seleccionada estratégicamente para brindarte variedad, durabilidad y resultados comprobados. Invierte en calidad y versatilidad que transformará tu rutina de ejercicio. Perfecto para principiantes y atletas experimentados que buscan expandir sus posibilidades de entrenamiento.",
+  "descripcion_origen": "encontrado_web (texto completo del listing)",
   "caracteristicas": [
     "8 agarres de polea distintos",
     "Compatibles con máquinas de cable",
@@ -76,12 +76,12 @@
   "multimedia": {
     "imagenes_galeria_confirmadas": [
       {
-        "url": "IR95401S1_recorte.png",
-        "nota": "Portada: recorte transparente (rembg), verificado a ojo."
+        "url": "Imagenes/gym_IR95401S1/galeria/01-producto_limpio.webp",
+        "nota": "Vista general del producto sobre fondo limpio"
       },
       {
         "url": "Imagenes/gym_IR95401S1/foto_01.webp",
-        "nota": "Foto de estudio, fuente Fitness Market, verificada por gate visual."
+        "nota": "Foto de estudio (Fitness Market)"
       }
     ],
     "imagenes_nota": "Galería mínima honesta: 1 foto real de la fuente + su recorte. La fuente publica 1 foto útil del producto.",
@@ -103,12 +103,26 @@
       "dimensiones_origen": null
     },
     "plan_galeria": {
-      "_slots_omitidos_y_por_que": [
-        "plan_galeria completo: no se reunió más material real (Fase 4.1); objeto = lote de medición."
-      ],
-      "imagen_base": null,
-      "imagen_base_origen": null,
-      "slots": []
+      "imagen_base": "Imagenes/gym_IR95401S1/foto_01.webp",
+      "imagen_base_origen": "encontrado_web",
+      "slots": [
+        {
+          "tipo": "producto_limpio",
+          "fuente": "generado_motor",
+          "deriva_de": null,
+          "nota": "Vista general del producto sobre fondo limpio",
+          "archivo": "Imagenes/gym_IR95401S1/galeria/01-producto_limpio.webp",
+          "origen": "encontrado_web"
+        },
+        {
+          "tipo": "foto_real",
+          "fuente": "foto_real",
+          "origen": "encontrado_web",
+          "archivo": "Imagenes/gym_IR95401S1/foto_01.webp",
+          "deriva_de": null,
+          "nota": "Foto de estudio (Fitness Market)"
+        }
+      ]
     }
   },
   "seo": {

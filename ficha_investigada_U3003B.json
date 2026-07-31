@@ -1,7 +1,6 @@
 {
   "_version_ficha": "1.4",
   "_uso": "Ficha investigada por Camino A (link exacto de tienda fitness colombiana). Extracción de la fuente, 2026-07-29. Prueba end-to-end de categoría GIMNASIO (producto sin motor).",
-
   "modo_entrada": "investigacion_web",
   "entrada_original": {
     "nombre_dado": "Máquina Leg Press",
@@ -11,7 +10,6 @@
   },
   "fecha_investigacion": "2026-07-29",
   "estado": "pendiente_revision",
-
   "identificacion_del_producto": {
     "resultado": "IDENTIFICADO",
     "detalle": "Máquina Leg Press (prensa de pierna) sentada, SKU U3003B, marca Fitness Market. Equipo de fuerza con pila de pesas de 109 kg. Extraído del listing exacto de Fitness Market Colombia.",
@@ -20,7 +18,6 @@
     "estado_en_proveedor": "Nuevo. Publicado a $6.199.900 COP (impuestos incluidos). Poco inventario: 2 unidades. Consultado 2026-07-29.",
     "origen_identificacion": "link"
   },
-
   "producto": {
     "nombre_propuesto": "MÁQUINA LEG PRESS SENTADO – PRENSA DE PIERNA PILA 109 KG",
     "nombre_origen": "generado_ia (formato de nombres Ekipon)",
@@ -29,10 +26,15 @@
     "es_motorizado": false,
     "categoria_propuesta": "Gimnasio",
     "categoria_confianza": "confirmado_por_angie — Angie eligió crear la categoría 'Gimnasio' (creada en vivo en la tienda de pruebas, id 465, 30-jul-2026).",
-    "etiquetas_propuestas": ["leg press", "prensa de pierna", "máquina de fuerza", "gimnasio", "pierna"],
+    "etiquetas_propuestas": [
+      "leg press",
+      "prensa de pierna",
+      "máquina de fuerza",
+      "gimnasio",
+      "pierna"
+    ],
     "garantia": "1 año (política fija de la tienda)"
   },
-
   "precios": {
     "precio": null,
     "precio_origen": "PENDIENTE_ANGIE — REGLA FIJA: el precio SIEMPRE lo define Angie manualmente. El sistema solo aporta referencias.",
@@ -47,10 +49,8 @@
     "nota_envio": "El precio suele incluir ~$100.000 de envío; se publica 'Envío GRATIS a todo el país' + pago contra entrega",
     "moneda": "COP"
   },
-
-  "descripcion_principal": "Máquina Leg Press robusta y eficiente, ideal para desarrollar fuerza en cuádriceps, glúteos e isquiotibiales. Su diseño en posición sentada permite un entrenamiento seguro, con una alineación natural de la espalda y las articulaciones, reduciendo el impacto en la zona lumbar. Pila de pesas de 109 kg.",
+  "descripcion_principal": "Máquina Leg Press de estructura robusta para el desarrollo de fuerza en el tren inferior: cuádriceps, glúteos e isquiotibiales. Su diseño en posición sentada mantiene una alineación natural de la espalda y las articulaciones, reduciendo el impacto en la zona lumbar y permitiendo un entrenamiento seguro y controlado. Incorpora una pila de pesas seleccionable de 109 kg, que permite ajustar la carga al instante sin cambiar discos, y una construcción pensada para el uso intensivo tanto en gimnasios comerciales como en espacios de entrenamiento en casa. Ideal para rutinas de fuerza, hipertrofia y acondicionamiento del tren inferior.",
   "descripcion_origen": "encontrado_web (redactado a partir de la descripción del listing)",
-
   "caracteristicas": [
     "Prensa de pierna en posición sentada",
     "Trabaja cuádriceps, glúteos e isquiotibiales",
@@ -59,7 +59,6 @@
     "Estructura robusta"
   ],
   "caracteristicas_origen": "encontrado_web",
-
   "ficha_tecnica": {
     "_origen_global": "encontrado_web — Fitness Market, listing U3003B, 2026-07-29",
     "_nota": "Claves en MAYÚSCULAS. Producto SIN motor (es de fuerza por pila de pesas). Datos extraídos de la fuente.",
@@ -71,7 +70,6 @@
     "PESO": "255 kg",
     "MUSCULOS TRABAJADOS": "Cuádriceps, glúteos, isquiotibiales"
   },
-
   "criterio_verificacion_visual": {
     "definido_por": "Investigador (Camino A); pendiente de confirmación de Angie",
     "SI_es": "Máquina de leg press con asiento reclinado y plataforma de empuje para los pies, guiada por pila de pesas seleccionable.",
@@ -79,29 +77,64 @@
     "rasgo_decisivo": "Asiento sentado + pila de pesas (no de discos). NUNCA el color.",
     "uso": "criterio para aceptar/rechazar imágenes; revisión final siempre humana"
   },
-
   "multimedia": {
     "imagenes_galeria_confirmadas": [
       {
-        "url": "U3003B_recorte.png",
-        "nota": "Portada: recorte transparente del leg press (rembg), verificado a ojo."
+        "url": "Imagenes/leg_press_U3003B/galeria/01-producto_limpio.webp",
+        "nota": "Vista general del leg press sobre fondo limpio"
       },
       {
         "url": "Imagenes/leg_press_U3003B/foto_01_press_de_pierna.webp",
-        "nota": "Foto de estudio del leg press, fuente Fitness Market, verificada por gate visual."
+        "nota": "Foto de estudio del leg press (Fitness Market)"
+      },
+      {
+        "url": "Imagenes/leg_press_U3003B/galeria/03-medidas.webp",
+        "nota": "Medidas del leg press: 1850 x 1050 x 1500 mm, 255 kg"
+      },
+      {
+        "url": "Imagenes/leg_press_U3003B/galeria/04-partes_senaladas.webp",
+        "nota": "Partes principales del leg press señaladas"
       }
     ],
-    "imagenes_nota": "Galería mínima honesta: 1 foto real de la fuente + su recorte de portada. La fuente solo publica UNA foto del producto; sin cuota fija (regla del proyecto). Tomas escala/escena/otro-ángulo: no aplican (generadores no construidos).",
+    "imagenes_nota": "Galería enriquecida por el motor a partir de 1 foto real de la fuente: portada limpia (recorte) + foto de estudio + tarjeta de medidas (de las dimensiones verificadas) + partes señaladas (puntos ubicados a ojo y revisados sobre la pieza renderizada). Tomas escala/escena/otro-ángulo: no aplican (generadores no construidos). Nada inventado.",
     "briefs_generacion_ia": [],
     "regla_generacion": "PROHIBIDO inventar textos, etiquetas, modelos o conectores que no estén en las fotos reales. Ante duda, la toma se descarta. Sufijo _IA en el archivo.",
     "formato_destino": "WebP 1080x1080 (estándar de la tienda)",
     "video_youtube": null,
     "video_nota": "Fase 5. No se descargó en esta pasada.",
-
     "galeria_tomas": {
       "_comentario": "Datos que alimentan las tomas GENERADAS de la galería. Extraídos de la fuente.",
-      "callouts": [],
-      "callouts_origen": null,
+      "callouts": [
+        {
+          "label": "Respaldo acolchado",
+          "point": [
+            0.8,
+            0.34
+          ]
+        },
+        {
+          "label": "Asiento",
+          "point": [
+            0.74,
+            0.67
+          ]
+        },
+        {
+          "label": "Plataforma de empuje",
+          "point": [
+            0.46,
+            0.4
+          ]
+        },
+        {
+          "label": "Pila de pesas 109 kg",
+          "point": [
+            0.4,
+            0.26
+          ]
+        }
+      ],
+      "callouts_origen": "encontrado_web — partes visibles en la foto de la fuente; puntos ubicados a ojo sobre el recorte y validados contra la silueta.",
       "dimensiones": {
         "alto": "1500 mm",
         "ancho": "1050 mm",
@@ -110,25 +143,58 @@
       },
       "dimensiones_origen": "encontrado_web — 'Dimensiones 1850-1050-1500 mm' y 'Peso 255', Fitness Market 2026-07-29. Mapeo largo/ancho/alto -> fondo/ancho/alto."
     },
-
     "plan_galeria": {
-      "_slots_omitidos_y_por_que": [
-        "plan_galeria completo: en esta pasada no se reunió material real verificado (Fase 4.1 no ejecutada); el objeto era la prueba end-to-end de categoría + colador."
-      ],
-      "imagen_base": null,
-      "imagen_base_origen": null,
-      "slots": []
+      "imagen_base": "Imagenes/leg_press_U3003B/foto_01_press_de_pierna.webp",
+      "imagen_base_origen": "encontrado_web",
+      "slots": [
+        {
+          "tipo": "producto_limpio",
+          "fuente": "generado_motor",
+          "deriva_de": null,
+          "nota": "Vista general del leg press sobre fondo limpio",
+          "archivo": "Imagenes/leg_press_U3003B/galeria/01-producto_limpio.webp",
+          "origen": "encontrado_web"
+        },
+        {
+          "tipo": "foto_real",
+          "fuente": "foto_real",
+          "origen": "encontrado_web",
+          "archivo": "Imagenes/leg_press_U3003B/foto_01_press_de_pierna.webp",
+          "deriva_de": null,
+          "nota": "Foto de estudio del leg press (Fitness Market)"
+        },
+        {
+          "tipo": "medidas",
+          "fuente": "generado_motor",
+          "deriva_de": null,
+          "nota": "Medidas del leg press: 1850 x 1050 x 1500 mm, 255 kg",
+          "archivo": "Imagenes/leg_press_U3003B/galeria/03-medidas.webp",
+          "origen": "encontrado_web — 'Dimensiones 1850-1050-1500 mm' y 'Peso 255', Fitness Market 2026-07-29. Mapeo largo/ancho/alto -> fondo/ancho/alto."
+        },
+        {
+          "tipo": "partes_senaladas",
+          "fuente": "generado_motor",
+          "deriva_de": null,
+          "nota": "Partes principales del leg press señaladas",
+          "archivo": "Imagenes/leg_press_U3003B/galeria/04-partes_senaladas.webp",
+          "origen": "encontrado_web — partes visibles en la foto de la fuente; puntos ubicados a ojo sobre el recorte y validados contra la silueta."
+        }
+      ]
     }
   },
-
   "seo": {
     "meta_titulo": "Máquina Leg Press Sentado Pila 109 kg | Ekipon",
     "meta_descripcion": "Leg press sentado para cuádriceps, glúteos e isquiotibiales, pila de 109 kg. Envío GRATIS a todo el país y pago contra entrega",
-    "palabras_clave": ["leg press", "prensa de pierna gimnasio", "máquina de pierna", "máquina de fuerza pila de pesas", "comprar leg press colombia"],
+    "palabras_clave": [
+      "leg press",
+      "prensa de pierna gimnasio",
+      "máquina de pierna",
+      "máquina de fuerza pila de pesas",
+      "comprar leg press colombia"
+    ],
     "texto_alt_base": "Máquina leg press sentado con pila de pesas de 109 kg, estructura robusta para entrenamiento de pierna",
     "origen": "generado_ia"
   },
-
   "campos_por_confirmar": [
     "Precio (lo define Angie — regla fija)",
     "Categoría (leer el árbol EN VIVO desde WooCommerce)"

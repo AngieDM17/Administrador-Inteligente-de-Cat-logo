@@ -47,8 +47,20 @@ el gate visual atrapó que el "set de 8 piezas" mezcla agarres + un rack en sus 
 validación frenó una ficha malformada antes de la tienda. **El pipeline es sólido (6/6 llegaron); los
 cuellos para 35 son operativos (DNS) + tu revisión sobre el ~50%, no el sistema.**
 
+**5. Enriquecimiento del contenido (feedback de Angie: "todo se ve corto salvo el banner").** Se
+subió el estándar de salida, sin cruzar a inventar. Automático para todos: **descripción COMPLETA**
+traída en vivo de la fuente (subió de ~150 a 300-560 chars), **tarjeta de medidas** (solo con ≥2
+ejes reales — una barra no la lleva, su largo va en la ficha técnica) y **recorte limpio** de
+portada. Con revisión por producto (solo en máquinas multi-parte): **partes señaladas** (callouts;
+los puntos se ubican a ojo y se revisa la pieza — `validar_puntos` solo confirma que caiga SOBRE el
+producto, no que sea la parte correcta). El leg press 50295 tiene el tratamiento COMPLETO (4 imgs,
+incluye callouts); los 6 del lote quedaron con el enriquecimiento automático. La ficha técnica NO se
+infla: la fuente publica ~5 datos y no se inventan specs. Generador: `scratchpad/gen_fichas_lote.py`
+(pendiente hornear `prosa_de_fuente` + `_plan_galeria` en el pipeline real).
+
 **Detalle:** memorias de Engram `end-to-end-completo-de-un-producto-de-gimnasio`,
-`primer-verde-del-colador`, `la-tienda-de-pruebas-no-tiene-categor-a-de-gimnasio`, `lote-de-muestra-gym`.
+`primer-verde-del-colador`, `la-tienda-de-pruebas-no-tiene-categor-a-de-gimnasio`, `lote-de-muestra-gym`,
+`demo-de-enriquecimiento-del-leg-press`, `enriquecimiento-aplicado-al-lote-de-6`.
 
 ---
 

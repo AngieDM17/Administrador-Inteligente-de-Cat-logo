@@ -49,8 +49,8 @@
     "nota_envio": "El precio suele incluir ~$100.000 de envío; se publica 'Envío GRATIS a todo el país' + pago contra entrega",
     "moneda": "COP"
   },
-  "descripcion_principal": "Máquina de flexión de pierna sentado, para el entrenamiento aislado de los isquiotibiales. Diseño en posición sentada con respaldo inclinado y rodillos ajustables para una alineación correcta y menor carga articular. Pila de pesas de 140 kg.",
-  "descripcion_origen": "encontrado_web (redactado desde el listing)",
+  "descripcion_principal": "Esta máquina está concebida para el entrenamiento específico de los isquiotibiales, localizados en la parte posterior del muslo. Su diseño en posición sentada ofrece estabilidad y control, facilitando una activación muscular más intensa al aislar esta zona de manera segura. El respaldo inclinado junto con los rodillos ajustables aseguran una alineación correcta durante el ejercicio, disminuyendo la carga en las articulaciones y aumentando la eficiencia del movimiento. Es perfecta para programas de fuerza, prevención de lesiones y rehabilitación.",
+  "descripcion_origen": "encontrado_web (texto completo del listing)",
   "caracteristicas": [
     "Flexión de pierna en posición sentada",
     "Aísla los isquiotibiales",
@@ -79,12 +79,16 @@
   "multimedia": {
     "imagenes_galeria_confirmadas": [
       {
-        "url": "U3023B_recorte.png",
-        "nota": "Portada: recorte transparente (rembg), verificado a ojo."
+        "url": "Imagenes/gym_U3023B/galeria/01-producto_limpio.webp",
+        "nota": "Vista general del producto sobre fondo limpio"
       },
       {
         "url": "Imagenes/gym_U3023B/foto_01.webp",
-        "nota": "Foto de estudio, fuente Fitness Market, verificada por gate visual."
+        "nota": "Foto de estudio (Fitness Market)"
+      },
+      {
+        "url": "Imagenes/gym_U3023B/galeria/03-medidas.webp",
+        "nota": "Medidas del producto"
       }
     ],
     "imagenes_nota": "Galería mínima honesta: 1 foto real de la fuente + su recorte. La fuente publica 1 foto útil del producto.",
@@ -106,12 +110,34 @@
       "dimensiones_origen": "encontrado_web — Fitness Market 2026-07-30."
     },
     "plan_galeria": {
-      "_slots_omitidos_y_por_que": [
-        "plan_galeria completo: no se reunió más material real (Fase 4.1); objeto = lote de medición."
-      ],
-      "imagen_base": null,
-      "imagen_base_origen": null,
-      "slots": []
+      "imagen_base": "Imagenes/gym_U3023B/foto_01.webp",
+      "imagen_base_origen": "encontrado_web",
+      "slots": [
+        {
+          "tipo": "producto_limpio",
+          "fuente": "generado_motor",
+          "deriva_de": null,
+          "nota": "Vista general del producto sobre fondo limpio",
+          "archivo": "Imagenes/gym_U3023B/galeria/01-producto_limpio.webp",
+          "origen": "encontrado_web"
+        },
+        {
+          "tipo": "foto_real",
+          "fuente": "foto_real",
+          "origen": "encontrado_web",
+          "archivo": "Imagenes/gym_U3023B/foto_01.webp",
+          "deriva_de": null,
+          "nota": "Foto de estudio (Fitness Market)"
+        },
+        {
+          "tipo": "medidas",
+          "fuente": "generado_motor",
+          "deriva_de": null,
+          "nota": "Medidas del producto",
+          "archivo": "Imagenes/gym_U3023B/galeria/03-medidas.webp",
+          "origen": "encontrado_web — Fitness Market 2026-07-30."
+        }
+      ]
     }
   },
   "seo": {

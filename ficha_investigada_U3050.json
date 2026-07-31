@@ -49,8 +49,8 @@
     "nota_envio": "El precio suele incluir ~$100.000 de envío; se publica 'Envío GRATIS a todo el país' + pago contra entrega",
     "moneda": "COP"
   },
-  "descripcion_principal": "Squat rack robusto para sentadillas, press de hombros y otros levantamientos con barra de forma segura. Construcción resistente con opciones de almacenamiento de discos.",
-  "descripcion_origen": "encontrado_web (redactado desde el listing)",
+  "descripcion_principal": "Pieza central indispensable para cualquier espacio de entrenamiento de fuerza serio, desde gimnasios comerciales hasta instalaciones de entrenamiento de élite. Diseñado para ofrecer máxima seguridad, versatilidad y durabilidad, este rack permite a los atletas realizar sentadillas, presses de hombros y otros levantamientos con barra de forma segura y eficiente. Su construcción robusta y sus mœltiples opciones de almacenamiento lo convierten en una solución integral para el entrenamiento de fuerza.",
+  "descripcion_origen": "encontrado_web (texto completo del listing)",
   "caracteristicas": [
     "Soportes ajustables para barra",
     "Para sentadilla y press con barra",
@@ -76,12 +76,12 @@
   "multimedia": {
     "imagenes_galeria_confirmadas": [
       {
-        "url": "U3050_recorte.png",
-        "nota": "Portada: recorte transparente (rembg), verificado a ojo."
+        "url": "Imagenes/gym_U3050/galeria/01-producto_limpio.webp",
+        "nota": "Vista general del producto sobre fondo limpio"
       },
       {
         "url": "Imagenes/gym_U3050/foto_01.webp",
-        "nota": "Foto de estudio, fuente Fitness Market, verificada por gate visual."
+        "nota": "Foto de estudio (Fitness Market)"
       }
     ],
     "imagenes_nota": "Galería mínima honesta: 1 foto real de la fuente + su recorte. La fuente publica 1 foto útil del producto.",
@@ -103,12 +103,26 @@
       "dimensiones_origen": "encontrado_web — Fitness Market 2026-07-30."
     },
     "plan_galeria": {
-      "_slots_omitidos_y_por_que": [
-        "plan_galeria completo: no se reunió más material real (Fase 4.1); objeto = lote de medición."
-      ],
-      "imagen_base": null,
-      "imagen_base_origen": null,
-      "slots": []
+      "imagen_base": "Imagenes/gym_U3050/foto_01.webp",
+      "imagen_base_origen": "encontrado_web",
+      "slots": [
+        {
+          "tipo": "producto_limpio",
+          "fuente": "generado_motor",
+          "deriva_de": null,
+          "nota": "Vista general del producto sobre fondo limpio",
+          "archivo": "Imagenes/gym_U3050/galeria/01-producto_limpio.webp",
+          "origen": "encontrado_web"
+        },
+        {
+          "tipo": "foto_real",
+          "fuente": "foto_real",
+          "origen": "encontrado_web",
+          "archivo": "Imagenes/gym_U3050/foto_01.webp",
+          "deriva_de": null,
+          "nota": "Foto de estudio (Fitness Market)"
+        }
+      ]
     }
   },
   "seo": {

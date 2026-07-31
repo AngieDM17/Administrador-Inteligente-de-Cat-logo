@@ -49,8 +49,8 @@
     "nota_envio": "El precio suele incluir ~$100.000 de envío; se publica 'Envío GRATIS a todo el país' + pago contra entrega",
     "moneda": "COP"
   },
-  "descripcion_principal": "Banco plano robusto para entrenamiento con peso libre: press de banca, vuelos, remo con mancuernas y otros movimientos esenciales. Superficie estable y materiales resistentes.",
-  "descripcion_origen": "encontrado_web (redactado desde el listing)",
+  "descripcion_principal": "Base fundamental para cualquier programa de entrenamiento de fuerza. Construido con materiales resistentes y estabilidad excepcional, este banco proporciona una superficie ideal para realizar diversos ejercicios con pesas libres, como press de banca, vuelos, remo con mancuernas y otros movimientos esenciales.",
+  "descripcion_origen": "encontrado_web (texto completo del listing)",
   "caracteristicas": [
     "Superficie plana acolchada",
     "Para press de banca, vuelos y remo",
@@ -76,12 +76,16 @@
   "multimedia": {
     "imagenes_galeria_confirmadas": [
       {
-        "url": "SM-3001_recorte.png",
-        "nota": "Portada: recorte transparente (rembg), verificado a ojo."
+        "url": "Imagenes/gym_SM-3001/galeria/01-producto_limpio.webp",
+        "nota": "Vista general del producto sobre fondo limpio"
       },
       {
         "url": "Imagenes/gym_SM-3001/foto_01.webp",
-        "nota": "Foto de estudio, fuente Fitness Market, verificada por gate visual."
+        "nota": "Foto de estudio (Fitness Market)"
+      },
+      {
+        "url": "Imagenes/gym_SM-3001/galeria/03-medidas.webp",
+        "nota": "Medidas del producto"
       }
     ],
     "imagenes_nota": "Galería mínima honesta: 1 foto real de la fuente + su recorte. La fuente publica 1 foto útil del producto.",
@@ -103,12 +107,34 @@
       "dimensiones_origen": "encontrado_web — Fitness Market 2026-07-30."
     },
     "plan_galeria": {
-      "_slots_omitidos_y_por_que": [
-        "plan_galeria completo: no se reunió más material real (Fase 4.1); objeto = lote de medición."
-      ],
-      "imagen_base": null,
-      "imagen_base_origen": null,
-      "slots": []
+      "imagen_base": "Imagenes/gym_SM-3001/foto_01.webp",
+      "imagen_base_origen": "encontrado_web",
+      "slots": [
+        {
+          "tipo": "producto_limpio",
+          "fuente": "generado_motor",
+          "deriva_de": null,
+          "nota": "Vista general del producto sobre fondo limpio",
+          "archivo": "Imagenes/gym_SM-3001/galeria/01-producto_limpio.webp",
+          "origen": "encontrado_web"
+        },
+        {
+          "tipo": "foto_real",
+          "fuente": "foto_real",
+          "origen": "encontrado_web",
+          "archivo": "Imagenes/gym_SM-3001/foto_01.webp",
+          "deriva_de": null,
+          "nota": "Foto de estudio (Fitness Market)"
+        },
+        {
+          "tipo": "medidas",
+          "fuente": "generado_motor",
+          "deriva_de": null,
+          "nota": "Medidas del producto",
+          "archivo": "Imagenes/gym_SM-3001/galeria/03-medidas.webp",
+          "origen": "encontrado_web — Fitness Market 2026-07-30."
+        }
+      ]
     }
   },
   "seo": {
