@@ -90,12 +90,17 @@ llevar contexto. Se elige el recorte de la foto de **mayor resolución con corte
 50255, `molino_portada_amarillo.png`, 1288×1662). El cliente sube PNG con su mime correcto.
 
 Mejoras que quedan (no son el cierre):
-- **Generadores no construidos** (tipos *creados*): `persona_escala` (escala; necesita la altura
-  real), `escena_funcionamiento` (IA + red + aprobación), `otro_angulo_ia` (íd.), `portada_variantes`
-  (solo si hay variantes de motor).
 - **Dimensiones reales del molino** sin confirmar (para que `medidas` deje de ser provisional).
 - **Automatizar el handoff del sourcing** (el "buzón") y el gate de verificación visual.
 - Aparte de imágenes: **medir la tasa de error del Investigador** (Prioridad A).
+
+**Fuera de alcance por ahora (decisión de Angie, 30-jul-2026):** `persona_escala` (persona junto
+al producto para dar escala), `escena_funcionamiento` (entorno generado con IA), `otro_angulo_ia`
+(re-render a otro ángulo) y `portada_variantes` (portada para variantes de motor). Estas tomas se
+van a generar por fuera del sistema y se suben a la galería a mano; se sacaron del contrato
+`plan_galeria` (`SKILL.md` y la plantilla ya no las ofrecen) para que el Investigador no las
+planifique. Se retoman cuando el plan de esa parte esté mejor montado — no es un "no" definitivo,
+es un "todavía no aquí".
 
 ---
 

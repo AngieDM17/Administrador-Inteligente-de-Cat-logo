@@ -113,8 +113,13 @@ porque venían de capturas de ~500 px ampliadas. **Un recorte nunca sustituye un
 | `deriva_de` | de qué foto real salió, si no es la `imagen_base` |
 | `nota` | descripción breve de la toma; termina siendo el texto ALT de SEO |
 
-**`tipo`** — uno de: `producto_limpio`, `persona_escala`, `partes_senaladas`, `portada_variantes`,
-`escena_funcionamiento`, `foto_real`, `medidas`, `otro_angulo_ia`, `accesorios`.
+**`tipo`** — uno de: `producto_limpio`, `partes_senaladas`, `foto_real`, `medidas`, `accesorios`.
+
+**Fuera de alcance por ahora (decisión de Angie, 30-jul-2026):** `persona_escala`,
+`portada_variantes`, `escena_funcionamiento`, `otro_angulo_ia`. Esas tomas se van a generar
+aparte y se suben a la galería a mano; **no las planifiques** en `plan_galeria` hasta que se
+avise que el plan está listo para incorporarlas de nuevo. No es una omisión caso por caso (no
+va en `_slots_omitidos_y_por_que`): es un tipo de toma que el proyecto no cubre todavía.
 
 **`fuente`** — uno de: `foto_real` (material real tal cual), `edicion_manual` (foto real editada a
 mano), `generado_motor` (pieza determinista del motor propio), `compuesto` (montaje de material
@@ -129,13 +134,12 @@ y hereda el origen del dato con que dibujó la pieza. **No inventes un responsab
 que todavía no existe**, y si la validación te rechaza un slot por origen, mirá primero si le pusiste
 `archivo`.
 
-**Slots condicionales:** `portada_variantes` solo si el producto TIENE variantes de motor;
-`accesorios` solo si viene con accesorios. Si no aplican, no van.
+**Slots condicionales:** `accesorios` solo si el producto viene con accesorios. Si no aplica, no va.
 
 #### Un slot que no va se DECLARA: `_slots_omitidos_y_por_que`
 
 Omitir un slot en silencio pierde información. La etapa siguiente no puede distinguir "este producto
-no lleva `persona_escala`" de "el Investigador se olvidó", y el próximo que abra la ficha rehace el
+no lleva `accesorios`" de "el Investigador se olvidó", y el próximo que abra la ficha rehace el
 mismo análisis para llegar a la misma conclusión.
 
 Por eso, cuando dejes fuera un slot que la plantilla de su categoría pedía, escribí el motivo en la
@@ -145,8 +149,7 @@ renglón por slot omitido. Si no omitiste ninguno, no pongas la clave.
 ```json
 "plan_galeria": {
   "_slots_omitidos_y_por_que": [
-    "persona_escala: ninguna foto muestra el equipo junto a una referencia de tamaño",
-    "portada_variantes: el producto no tiene variantes de motor"
+    "accesorios: la fuente no menciona que el producto incluya accesorios"
   ],
   "imagen_base": "…"
 }
@@ -186,14 +189,15 @@ Tú averiguas **QUÉ partes** tiene el producto leyendo la web; **no sabes DÓND
 — eso solo se sabe mirando la imagen. Sin punto, esa parte simplemente no se dibuja. **Nunca
 inventes una coordenada.** Ubicar los puntos es un paso visual posterior.
 
-### 4.4 Generación con IA
+### 4.4 Generación con IA — fuera de alcance por ahora
 
-Sigue permitida y acotada: solo `imagen_a_imagen` (otro ángulo del MISMO equipo) o `escena_ia`
-(entorno generado con el producto real encima). Escribe los briefs citando qué fotos reales sirven
-de referencia estricta. Prohibido que la IA invente textos, etiquetas, modelos o conectores; ante
-duda, la toma se descarta. **No ejecutes los briefs sin que Angie los apruebe**, y recuerda que
-imagen → imagen inventa las caras que ninguna foto muestra (trasera, superior): eso se comprobó en
-el NBC 250.
+**Descartada del proyecto por decisión de Angie (30-jul-2026).** `imagen_a_imagen` (otro ángulo
+del MISMO equipo) y `escena_ia` (entorno generado con el producto real encima) no se generan
+hoy: esas tomas se van a producir aparte y se suben a la galería a mano. No escribas
+`briefs_generacion_ia` ni planifiques estos tipos — se retoma cuando el plan de esa parte esté
+mejor montado. Se conserva la regla de fondo para cuando se reactive: prohibido que la IA
+invente textos, etiquetas, modelos o conectores; imagen → imagen inventa las caras que ninguna
+foto muestra (comprobado en el NBC 250), y nada de esto se ejecuta sin que Angie lo apruebe.
 
 ## Fase 5 — SEO
 
