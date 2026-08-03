@@ -1,0 +1,142 @@
+{
+  "_version_ficha": "1.4",
+  "_uso": "Ficha AUTO del lote grande gym (Camino A, Fitness Market). Extracción 2026-07-30. Primer paso: revisar con colador + Angie.",
+  "modo_entrada": "investigacion_web",
+  "entrada_original": {
+    "nombre_dado": "Torre Multiestación Fitness Market - 8 Puestos 1205 kg",
+    "codigo_proveedor": "U2066PA",
+    "foto_referencia": "Entrada por link (Camino A); portada pendiente de gate visual.",
+    "link_producto": "https://www.fitnessmarket.com.co/products/8-multi-station-tower"
+  },
+  "fecha_investigacion": "2026-07-30",
+  "estado": "pendiente_revision",
+  "identificacion_del_producto": {
+    "resultado": "IDENTIFICADO",
+    "detalle": "Torre Multiestación Fitness Market - 8 Puestos 1205 kg. Extraído del listing exacto de Fitness Market (SKU U2066PA).",
+    "fuente_principal": "Fitness Market — fitnessmarket.com.co/8-multi-station-tower (SKU U2066PA), 2026-07-30.",
+    "advertencias": [],
+    "estado_en_proveedor": "Nuevo. Publicado a $36.990.900 COP. Consultado 2026-07-30.",
+    "origen_identificacion": "link"
+  },
+  "producto": {
+    "nombre_propuesto": "TORRE MULTIESTACIÓN - 8 PUESTOS 1205 KG",
+    "nombre_origen": "generado_ia (formato Ekipon)",
+    "modelo": "U2066PA",
+    "sku": "AUTOMATICO — lo asigna el sistema de la tienda, no se muestra al público",
+    "es_motorizado": false,
+    "categoria_propuesta": "Gimnasio",
+    "categoria_confianza": "confirmado_por_angie — categoría 'Gimnasio' (id 465).",
+    "etiquetas_propuestas": [
+      "torre",
+      "multiestación",
+      "puestos",
+      "1205",
+      "gimnasio"
+    ],
+    "garantia": "1 año (política fija de la tienda)"
+  },
+  "precios": {
+    "precio": null,
+    "precio_origen": "PENDIENTE_ANGIE — REGLA FIJA: el precio SIEMPRE lo define Angie manualmente.",
+    "referencias_mercado": [
+      {
+        "fuente": "Fitness Market (U2066PA)",
+        "precio": "$36.990.900 COP",
+        "fecha": "2026-07-30",
+        "existencias": "publicado"
+      }
+    ],
+    "nota_envio": "El precio suele incluir ~$100.000 de envío; se publica 'Envío GRATIS a todo el país' + pago contra entrega",
+    "moneda": "COP"
+  },
+  "descripcion_principal": "La opción más completa y eficaz para gimnasios grandes y centros de alto rendimiento que desean aumentar la capacidad de entrenamiento y la variedad de ejercicios en un solo equipo. Esta sólida torre modular permite que hasta ocho personas entrenen al mismo tiempo en diferentes estaciones, proporcionando una experiencia integral de entrenamiento de fuerza sin pausas. Es el punto central perfecto para mejorar la organización del gimnasio y atender las demandas de diversos programas de fitness. La solución más completa y eficiente para gimnasios de gran tamaño y centros de alto rendimiento que buscan maximizar tanto la capacidad de entrenamiento como la diversidad de ejercicios en un solo equipo. Esta imponente torre modular está diseñada para permitir que hasta ocho usuarios entrenen simultáneamente en diferentes estaciones, lo que facilita una experiencia de entrenamiento de fuerza integral y continua sin interrupciones.",
+  "descripcion_origen": "encontrado_web (texto completo del listing)",
+  "caracteristicas": [
+    "La opción más completa y eficaz para gimnasios grandes y centros de alto rendimiento que desean aumentar la capacidad de entrenamiento y la variedad de ejercicios en un solo equipo",
+    "Esta sólida torre modular permite que hasta ocho personas entrenen al mismo tiempo en diferentes estaciones, proporcionando una experiencia integral de entrenamiento de fuerza sin pausas",
+    "Es el punto central perfecto para mejorar la organización del gimnasio y atender las demandas de diversos programas de fitness",
+    "La solución más completa y eficiente para gimnasios de gran tamaño y centros de alto rendimiento que buscan maximizar tanto la capacidad de entrenamiento como la diversidad de ejercicios en un solo equipo",
+    "Esta imponente torre modular está diseñada para permitir que hasta ocho usuarios entrenen simultáneamente en diferentes estaciones, lo que facilita una experiencia de entrenamiento de fuerza integral y continua sin interrupciones"
+  ],
+  "caracteristicas_origen": "encontrado_web",
+  "ficha_tecnica": {
+    "_origen_global": "encontrado_web — Fitness Market, listing U2066PA, 2026-07-30",
+    "_nota": "Claves en MAYÚSCULAS. Producto SIN motor. Datos extraídos de la fuente.",
+    "MODELO": "U2066PA",
+    "MARCA": "Fitness Market",
+    "PESO": "1205 kg"
+  },
+  "criterio_verificacion_visual": {
+    "definido_por": "Investigador (Camino A); pendiente de Angie",
+    "SI_es": "El producto 'Torre Multiestación Fitness Market - 8 Puestos 1205 kg' tal como lo muestra la foto de la fuente.",
+    "NO_es": "Otro equipo de gimnasio parecido; se rechaza si los rasgos estructurales no coinciden.",
+    "rasgo_decisivo": "Rasgos estructurales, NUNCA el color.",
+    "uso": "aceptar/rechazar imágenes; revisión humana final"
+  },
+  "multimedia": {
+    "imagenes_galeria_confirmadas": [],
+    "imagenes_nota": "Galería por motor: recorte + foto + medidas (si hay footprint). Pendiente gate visual de la portada.",
+    "briefs_generacion_ia": [],
+    "regla_generacion": "PROHIBIDO inventar textos/etiquetas/modelos que no estén en las fotos reales.",
+    "formato_destino": "WebP 1080x1080 (estándar de la tienda)",
+    "video_youtube": null,
+    "video_nota": "Fase 5.",
+    "galeria_tomas": {
+      "_comentario": "Datos de las tomas generadas. Solo lo verificado.",
+      "callouts": [],
+      "callouts_origen": null,
+      "dimensiones": {
+        "alto": null,
+        "ancho": null,
+        "fondo": null,
+        "peso": "1205 kg"
+      },
+      "dimensiones_origen": "encontrado_web — Fitness Market 2026-07-30."
+    },
+    "plan_galeria": {
+      "imagen_base": "Imagenes/gym_U2066PA/foto_01.webp",
+      "imagen_base_origen": "encontrado_web",
+      "slots": [
+        {
+          "tipo": "producto_limpio",
+          "fuente": "generado_motor",
+          "deriva_de": null,
+          "nota": "Vista general del producto sobre fondo limpio"
+        },
+        {
+          "tipo": "foto_real",
+          "fuente": "foto_real",
+          "origen": "encontrado_web",
+          "archivo": "Imagenes/gym_U2066PA/foto_01.webp",
+          "deriva_de": null,
+          "nota": "Foto de estudio (Fitness Market)"
+        }
+      ]
+    }
+  },
+  "seo": {
+    "meta_titulo": "Torre Multiestación - 8 Puestos 1205 Kg | Ekipon",
+    "meta_descripcion": "La opción más completa y eficaz para gimnasios grandes y centros de alto rendimiento que desean aumentar la capacidad  Envío GRATIS a todo el país",
+    "palabras_clave": [
+      "torre",
+      "multiestación",
+      "puestos",
+      "1205",
+      "gimnasio"
+    ],
+    "texto_alt_base": "Torre Multiestación - 8 Puestos 1205 Kg",
+    "origen": "generado_ia"
+  },
+  "campos_por_confirmar": [
+    "Precio (lo define Angie — regla fija)",
+    "Categoría (leer el árbol EN VIVO desde WooCommerce)",
+    "Dimensiones (alto/ancho/fondo): no publicadas en la fuente."
+  ],
+  "fuentes_consultadas": [
+    {
+      "fuente": "Fitness Market — 8-multi-station-tower (SKU U2066PA)",
+      "uso": "Fuente principal.",
+      "fecha": "2026-07-30"
+    }
+  ]
+}

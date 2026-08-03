@@ -1,0 +1,146 @@
+{
+  "_version_ficha": "1.4",
+  "_uso": "Ficha AUTO del lote grande gym (Camino A, Fitness Market). Extracción 2026-07-30. Primer paso: revisar con colador + Angie.",
+  "modo_entrada": "investigacion_web",
+  "entrada_original": {
+    "nombre_dado": "Banco Olímpico Inclinado Fitness Market SM-3013 - 90 kg",
+    "codigo_proveedor": "SM-3013",
+    "foto_referencia": "Entrada por link (Camino A); portada pendiente de gate visual.",
+    "link_producto": "https://www.fitnessmarket.com.co/products/olympic-incline-bench"
+  },
+  "fecha_investigacion": "2026-07-30",
+  "estado": "pendiente_revision",
+  "identificacion_del_producto": {
+    "resultado": "IDENTIFICADO",
+    "detalle": "Banco Olímpico Inclinado Fitness Market SM-3013 - 90 kg. Extraído del listing exacto de Fitness Market (SKU SM-3013).",
+    "fuente_principal": "Fitness Market — fitnessmarket.com.co/olympic-incline-bench (SKU SM-3013), 2026-07-30.",
+    "advertencias": [],
+    "estado_en_proveedor": "Nuevo. Publicado a $2.631.900 COP. Consultado 2026-07-30.",
+    "origen_identificacion": "link"
+  },
+  "producto": {
+    "nombre_propuesto": "BANCO OLÍMPICO INCLINADO SM-3013 - 90 KG",
+    "nombre_origen": "generado_ia (formato Ekipon)",
+    "modelo": "SM-3013",
+    "sku": "AUTOMATICO — lo asigna el sistema de la tienda, no se muestra al público",
+    "es_motorizado": false,
+    "categoria_propuesta": "Gimnasio",
+    "categoria_confianza": "confirmado_por_angie — categoría 'Gimnasio' (id 465).",
+    "etiquetas_propuestas": [
+      "banco",
+      "olímpico",
+      "inclinado",
+      "3013",
+      "gimnasio"
+    ],
+    "garantia": "1 año (política fija de la tienda)"
+  },
+  "precios": {
+    "precio": null,
+    "precio_origen": "PENDIENTE_ANGIE — REGLA FIJA: el precio SIEMPRE lo define Angie manualmente.",
+    "referencias_mercado": [
+      {
+        "fuente": "Fitness Market (SM-3013)",
+        "precio": "$2.631.900 COP",
+        "fecha": "2026-07-30",
+        "existencias": "publicado"
+      }
+    ],
+    "nota_envio": "El precio suele incluir ~$100.000 de envío; se publica 'Envío GRATIS a todo el país' + pago contra entrega",
+    "moneda": "COP"
+  },
+  "descripcion_principal": "Este banco olímpico inclinado con rack integrado es la opción ideal para trabajar la parte superior del pecho y los hombros con alta eficiencia y seguridad. Su diseño con ángulo fijo de inclinación favorece una activación muscular óptima, mientras que los soportes para barra incorporados proporcionan un levantamiento estable y seguro. Es un equipo fundamental para cualquier gimnasio profesional o área de entrenamiento especializada.",
+  "descripcion_origen": "encontrado_web (texto completo del listing)",
+  "caracteristicas": [
+    "Este banco olímpico inclinado con rack integrado es la opción ideal para trabajar la parte superior del pecho y los hombros con alta eficiencia y seguridad",
+    "Su diseño con ángulo fijo de inclinación favorece una activación muscular óptima, mientras que los soportes para barra incorporados proporcionan un levantamiento estable y seguro",
+    "Es un equipo fundamental para cualquier gimnasio profesional o área de entrenamiento especializada"
+  ],
+  "caracteristicas_origen": "encontrado_web",
+  "ficha_tecnica": {
+    "_origen_global": "encontrado_web — Fitness Market, listing SM-3013, 2026-07-30",
+    "_nota": "Claves en MAYÚSCULAS. Producto SIN motor. Datos extraídos de la fuente.",
+    "MODELO": "SM-3013",
+    "MARCA": "Fitness Market",
+    "DIMENSIONES": "1300 x 1330 x 1480 mm",
+    "PESO": "90 kg"
+  },
+  "criterio_verificacion_visual": {
+    "definido_por": "Investigador (Camino A); pendiente de Angie",
+    "SI_es": "El producto 'Banco Olímpico Inclinado Fitness Market SM-3013 - 90 kg' tal como lo muestra la foto de la fuente.",
+    "NO_es": "Otro equipo de gimnasio parecido; se rechaza si los rasgos estructurales no coinciden.",
+    "rasgo_decisivo": "Rasgos estructurales, NUNCA el color.",
+    "uso": "aceptar/rechazar imágenes; revisión humana final"
+  },
+  "multimedia": {
+    "imagenes_galeria_confirmadas": [],
+    "imagenes_nota": "Galería por motor: recorte + foto + medidas (si hay footprint). Pendiente gate visual de la portada.",
+    "briefs_generacion_ia": [],
+    "regla_generacion": "PROHIBIDO inventar textos/etiquetas/modelos que no estén en las fotos reales.",
+    "formato_destino": "WebP 1080x1080 (estándar de la tienda)",
+    "video_youtube": null,
+    "video_nota": "Fase 5.",
+    "galeria_tomas": {
+      "_comentario": "Datos de las tomas generadas. Solo lo verificado.",
+      "callouts": [],
+      "callouts_origen": null,
+      "dimensiones": {
+        "alto": "1480 mm",
+        "ancho": "1330 mm",
+        "fondo": "1300 mm",
+        "peso": "90 kg"
+      },
+      "dimensiones_origen": "encontrado_web — Fitness Market 2026-07-30."
+    },
+    "plan_galeria": {
+      "imagen_base": "Imagenes/gym_SM-3013/foto_01.webp",
+      "imagen_base_origen": "encontrado_web",
+      "slots": [
+        {
+          "tipo": "producto_limpio",
+          "fuente": "generado_motor",
+          "deriva_de": null,
+          "nota": "Vista general del producto sobre fondo limpio"
+        },
+        {
+          "tipo": "foto_real",
+          "fuente": "foto_real",
+          "origen": "encontrado_web",
+          "archivo": "Imagenes/gym_SM-3013/foto_01.webp",
+          "deriva_de": null,
+          "nota": "Foto de estudio (Fitness Market)"
+        },
+        {
+          "tipo": "medidas",
+          "fuente": "generado_motor",
+          "deriva_de": null,
+          "nota": "Medidas del producto"
+        }
+      ]
+    }
+  },
+  "seo": {
+    "meta_titulo": "Banco Olímpico Inclinado Sm-3013 - 90 Kg | Ekipon",
+    "meta_descripcion": "Este banco olímpico inclinado con rack integrado es la opción ideal para trabajar la parte superior del pecho y los ho Envío GRATIS a todo el país",
+    "palabras_clave": [
+      "banco",
+      "olímpico",
+      "inclinado",
+      "3013",
+      "gimnasio"
+    ],
+    "texto_alt_base": "Banco Olímpico Inclinado Sm-3013 - 90 Kg",
+    "origen": "generado_ia"
+  },
+  "campos_por_confirmar": [
+    "Precio (lo define Angie — regla fija)",
+    "Categoría (leer el árbol EN VIVO desde WooCommerce)"
+  ],
+  "fuentes_consultadas": [
+    {
+      "fuente": "Fitness Market — olympic-incline-bench (SKU SM-3013)",
+      "uso": "Fuente principal.",
+      "fecha": "2026-07-30"
+    }
+  ]
+}

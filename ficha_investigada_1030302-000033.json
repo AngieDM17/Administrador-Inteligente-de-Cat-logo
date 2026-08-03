@@ -1,0 +1,144 @@
+{
+  "_version_ficha": "1.4",
+  "_uso": "Ficha AUTO del lote grande gym (Camino A, Fitness Market). Extracción 2026-07-30. Primer paso: revisar con colador + Angie.",
+  "modo_entrada": "investigacion_web",
+  "entrada_original": {
+    "nombre_dado": "Hack Squat - Fitness Market",
+    "codigo_proveedor": "1030302-000033",
+    "foto_referencia": "Entrada por link (Camino A); portada pendiente de gate visual.",
+    "link_producto": "https://www.fitnessmarket.com.co/products/hack-squat-fitness-market"
+  },
+  "fecha_investigacion": "2026-07-30",
+  "estado": "pendiente_revision",
+  "identificacion_del_producto": {
+    "resultado": "IDENTIFICADO",
+    "detalle": "Hack Squat - Fitness Market. Extraído del listing exacto de Fitness Market (SKU 1030302-000033).",
+    "fuente_principal": "Fitness Market — fitnessmarket.com.co/hack-squat-fitness-market (SKU 1030302-000033), 2026-07-30.",
+    "advertencias": [],
+    "estado_en_proveedor": "Nuevo. Publicado a $5.205.900 COP. Consultado 2026-07-30.",
+    "origen_identificacion": "link"
+  },
+  "producto": {
+    "nombre_propuesto": "HACK SQUAT",
+    "nombre_origen": "generado_ia (formato Ekipon)",
+    "modelo": "1030302-000033",
+    "sku": "AUTOMATICO — lo asigna el sistema de la tienda, no se muestra al público",
+    "es_motorizado": false,
+    "categoria_propuesta": "Gimnasio",
+    "categoria_confianza": "confirmado_por_angie — categoría 'Gimnasio' (id 465).",
+    "etiquetas_propuestas": [
+      "hack",
+      "squat",
+      "gimnasio"
+    ],
+    "garantia": "1 año (política fija de la tienda)"
+  },
+  "precios": {
+    "precio": null,
+    "precio_origen": "PENDIENTE_ANGIE — REGLA FIJA: el precio SIEMPRE lo define Angie manualmente.",
+    "referencias_mercado": [
+      {
+        "fuente": "Fitness Market (1030302-000033)",
+        "precio": "$5.205.900 COP",
+        "fecha": "2026-07-30",
+        "existencias": "publicado"
+      }
+    ],
+    "nota_envio": "El precio suele incluir ~$100.000 de envío; se publica 'Envío GRATIS a todo el país' + pago contra entrega",
+    "moneda": "COP"
+  },
+  "descripcion_principal": "Máquina Hack Squat de alta resistencia diseñada para trabajar cuádriceps, glúteos e isquiotibiales con seguridad y control. Estructura robusta con guías de movimiento suave que permite un rango de movimiento natural. Las almohadillas para el cuello de doble posición te permiten realizar sentadillas mirando hacia adelante o hacia atrás, adaptándose a tus preferencias y objetivos de entrenamiento. Ideal para entrenamientos intensos en gimnasios profesionales y centros de fitness. Carga máxima de capacidad superior para usuarios avanzados. Acabado premium con protección anticorrosión que garantiza durabilidad y mantenimiento mínimo en entornos de uso intenso.",
+  "descripcion_origen": "encontrado_web (texto completo del listing)",
+  "caracteristicas": [
+    "Máquina Hack Squat de alta resistencia diseñada para trabajar cuádriceps, glúteos e isquiotibiales con seguridad y control",
+    "Estructura robusta con guías de movimiento suave que permite un rango de movimiento natural",
+    "Las almohadillas para el cuello de doble posición te permiten realizar sentadillas mirando hacia adelante o hacia atrás, adaptándose a tus preferencias y objetivos de entrenamiento",
+    "Ideal para entrenamientos intensos en gimnasios profesionales y centros de fitness",
+    "Carga máxima de capacidad superior para usuarios avanzados"
+  ],
+  "caracteristicas_origen": "encontrado_web",
+  "ficha_tecnica": {
+    "_origen_global": "encontrado_web — Fitness Market, listing 1030302-000033, 2026-07-30",
+    "_nota": "Claves en MAYÚSCULAS. Producto SIN motor. Datos extraídos de la fuente.",
+    "MODELO": "1030302-000033",
+    "MARCA": "Fitness Market",
+    "DIMENSIONES": "145 x 108 x 203 mm",
+    "PESO": "132 kg"
+  },
+  "criterio_verificacion_visual": {
+    "definido_por": "Investigador (Camino A); pendiente de Angie",
+    "SI_es": "El producto 'Hack Squat - Fitness Market' tal como lo muestra la foto de la fuente.",
+    "NO_es": "Otro equipo de gimnasio parecido; se rechaza si los rasgos estructurales no coinciden.",
+    "rasgo_decisivo": "Rasgos estructurales, NUNCA el color.",
+    "uso": "aceptar/rechazar imágenes; revisión humana final"
+  },
+  "multimedia": {
+    "imagenes_galeria_confirmadas": [],
+    "imagenes_nota": "Galería por motor: recorte + foto + medidas (si hay footprint). Pendiente gate visual de la portada.",
+    "briefs_generacion_ia": [],
+    "regla_generacion": "PROHIBIDO inventar textos/etiquetas/modelos que no estén en las fotos reales.",
+    "formato_destino": "WebP 1080x1080 (estándar de la tienda)",
+    "video_youtube": null,
+    "video_nota": "Fase 5.",
+    "galeria_tomas": {
+      "_comentario": "Datos de las tomas generadas. Solo lo verificado.",
+      "callouts": [],
+      "callouts_origen": null,
+      "dimensiones": {
+        "alto": "203 mm",
+        "ancho": "108 mm",
+        "fondo": "145 mm",
+        "peso": "132 kg"
+      },
+      "dimensiones_origen": "encontrado_web — Fitness Market 2026-07-30."
+    },
+    "plan_galeria": {
+      "imagen_base": "Imagenes/gym_1030302-000033/foto_01.webp",
+      "imagen_base_origen": "encontrado_web",
+      "slots": [
+        {
+          "tipo": "producto_limpio",
+          "fuente": "generado_motor",
+          "deriva_de": null,
+          "nota": "Vista general del producto sobre fondo limpio"
+        },
+        {
+          "tipo": "foto_real",
+          "fuente": "foto_real",
+          "origen": "encontrado_web",
+          "archivo": "Imagenes/gym_1030302-000033/foto_01.webp",
+          "deriva_de": null,
+          "nota": "Foto de estudio (Fitness Market)"
+        },
+        {
+          "tipo": "medidas",
+          "fuente": "generado_motor",
+          "deriva_de": null,
+          "nota": "Medidas del producto"
+        }
+      ]
+    }
+  },
+  "seo": {
+    "meta_titulo": "Hack Squat | Ekipon",
+    "meta_descripcion": "Máquina Hack Squat de alta resistencia diseñada para trabajar cuádriceps, glúteos e isquiotibiales con seguridad y con Envío GRATIS a todo el país",
+    "palabras_clave": [
+      "hack",
+      "squat",
+      "gimnasio"
+    ],
+    "texto_alt_base": "Hack Squat",
+    "origen": "generado_ia"
+  },
+  "campos_por_confirmar": [
+    "Precio (lo define Angie — regla fija)",
+    "Categoría (leer el árbol EN VIVO desde WooCommerce)"
+  ],
+  "fuentes_consultadas": [
+    {
+      "fuente": "Fitness Market — hack-squat-fitness-market (SKU 1030302-000033)",
+      "uso": "Fuente principal.",
+      "fecha": "2026-07-30"
+    }
+  ]
+}

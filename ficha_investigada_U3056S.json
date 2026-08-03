@@ -1,0 +1,146 @@
+{
+  "_version_ficha": "1.4",
+  "_uso": "Ficha AUTO del lote grande gym (Camino A, Fitness Market). Extracción 2026-07-30. Primer paso: revisar con colador + Angie.",
+  "modo_entrada": "investigacion_web",
+  "entrada_original": {
+    "nombre_dado": "Máquina Angled Leg Press Fitness Market - Linear Bearing",
+    "codigo_proveedor": "U3056S",
+    "foto_referencia": "Entrada por link (Camino A); portada pendiente de gate visual.",
+    "link_producto": "https://www.fitnessmarket.com.co/products/angled-leg-press-linear-bearing"
+  },
+  "fecha_investigacion": "2026-07-30",
+  "estado": "pendiente_revision",
+  "identificacion_del_producto": {
+    "resultado": "IDENTIFICADO",
+    "detalle": "Máquina Angled Leg Press Fitness Market - Linear Bearing. Extraído del listing exacto de Fitness Market (SKU U3056S).",
+    "fuente_principal": "Fitness Market — fitnessmarket.com.co/angled-leg-press-linear-bearing (SKU U3056S), 2026-07-30.",
+    "advertencias": [],
+    "estado_en_proveedor": "Nuevo. Publicado a $8.199.899 COP. Consultado 2026-07-30.",
+    "origen_identificacion": "link"
+  },
+  "producto": {
+    "nombre_propuesto": "MÁQUINA ANGLED LEG PRESS - LINEAR BEARING",
+    "nombre_origen": "generado_ia (formato Ekipon)",
+    "modelo": "U3056S",
+    "sku": "AUTOMATICO — lo asigna el sistema de la tienda, no se muestra al público",
+    "es_motorizado": false,
+    "categoria_propuesta": "Gimnasio",
+    "categoria_confianza": "confirmado_por_angie — categoría 'Gimnasio' (id 465).",
+    "etiquetas_propuestas": [
+      "máquina",
+      "angled",
+      "leg",
+      "press",
+      "gimnasio"
+    ],
+    "garantia": "1 año (política fija de la tienda)"
+  },
+  "precios": {
+    "precio": null,
+    "precio_origen": "PENDIENTE_ANGIE — REGLA FIJA: el precio SIEMPRE lo define Angie manualmente.",
+    "referencias_mercado": [
+      {
+        "fuente": "Fitness Market (U3056S)",
+        "precio": "$8.199.899 COP",
+        "fecha": "2026-07-30",
+        "existencias": "publicado"
+      }
+    ],
+    "nota_envio": "El precio suele incluir ~$100.000 de envío; se publica 'Envío GRATIS a todo el país' + pago contra entrega",
+    "moneda": "COP"
+  },
+  "descripcion_principal": "Máquina fundamental para el desarrollo robusto de la parte inferior del cuerpo, diseñada para ofrecer un entrenamiento de piernas potente, seguro y eficaz. Con un movimiento suave y guiado, esta prensa permite a los usuarios trabajar los cuadriceps, isquiotibiales y gluteos de manera concentrada, minimizando el riesgo de lesiones y optimizando la activación muscular. Es una adición indispensable para cualquier gimnasio comercial, centro de alto rendimiento o instalación deportiva.",
+  "descripcion_origen": "encontrado_web (texto completo del listing)",
+  "caracteristicas": [
+    "Máquina fundamental para el desarrollo robusto de la parte inferior del cuerpo, diseñada para ofrecer un entrenamiento de piernas potente, seguro y eficaz",
+    "Con un movimiento suave y guiado, esta prensa permite a los usuarios trabajar los cuadriceps, isquiotibiales y gluteos de manera concentrada, minimizando el riesgo de lesiones y optimizando la activación muscular",
+    "Es una adición indispensable para cualquier gimnasio comercial, centro de alto rendimiento o instalación deportiva"
+  ],
+  "caracteristicas_origen": "encontrado_web",
+  "ficha_tecnica": {
+    "_origen_global": "encontrado_web — Fitness Market, listing U3056S, 2026-07-30",
+    "_nota": "Claves en MAYÚSCULAS. Producto SIN motor. Datos extraídos de la fuente.",
+    "MODELO": "U3056S",
+    "MARCA": "Fitness Market",
+    "DIMENSIONES": "2170 x 1610 x 1260 mm",
+    "PESO": "241 kg"
+  },
+  "criterio_verificacion_visual": {
+    "definido_por": "Investigador (Camino A); pendiente de Angie",
+    "SI_es": "El producto 'Máquina Angled Leg Press Fitness Market - Linear Bearing' tal como lo muestra la foto de la fuente.",
+    "NO_es": "Otro equipo de gimnasio parecido; se rechaza si los rasgos estructurales no coinciden.",
+    "rasgo_decisivo": "Rasgos estructurales, NUNCA el color.",
+    "uso": "aceptar/rechazar imágenes; revisión humana final"
+  },
+  "multimedia": {
+    "imagenes_galeria_confirmadas": [],
+    "imagenes_nota": "Galería por motor: recorte + foto + medidas (si hay footprint). Pendiente gate visual de la portada.",
+    "briefs_generacion_ia": [],
+    "regla_generacion": "PROHIBIDO inventar textos/etiquetas/modelos que no estén en las fotos reales.",
+    "formato_destino": "WebP 1080x1080 (estándar de la tienda)",
+    "video_youtube": null,
+    "video_nota": "Fase 5.",
+    "galeria_tomas": {
+      "_comentario": "Datos de las tomas generadas. Solo lo verificado.",
+      "callouts": [],
+      "callouts_origen": null,
+      "dimensiones": {
+        "alto": "1260 mm",
+        "ancho": "1610 mm",
+        "fondo": "2170 mm",
+        "peso": "241 kg"
+      },
+      "dimensiones_origen": "encontrado_web — Fitness Market 2026-07-30."
+    },
+    "plan_galeria": {
+      "imagen_base": "Imagenes/gym_U3056S/foto_01.webp",
+      "imagen_base_origen": "encontrado_web",
+      "slots": [
+        {
+          "tipo": "producto_limpio",
+          "fuente": "generado_motor",
+          "deriva_de": null,
+          "nota": "Vista general del producto sobre fondo limpio"
+        },
+        {
+          "tipo": "foto_real",
+          "fuente": "foto_real",
+          "origen": "encontrado_web",
+          "archivo": "Imagenes/gym_U3056S/foto_01.webp",
+          "deriva_de": null,
+          "nota": "Foto de estudio (Fitness Market)"
+        },
+        {
+          "tipo": "medidas",
+          "fuente": "generado_motor",
+          "deriva_de": null,
+          "nota": "Medidas del producto"
+        }
+      ]
+    }
+  },
+  "seo": {
+    "meta_titulo": "Máquina Angled Leg Press - Linear Bearing | Ekipon",
+    "meta_descripcion": "Máquina fundamental para el desarrollo robusto de la parte inferior del cuerpo, diseñada para ofrecer un entrenamiento Envío GRATIS a todo el país",
+    "palabras_clave": [
+      "máquina",
+      "angled",
+      "leg",
+      "press",
+      "gimnasio"
+    ],
+    "texto_alt_base": "Máquina Angled Leg Press - Linear Bearing",
+    "origen": "generado_ia"
+  },
+  "campos_por_confirmar": [
+    "Precio (lo define Angie — regla fija)",
+    "Categoría (leer el árbol EN VIVO desde WooCommerce)"
+  ],
+  "fuentes_consultadas": [
+    {
+      "fuente": "Fitness Market — angled-leg-press-linear-bearing (SKU U3056S)",
+      "uso": "Fuente principal.",
+      "fecha": "2026-07-30"
+    }
+  ]
+}

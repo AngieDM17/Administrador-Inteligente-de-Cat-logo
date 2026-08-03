@@ -1,0 +1,146 @@
+{
+  "_version_ficha": "1.4",
+  "_uso": "Ficha AUTO del lote grande gym (Camino A, Fitness Market). Extracción 2026-07-30. Primer paso: revisar con colador + Angie.",
+  "modo_entrada": "investigacion_web",
+  "entrada_original": {
+    "nombre_dado": "Máquina Multifuerza Serie 3 - Fitness Market",
+    "codigo_proveedor": "1030702-000038",
+    "foto_referencia": "Entrada por link (Camino A); portada pendiente de gate visual.",
+    "link_producto": "https://www.fitnessmarket.com.co/products/maquina-multifuerza-serie-3-fitness-market"
+  },
+  "fecha_investigacion": "2026-07-30",
+  "estado": "pendiente_revision",
+  "identificacion_del_producto": {
+    "resultado": "IDENTIFICADO",
+    "detalle": "Máquina Multifuerza Serie 3 - Fitness Market. Extraído del listing exacto de Fitness Market (SKU 1030702-000038).",
+    "fuente_principal": "Fitness Market — fitnessmarket.com.co/maquina-multifuerza-serie-3-fitness-market (SKU 1030702-000038), 2026-07-30.",
+    "advertencias": [],
+    "estado_en_proveedor": "Nuevo. Publicado a $4.305.900 COP. Consultado 2026-07-30.",
+    "origen_identificacion": "link"
+  },
+  "producto": {
+    "nombre_propuesto": "MÁQUINA MULTIFUERZA SERIE 3",
+    "nombre_origen": "generado_ia (formato Ekipon)",
+    "modelo": "1030702-000038",
+    "sku": "AUTOMATICO — lo asigna el sistema de la tienda, no se muestra al público",
+    "es_motorizado": false,
+    "categoria_propuesta": "Gimnasio",
+    "categoria_confianza": "confirmado_por_angie — categoría 'Gimnasio' (id 465).",
+    "etiquetas_propuestas": [
+      "máquina",
+      "multifuerza",
+      "serie",
+      "gimnasio"
+    ],
+    "garantia": "1 año (política fija de la tienda)"
+  },
+  "precios": {
+    "precio": null,
+    "precio_origen": "PENDIENTE_ANGIE — REGLA FIJA: el precio SIEMPRE lo define Angie manualmente.",
+    "referencias_mercado": [
+      {
+        "fuente": "Fitness Market (1030702-000038)",
+        "precio": "$4.305.900 COP",
+        "fecha": "2026-07-30",
+        "existencias": "publicado"
+      }
+    ],
+    "nota_envio": "El precio suele incluir ~$100.000 de envío; se publica 'Envío GRATIS a todo el país' + pago contra entrega",
+    "moneda": "COP"
+  },
+  "descripcion_principal": "La multiestación Fitness Market es un equipo multifuncional diseñado para entrenar diferentes grupos musculares en un solo espacio. Su sistema de poleas, estación de press, jalón superior, remo bajo y desarrollador de piernas permite realizar rutinas completas de fuerza, tonificación y acondicionamiento físico de forma cómoda y segura. Características principales: Sistema multifuncional para entrenamiento de cuerpo completo con estación de jalón dorsal para trabajo de espalda y brazos, brazos de press para ejercicios de pecho y hombros, y desarrollador de piernas para trabajo de tren inferior. Sistema de carga mediante torre de peso selectorizada que facilita ajustes rápidos entre ejercicios. Apta para uso doméstico, semicomercial o funcional, permitiendo entrenar pectorales, espalda, hombros, bíceps, tríceps, abdomen, cuádriceps, glúteos e isquiotibiales. Construcción robusta con estructura de acero, poleas, cables y brazos articulados de alta durabilidad. Asiento y espaldar acolchados para máxima comodidad durante las sesiones de entrenamiento.",
+  "descripcion_origen": "encontrado_web (texto completo del listing)",
+  "caracteristicas": [
+    "La multiestación Fitness Market es un equipo multifuncional diseñado para entrenar diferentes grupos musculares en un solo espacio",
+    "Su sistema de poleas, estación de press, jalón superior, remo bajo y desarrollador de piernas permite realizar rutinas completas de fuerza, tonificación y acondicionamiento físico de forma cómoda y segura",
+    "Características principales: Sistema multifuncional para entrenamiento de cuerpo completo con estación de jalón dorsal para trabajo de espalda y brazos, brazos de press para ejercicios de pecho y hombros, y desarrollador de piernas para trabajo de tren inferior",
+    "Sistema de carga mediante torre de peso selectorizada que facilita ajustes rápidos entre ejercicios",
+    "Apta para uso doméstico, semicomercial o funcional, permitiendo entrenar pectorales, espalda, hombros, bíceps, tríceps, abdomen, cuádriceps, glúteos e isquiotibiales"
+  ],
+  "caracteristicas_origen": "encontrado_web",
+  "ficha_tecnica": {
+    "_origen_global": "encontrado_web — Fitness Market, listing 1030702-000038, 2026-07-30",
+    "_nota": "Claves en MAYÚSCULAS. Producto SIN motor. Datos extraídos de la fuente.",
+    "MODELO": "1030702-000038",
+    "MARCA": "Fitness Market",
+    "DIMENSIONES": "145 x 108 x 203 cm",
+    "PESO": "140 kg"
+  },
+  "criterio_verificacion_visual": {
+    "definido_por": "Investigador (Camino A); pendiente de Angie",
+    "SI_es": "El producto 'Máquina Multifuerza Serie 3 - Fitness Market' tal como lo muestra la foto de la fuente.",
+    "NO_es": "Otro equipo de gimnasio parecido; se rechaza si los rasgos estructurales no coinciden.",
+    "rasgo_decisivo": "Rasgos estructurales, NUNCA el color.",
+    "uso": "aceptar/rechazar imágenes; revisión humana final"
+  },
+  "multimedia": {
+    "imagenes_galeria_confirmadas": [],
+    "imagenes_nota": "Galería por motor: recorte + foto + medidas (si hay footprint). Pendiente gate visual de la portada.",
+    "briefs_generacion_ia": [],
+    "regla_generacion": "PROHIBIDO inventar textos/etiquetas/modelos que no estén en las fotos reales.",
+    "formato_destino": "WebP 1080x1080 (estándar de la tienda)",
+    "video_youtube": null,
+    "video_nota": "Fase 5.",
+    "galeria_tomas": {
+      "_comentario": "Datos de las tomas generadas. Solo lo verificado.",
+      "callouts": [],
+      "callouts_origen": null,
+      "dimensiones": {
+        "alto": "203 cm",
+        "ancho": "108 cm",
+        "fondo": "145 cm",
+        "peso": "140 kg"
+      },
+      "dimensiones_origen": "encontrado_web — Fitness Market 2026-07-30."
+    },
+    "plan_galeria": {
+      "imagen_base": "Imagenes/gym_1030702-000038/foto_01.webp",
+      "imagen_base_origen": "encontrado_web",
+      "slots": [
+        {
+          "tipo": "producto_limpio",
+          "fuente": "generado_motor",
+          "deriva_de": null,
+          "nota": "Vista general del producto sobre fondo limpio"
+        },
+        {
+          "tipo": "foto_real",
+          "fuente": "foto_real",
+          "origen": "encontrado_web",
+          "archivo": "Imagenes/gym_1030702-000038/foto_01.webp",
+          "deriva_de": null,
+          "nota": "Foto de estudio (Fitness Market)"
+        },
+        {
+          "tipo": "medidas",
+          "fuente": "generado_motor",
+          "deriva_de": null,
+          "nota": "Medidas del producto"
+        }
+      ]
+    }
+  },
+  "seo": {
+    "meta_titulo": "Máquina Multifuerza Serie 3 | Ekipon",
+    "meta_descripcion": "La multiestación Fitness Market es un equipo multifuncional diseñado para entrenar diferentes grupos musculares en un  Envío GRATIS a todo el país",
+    "palabras_clave": [
+      "máquina",
+      "multifuerza",
+      "serie",
+      "gimnasio"
+    ],
+    "texto_alt_base": "Máquina Multifuerza Serie 3",
+    "origen": "generado_ia"
+  },
+  "campos_por_confirmar": [
+    "Precio (lo define Angie — regla fija)",
+    "Categoría (leer el árbol EN VIVO desde WooCommerce)"
+  ],
+  "fuentes_consultadas": [
+    {
+      "fuente": "Fitness Market — maquina-multifuerza-serie-3-fitness-market (SKU 1030702-000038)",
+      "uso": "Fuente principal.",
+      "fecha": "2026-07-30"
+    }
+  ]
+}

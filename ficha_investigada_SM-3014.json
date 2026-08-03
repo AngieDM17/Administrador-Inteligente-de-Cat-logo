@@ -1,0 +1,144 @@
+{
+  "_version_ficha": "1.4",
+  "_uso": "Ficha AUTO del lote grande gym (Camino A, Fitness Market). Extracción 2026-07-30. Primer paso: revisar con colador + Angie.",
+  "modo_entrada": "investigacion_web",
+  "entrada_original": {
+    "nombre_dado": "Banco Olímpico Declinado Fitness Market  87 kg",
+    "codigo_proveedor": "SM-3014",
+    "foto_referencia": "Entrada por link (Camino A); portada pendiente de gate visual.",
+    "link_producto": "https://www.fitnessmarket.com.co/products/olympic-decline-bench"
+  },
+  "fecha_investigacion": "2026-07-30",
+  "estado": "pendiente_revision",
+  "identificacion_del_producto": {
+    "resultado": "IDENTIFICADO",
+    "detalle": "Banco Olímpico Declinado Fitness Market  87 kg. Extraído del listing exacto de Fitness Market (SKU SM-3014).",
+    "fuente_principal": "Fitness Market — fitnessmarket.com.co/olympic-decline-bench (SKU SM-3014), 2026-07-30.",
+    "advertencias": [],
+    "estado_en_proveedor": "Nuevo. Publicado a $2.199.899 COP. Consultado 2026-07-30.",
+    "origen_identificacion": "link"
+  },
+  "producto": {
+    "nombre_propuesto": "BANCO OLÍMPICO DECLINADO 87 KG",
+    "nombre_origen": "generado_ia (formato Ekipon)",
+    "modelo": "SM-3014",
+    "sku": "AUTOMATICO — lo asigna el sistema de la tienda, no se muestra al público",
+    "es_motorizado": false,
+    "categoria_propuesta": "Gimnasio",
+    "categoria_confianza": "confirmado_por_angie — categoría 'Gimnasio' (id 465).",
+    "etiquetas_propuestas": [
+      "banco",
+      "olímpico",
+      "declinado",
+      "gimnasio"
+    ],
+    "garantia": "1 año (política fija de la tienda)"
+  },
+  "precios": {
+    "precio": null,
+    "precio_origen": "PENDIENTE_ANGIE — REGLA FIJA: el precio SIEMPRE lo define Angie manualmente.",
+    "referencias_mercado": [
+      {
+        "fuente": "Fitness Market (SM-3014)",
+        "precio": "$2.199.899 COP",
+        "fecha": "2026-07-30",
+        "existencias": "publicado"
+      }
+    ],
+    "nota_envio": "El precio suele incluir ~$100.000 de envío; se publica 'Envío GRATIS a todo el país' + pago contra entrega",
+    "moneda": "COP"
+  },
+  "descripcion_principal": "Esta Máquina de Press de Banca Declinada con rack integrado es una herramienta esencial para el desarrollo completo del pecho, enfocandose específicamente en la porción inferior del pectoral. Su diseño de ángulo fijo garantiza la posición óptima para el press declinado, mientras que los soportes para barra incorporados y los rodillos de sujeción de piernas ofrecen seguridad y estabilidad inigualables durante los levantamientos mis pesados. Ideal para gimnasios comerciales y atletas que buscan optimizar su entrenamiento de fuerza.",
+  "descripcion_origen": "encontrado_web (texto completo del listing)",
+  "caracteristicas": [
+    "Esta Máquina de Press de Banca Declinada con rack integrado es una herramienta esencial para el desarrollo completo del pecho, enfocandose específicamente en la porción inferior del pectoral",
+    "Su diseño de ángulo fijo garantiza la posición óptima para el press declinado, mientras que los soportes para barra incorporados y los rodillos de sujeción de piernas ofrecen seguridad y estabilidad inigualables durante los levantamientos mis pesados",
+    "Ideal para gimnasios comerciales y atletas que buscan optimizar su entrenamiento de fuerza"
+  ],
+  "caracteristicas_origen": "encontrado_web",
+  "ficha_tecnica": {
+    "_origen_global": "encontrado_web — Fitness Market, listing SM-3014, 2026-07-30",
+    "_nota": "Claves en MAYÚSCULAS. Producto SIN motor. Datos extraídos de la fuente.",
+    "MODELO": "SM-3014",
+    "MARCA": "Fitness Market",
+    "DIMENSIONES": "1530 x 1350 x 1270 mm",
+    "PESO": "87 kg"
+  },
+  "criterio_verificacion_visual": {
+    "definido_por": "Investigador (Camino A); pendiente de Angie",
+    "SI_es": "El producto 'Banco Olímpico Declinado Fitness Market  87 kg' tal como lo muestra la foto de la fuente.",
+    "NO_es": "Otro equipo de gimnasio parecido; se rechaza si los rasgos estructurales no coinciden.",
+    "rasgo_decisivo": "Rasgos estructurales, NUNCA el color.",
+    "uso": "aceptar/rechazar imágenes; revisión humana final"
+  },
+  "multimedia": {
+    "imagenes_galeria_confirmadas": [],
+    "imagenes_nota": "Galería por motor: recorte + foto + medidas (si hay footprint). Pendiente gate visual de la portada.",
+    "briefs_generacion_ia": [],
+    "regla_generacion": "PROHIBIDO inventar textos/etiquetas/modelos que no estén en las fotos reales.",
+    "formato_destino": "WebP 1080x1080 (estándar de la tienda)",
+    "video_youtube": null,
+    "video_nota": "Fase 5.",
+    "galeria_tomas": {
+      "_comentario": "Datos de las tomas generadas. Solo lo verificado.",
+      "callouts": [],
+      "callouts_origen": null,
+      "dimensiones": {
+        "alto": "1270 mm",
+        "ancho": "1350 mm",
+        "fondo": "1530 mm",
+        "peso": "87 kg"
+      },
+      "dimensiones_origen": "encontrado_web — Fitness Market 2026-07-30."
+    },
+    "plan_galeria": {
+      "imagen_base": "Imagenes/gym_SM-3014/foto_01.webp",
+      "imagen_base_origen": "encontrado_web",
+      "slots": [
+        {
+          "tipo": "producto_limpio",
+          "fuente": "generado_motor",
+          "deriva_de": null,
+          "nota": "Vista general del producto sobre fondo limpio"
+        },
+        {
+          "tipo": "foto_real",
+          "fuente": "foto_real",
+          "origen": "encontrado_web",
+          "archivo": "Imagenes/gym_SM-3014/foto_01.webp",
+          "deriva_de": null,
+          "nota": "Foto de estudio (Fitness Market)"
+        },
+        {
+          "tipo": "medidas",
+          "fuente": "generado_motor",
+          "deriva_de": null,
+          "nota": "Medidas del producto"
+        }
+      ]
+    }
+  },
+  "seo": {
+    "meta_titulo": "Banco Olímpico Declinado 87 Kg | Ekipon",
+    "meta_descripcion": "Esta Máquina de Press de Banca Declinada con rack integrado es una herramienta esencial para el desarrollo completo de Envío GRATIS a todo el país",
+    "palabras_clave": [
+      "banco",
+      "olímpico",
+      "declinado",
+      "gimnasio"
+    ],
+    "texto_alt_base": "Banco Olímpico Declinado 87 Kg",
+    "origen": "generado_ia"
+  },
+  "campos_por_confirmar": [
+    "Precio (lo define Angie — regla fija)",
+    "Categoría (leer el árbol EN VIVO desde WooCommerce)"
+  ],
+  "fuentes_consultadas": [
+    {
+      "fuente": "Fitness Market — olympic-decline-bench (SKU SM-3014)",
+      "uso": "Fuente principal.",
+      "fecha": "2026-07-30"
+    }
+  ]
+}

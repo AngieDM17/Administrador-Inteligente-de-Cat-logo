@@ -58,9 +58,19 @@ incluye callouts); los 6 del lote quedaron con el enriquecimiento automático. L
 infla: la fuente publica ~5 datos y no se inventan specs. Generador: `scratchpad/gen_fichas_lote.py`
 (pendiente hornear `prosa_de_fuente` + `_plan_galeria` en el pipeline real).
 
+**6. Los 28 restantes de Fitness Market: preparados + medidos (aún NO publicados).** Se construyó un
+**extractor automático** (`scratchpad/gen_fichas_auto.py`) que trae cada producto, parsea specs por
+regex y arma la ficha enriquecida (descripción completa + galería recorte/foto/medidas). Medición
+del colador: **20 VERDES / 8 REVISAR** (~71% limpio; los 8 por dato faltante real: torre con 2 dims,
+accesorios sin specs, 4 multifuerza sin peso). **Lección de escala:** el extractor auto es tan bueno
+como su parser — la 1ª regex era angosta (exigía "mm", sin guiones ni cm) y producía falsos
+"contenido corto"; se cazó **verificando la medición contra la fuente**, no aceptando el número.
+FALTA: gate visual de las 28 portadas (obligatorio) → recorte → publicar, **en oleadas de ~7** (no
+las 28 a ciegas). Este commit es un CHECKPOINT: fichas + fotos preparadas, nada publicado aún.
+
 **Detalle:** memorias de Engram `end-to-end-completo-de-un-producto-de-gimnasio`,
 `primer-verde-del-colador`, `la-tienda-de-pruebas-no-tiene-categor-a-de-gimnasio`, `lote-de-muestra-gym`,
-`demo-de-enriquecimiento-del-leg-press`, `enriquecimiento-aplicado-al-lote-de-6`.
+`demo-de-enriquecimiento-del-leg-press`, `enriquecimiento-aplicado-al-lote-de-6`, `los-28-restantes-de-fitness-market`.
 
 ---
 
