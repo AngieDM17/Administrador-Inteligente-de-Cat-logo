@@ -73,7 +73,20 @@
     "uso": "aceptar/rechazar imágenes; revisión humana final"
   },
   "multimedia": {
-    "imagenes_galeria_confirmadas": [],
+    "imagenes_galeria_confirmadas": [
+      {
+        "url": "Imagenes/gym_U3001B/galeria/01-producto_limpio.webp",
+        "nota": "Vista general del producto sobre fondo limpio"
+      },
+      {
+        "url": "Imagenes/gym_U3001B/foto_01.webp",
+        "nota": "Foto de estudio (Fitness Market)"
+      },
+      {
+        "url": "Imagenes/gym_U3001B/galeria/03-medidas.webp",
+        "nota": "Medidas del producto"
+      }
+    ],
     "imagenes_nota": "Galería por motor: recorte + foto + medidas (si hay footprint). Pendiente gate visual de la portada.",
     "briefs_generacion_ia": [],
     "regla_generacion": "PROHIBIDO inventar textos/etiquetas/modelos que no estén en las fotos reales.",
@@ -100,7 +113,9 @@
           "tipo": "producto_limpio",
           "fuente": "generado_motor",
           "deriva_de": null,
-          "nota": "Vista general del producto sobre fondo limpio"
+          "nota": "Vista general del producto sobre fondo limpio",
+          "archivo": "Imagenes/gym_U3001B/galeria/01-producto_limpio.webp",
+          "origen": "encontrado_web"
         },
         {
           "tipo": "foto_real",
@@ -114,7 +129,9 @@
           "tipo": "medidas",
           "fuente": "generado_motor",
           "deriva_de": null,
-          "nota": "Medidas del producto"
+          "nota": "Medidas del producto",
+          "archivo": "Imagenes/gym_U3001B/galeria/03-medidas.webp",
+          "origen": "encontrado_web — Fitness Market 2026-07-30."
         }
       ]
     }

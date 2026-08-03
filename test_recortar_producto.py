@@ -6,6 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+import numpy as np
 from PIL import Image, ImageDraw
 
 import recortar_producto as rp
@@ -45,6 +46,33 @@ class PruebasPreview(unittest.TestCase):
             salida = Path(d) / "prev.png"
             out = rp.generar_preview(_recorte(), _recorte(), salida)
             self.assertTrue(out.exists())
+
+
+class PruebasLimpiarHalo(unittest.TestCase):
+    """El halo blanco = borde de alfa parcial y color casi-blanco (fondo que
+    rembg no termino de quitar). Se elimina sin tocar el producto."""
+
+    def _imagen(self):
+        a = np.zeros((4, 4, 4), dtype=np.uint8)
+        a[0, 0] = [30, 30, 30, 255]     # producto oscuro SOLIDO -> se mantiene
+        a[1, 1] = [250, 250, 250, 120]  # HALO: casi-blanco + alfa parcial -> fuera
+        a[2, 2] = [20, 20, 20, 120]     # cable oscuro, alfa parcial -> se mantiene
+        a[3, 3] = [230, 230, 230, 255]  # marco plateado SOLIDO -> se mantiene
+        return Image.fromarray(a, "RGBA")
+
+    def test_halo_casi_blanco_parcial_se_vuelve_transparente(self):
+        out = np.array(rp.limpiar_halo(self._imagen()))
+        self.assertEqual(out[1, 1, 3], 0)
+
+    def test_producto_solido_no_se_erosiona(self):
+        out = np.array(rp.limpiar_halo(self._imagen()))
+        self.assertEqual(out[0, 0, 3], 255)   # oscuro solido
+        self.assertEqual(out[3, 3, 3], 255)   # plateado solido (no es halo)
+
+    def test_borde_oscuro_parcial_se_mantiene(self):
+        # Un cable/eje fino tiene borde de alfa parcial pero NO es blanco: intacto.
+        out = np.array(rp.limpiar_halo(self._imagen()))
+        self.assertEqual(out[2, 2, 3], 120)
 
 
 if __name__ == "__main__":

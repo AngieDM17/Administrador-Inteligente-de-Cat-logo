@@ -68,9 +68,18 @@ como su parser — la 1ª regex era angosta (exigía "mm", sin guiones ni cm) y 
 FALTA: gate visual de las 28 portadas (obligatorio) → recorte → publicar, **en oleadas de ~7** (no
 las 28 a ciegas). Este commit es un CHECKPOINT: fichas + fotos preparadas, nada publicado aún.
 
+**7. Oleada 1 publicada (7 máquinas serie U, 50347-50377) + arreglo del HALO del recorte.** Angie
+detectó a ojo (su dominio) un **halo blanco** en el banner del vertical press: rembg deja el borde
+anti-aliased con color casi-blanco (fondo filtrado) que, sobre el banner oscuro, se ve como glow.
+Fix: `recortar_producto.limpiar_halo` vuelve transparentes los píxeles de alfa PARCIAL + casi-blancos,
+sin tocar el producto sólido (marco plateado intacto) ni los cables finos oscuros. 3 tests nuevos
+(suite **264**). Se re-limpiaron y re-publicaron los **14** productos ya en la tienda con el banner
+limpio. **Van 14 gym publicados; faltan 21** (oleadas siguientes).
+
 **Detalle:** memorias de Engram `end-to-end-completo-de-un-producto-de-gimnasio`,
 `primer-verde-del-colador`, `la-tienda-de-pruebas-no-tiene-categor-a-de-gimnasio`, `lote-de-muestra-gym`,
-`demo-de-enriquecimiento-del-leg-press`, `enriquecimiento-aplicado-al-lote-de-6`, `los-28-restantes-de-fitness-market`.
+`demo-de-enriquecimiento-del-leg-press`, `enriquecimiento-aplicado-al-lote-de-6`, `los-28-restantes-de-fitness-market`,
+`primera-oleada-publicada`.
 
 ---
 

@@ -17,6 +17,7 @@ import argparse
 import sys
 from pathlib import Path
 
+import numpy as np
 from PIL import Image
 
 
@@ -46,12 +47,31 @@ def recortar_a_contenido(imagen: Image.Image, margen: float = 0.04) -> Image.Ima
     return imagen.crop((izq, arr, der, aba))
 
 
+def limpiar_halo(imagen: Image.Image, umbral_blanco: int = 210) -> Image.Image:
+    """Quita el halo blanco del borde. rembg deja el borde anti-aliased con
+    alfa PARCIAL y color casi-blanco: es fondo filtrado, no producto, y sobre un
+    banner oscuro se ve como un glow. Esos pixeles (alfa parcial + casi-blanco)
+    se vuelven transparentes.
+
+    NO toca el producto: el relleno solido (alfa 255) queda intacto, asi que el
+    marco plateado no se erosiona; y solo mira pixeles CASI-BLANCOS, asi que un
+    cable fino oscuro (color, no blanco) tampoco se pierde. Detectado por Angie
+    en el banner del vertical press (30-jul-2026)."""
+    a = np.array(imagen.convert("RGBA"))
+    alpha = a[:, :, 3]
+    rgb_min = a[:, :, :3].min(axis=2)
+    halo = (alpha > 0) & (alpha < 250) & (rgb_min > umbral_blanco)
+    a[halo, 3] = 0
+    return Image.fromarray(a, "RGBA")
+
+
 def generar_recorte(ruta_entrada: Path, ruta_salida: Path,
                     margen: float = 0.04) -> Image.Image:
     """Compone el recorte transparente y lo guarda como PNG. Devuelve la imagen."""
     original = Image.open(ruta_entrada)
     sin_fondo = quitar_fondo(original)
-    recorte = recortar_a_contenido(sin_fondo, margen)
+    sin_halo = limpiar_halo(sin_fondo)
+    recorte = recortar_a_contenido(sin_halo, margen)
     recorte.save(ruta_salida, "PNG")
     return recorte
 
