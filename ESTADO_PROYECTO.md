@@ -81,6 +81,16 @@ limpio. **Van 14 gym publicados; faltan 21** (oleadas siguientes).
 `demo-de-enriquecimiento-del-leg-press`, `enriquecimiento-aplicado-al-lote-de-6`, `los-28-restantes-de-fitness-market`,
 `primera-oleada-publicada`.
 
+**8. COLECCIÓN COMPLETA de Fitness Market marca-propia publicada (30-jul).** Oleada 3 (6 máquinas,
+50438-50463) cerró los 20 verdes; luego se subieron los **8 REVISAR** restantes (50467-50502) como
+borrador — el colador los marca porque les falta un dato real (specs/peso/dimensiones) que Angie
+debe completar antes de publicar en vivo. **Bug encontrado y arreglado:** 2 fotos (multifuerza serie
+1 y 2) venían de la fuente a 2613×2613 px en vez de 1080×1080; el Publicador tardaba más del timeout
+de 30s al subirlas y fallaba (timeout de LECTURA, no DNS — el reintento no actuó solo, correctamente:
+un POST que expira en la lectura pudo haberse aplicado, reintentar a ciegas duplicaría). Se
+redimensionaron a 1080×1080 antes de subir; el Publicador es idempotente así que reintentar el
+comando fue seguro. **Total: 29 productos de gimnasio en `pruebas.ekipon.co`, categoría Gimnasio.**
+
 ---
 
 ## 🔵 ACTUALIZACIÓN 29-jul-2026
