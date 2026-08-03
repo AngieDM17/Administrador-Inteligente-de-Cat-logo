@@ -53,16 +53,22 @@ class PruebasLimpiarHalo(unittest.TestCase):
     rembg no termino de quitar). Se elimina sin tocar el producto."""
 
     def _imagen(self):
-        a = np.zeros((4, 4, 4), dtype=np.uint8)
+        a = np.zeros((5, 5, 4), dtype=np.uint8)
         a[0, 0] = [30, 30, 30, 255]     # producto oscuro SOLIDO -> se mantiene
-        a[1, 1] = [250, 250, 250, 120]  # HALO: casi-blanco + alfa parcial -> fuera
-        a[2, 2] = [20, 20, 20, 120]     # cable oscuro, alfa parcial -> se mantiene
+        a[1, 1] = [250, 250, 250, 120]  # HALO blanco parcial -> fuera
+        a[2, 2] = [20, 20, 20, 120]     # cable oscuro parcial -> se mantiene
         a[3, 3] = [230, 230, 230, 255]  # marco plateado SOLIDO -> se mantiene
+        a[4, 4] = [190, 190, 190, 120]  # HALO plateado parcial -> fuera (dip/chin)
         return Image.fromarray(a, "RGBA")
 
-    def test_halo_casi_blanco_parcial_se_vuelve_transparente(self):
+    def test_halo_blanco_parcial_se_vuelve_transparente(self):
         out = np.array(rp.limpiar_halo(self._imagen()))
         self.assertEqual(out[1, 1, 3], 0)
+
+    def test_halo_plateado_parcial_se_vuelve_transparente(self):
+        # El caso que Angie detecto en la dip/chin: fringe plateado (no blanco).
+        out = np.array(rp.limpiar_halo(self._imagen()))
+        self.assertEqual(out[4, 4, 3], 0)
 
     def test_producto_solido_no_se_erosiona(self):
         out = np.array(rp.limpiar_halo(self._imagen()))
@@ -70,7 +76,7 @@ class PruebasLimpiarHalo(unittest.TestCase):
         self.assertEqual(out[3, 3, 3], 255)   # plateado solido (no es halo)
 
     def test_borde_oscuro_parcial_se_mantiene(self):
-        # Un cable/eje fino tiene borde de alfa parcial pero NO es blanco: intacto.
+        # Un cable/eje fino tiene borde de alfa parcial pero NO es claro: intacto.
         out = np.array(rp.limpiar_halo(self._imagen()))
         self.assertEqual(out[2, 2, 3], 120)
 

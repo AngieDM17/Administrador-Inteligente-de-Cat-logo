@@ -47,20 +47,23 @@ def recortar_a_contenido(imagen: Image.Image, margen: float = 0.04) -> Image.Ima
     return imagen.crop((izq, arr, der, aba))
 
 
-def limpiar_halo(imagen: Image.Image, umbral_blanco: int = 210) -> Image.Image:
-    """Quita el halo blanco del borde. rembg deja el borde anti-aliased con
-    alfa PARCIAL y color casi-blanco: es fondo filtrado, no producto, y sobre un
-    banner oscuro se ve como un glow. Esos pixeles (alfa parcial + casi-blanco)
-    se vuelven transparentes.
+def limpiar_halo(imagen: Image.Image, umbral_claro: int = 170) -> Image.Image:
+    """Quita el halo claro del borde. rembg deja el borde anti-aliased con alfa
+    PARCIAL y color del fondo (claro) filtrado; sobre un banner oscuro se ve como
+    un glow. Esos pixeles (alfa parcial + color claro) se vuelven transparentes.
 
-    NO toca el producto: el relleno solido (alfa 255) queda intacto, asi que el
-    marco plateado no se erosiona; y solo mira pixeles CASI-BLANCOS, asi que un
-    cable fino oscuro (color, no blanco) tampoco se pierde. Detectado por Angie
-    en el banner del vertical press (30-jul-2026)."""
+    NO toca el producto: solo mira pixeles de alfa PARCIAL (el relleno solido,
+    alfa 255, queda intacto -> el marco plateado no se erosiona), y solo los
+    CLAROS, asi que un cable fino oscuro (color, no claro) no se pierde.
+
+    Historia del umbral: arranco en 210 (casi-blanco) tras el banner del vertical
+    press; Angie vio que en maquinas PLATEADAS (dip/chin) seguia el glow, porque
+    su fringe cae en 170-210 (plateado), no en blanco. Bajado a 170 (30-jul-2026).
+    Solo toca alfa parcial, asi que bajar el umbral no come el marco solido."""
     a = np.array(imagen.convert("RGBA"))
     alpha = a[:, :, 3]
     rgb_min = a[:, :, :3].min(axis=2)
-    halo = (alpha > 0) & (alpha < 250) & (rgb_min > umbral_blanco)
+    halo = (alpha > 0) & (alpha < 250) & (rgb_min > umbral_claro)
     a[halo, 3] = 0
     return Image.fromarray(a, "RGBA")
 
