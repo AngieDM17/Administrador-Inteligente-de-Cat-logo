@@ -6,3 +6,12 @@ Origen del archivo: https://github.com/googlefonts/opensans (fonts/ttf/OpenSans-
 
 Se incluye en el repositorio para que el generador de banners sea reproducible
 sin depender de fuentes instaladas en el sistema.
+
+Anton-Regular.ttf
+Fuente: Anton, por The Anton Project Authors.
+Licencia: SIL Open Font License, Version 1.1 (OFL-1.1).
+Texto de la licencia: https://openfontlicense.org
+Origen del archivo: https://github.com/google/fonts (ofl/anton/Anton-Regular.ttf)
+
+Se incluye en el repositorio para que el generador de portada de video sea
+reproducible sin depender de fuentes instaladas en el sistema.
