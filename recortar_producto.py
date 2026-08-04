@@ -1,6 +1,6 @@
 """Automated product cutout (etapa Imagenes).
 
-Removes the background from a product photo with rembg (u2net) and returns a
+Removes the background from a product photo with rembg (isnet-general-use) and returns a
 transparent RGBA cutout, optionally trimmed to the product's bounding box so the
 result drops cleanly into the banner and gallery generators. This replaces the
 manual Canva step in the pipeline.
@@ -21,12 +21,28 @@ import numpy as np
 from PIL import Image
 
 
-def quitar_fondo(imagen: Image.Image) -> Image.Image:
-    """Devuelve la imagen con el fondo eliminado (RGBA transparente)."""
-    # Import diferido: cargar rembg (y su modelo) solo cuando se usa de verdad.
-    from rembg import remove
+_NOMBRE_MODELO = "isnet-general-use"
+_sesion_rembg = None
 
-    return remove(imagen.convert("RGBA"))
+
+def quitar_fondo(imagen: Image.Image) -> Image.Image:
+    """Devuelve la imagen con el fondo eliminado (RGBA transparente).
+
+    Modelo: isnet-general-use, no el u2net por defecto de rembg. Angie detecto
+    (4-ago-2026) que u2net deja parches de fondo SOLIDOS atrapados dentro de la
+    silueta (ej. bajo el asiento de una maquina de gimnasio, reflejo de piso
+    entre partes) -- no es un halo de borde (eso ya lo resuelve limpiar_halo),
+    es una zona interior que el modelo no segmenta. Verificado corriendo los
+    dos modelos sobre la misma foto de origen (leg press U3003B): u2net deja el
+    parche, isnet-general-use no. Sesion cacheada: cargar el modelo (~180 MB)
+    de nuevo por cada llamada seria carisimo en un lote grande."""
+    # Import diferido: cargar rembg (y su modelo) solo cuando se usa de verdad.
+    global _sesion_rembg
+    from rembg import new_session, remove
+
+    if _sesion_rembg is None:
+        _sesion_rembg = new_session(_NOMBRE_MODELO)
+    return remove(imagen.convert("RGBA"), session=_sesion_rembg)
 
 
 def recortar_a_contenido(imagen: Image.Image, margen: float = 0.04) -> Image.Image:
