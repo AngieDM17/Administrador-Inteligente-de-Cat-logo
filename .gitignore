@@ -18,6 +18,7 @@ Desktop.ini
 
 # === Temp working files ===
 _tmp/
+_final/
 
 # Estado local
 *.db

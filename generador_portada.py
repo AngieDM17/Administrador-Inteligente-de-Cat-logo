@@ -67,10 +67,10 @@ COLOR_PRIMERA_PALABRA_TITULO = "#FF4E03"
 CONFIG_PORTADA = {
     "fuente_titulo": RUTA_FUENTE_TITULO_PORTADA,
     "titulo": {
-        "caja": (0.04, 0.30, 0.46, 0.62),
+        "caja": (0.04, 0.14, 0.46, 0.62),
         "color": "#000000",       # color del resto del titulo (todo menos la 1ra palabra)
         "mayusculas": True,
-        "tam_max_frac": 0.080,   # fraccion de la ALTURA del lienzo (Anton es mas ancha/pesada que Open Sans: se bajo de 0.110)
+        "tam_max_frac": 0.100,   # fraccion de la ALTURA del lienzo (Anton es mas ancha/pesada que Open Sans: se bajo de 0.110)
         "tam_min_frac": 0.040,
         "max_lineas": 3,
         "interlineado": 1.10,
