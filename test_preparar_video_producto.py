@@ -1,9 +1,10 @@
 """Pruebas de preparar_video_producto. Offline: no corren ffmpeg/ffprobe reales
 (herramientas externas pesadas). Solo se prueba la logica pura que decide si
-hace falta reescalar y la que arma el filtro de zoom extra (_filtro_zoom_
-extra); _dimensiones_video/generar_a_archivo (que sí llaman a ffprobe/ffmpeg)
-se verifican a mano/CLI contra clips reales, igual que quitar_fondo/generar_
-recorte en recortar_producto.py.
+hace falta reescalar y la que arma los filtros de zoom extra (_filtro_zoom_
+extra) y fondo difuminado (_filtro_fondo_difuminado); _dimensiones_video/
+generar_a_archivo (que sí llaman a ffprobe/ffmpeg) se verifican a mano/CLI
+contra clips reales, igual que quitar_fondo/generar_recorte en
+recortar_producto.py.
 """
 
 import unittest
@@ -71,6 +72,25 @@ class PruebasFiltroZoomExtra(unittest.TestCase):
         # max(0.0, zoom_extra) en la implementacion: un valor negativo no
         # agranda el recorte por error.
         self.assertEqual(pvp._filtro_zoom_extra(-0.5), pvp._filtro_zoom_extra(0.0))
+
+
+class PruebasFiltroFondoDifuminado(unittest.TestCase):
+    def test_arma_las_tres_etapas_del_filtro(self):
+        # crop del contenido real -> split en nitido+fondo -> fondo cubre
+        # 1920x1080 desenfocado -> nitido escalado a 1080 de alto -> overlay
+        # centrado. Los 4 numeros de crop vienen de medir el clip real con
+        # `ffmpeg -vf cropdetect` (ver docstring), no se inventan aca.
+        filtro = pvp._filtro_fondo_difuminado(548, 720, 86, 0)
+        self.assertIn("crop=548:720:86:0", filtro)
+        self.assertIn("split=2", filtro)
+        self.assertIn("gblur", filtro)
+        self.assertIn("scale=1920:1080", filtro)
+        self.assertIn("scale=-2:1080", filtro)
+        self.assertIn("overlay=(W-w)/2:0", filtro)
+
+    def test_usa_los_4_numeros_de_crop_recibidos(self):
+        filtro = pvp._filtro_fondo_difuminado(400, 600, 20, 10)
+        self.assertIn("crop=400:600:20:10", filtro)
 
 
 if __name__ == "__main__":

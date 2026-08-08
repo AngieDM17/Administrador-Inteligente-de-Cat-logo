@@ -122,8 +122,43 @@ def _filtro_zoom_extra(zoom_extra: float) -> str:
     return f"crop={ancho_recorte}:{alto_recorte}:{x}:0,scale=1920:1080"
 
 
+def _filtro_fondo_difuminado(crop_ancho: int, crop_alto: int,
+                             crop_x: int, crop_y: int) -> str:
+    """Filtro ffmpeg para clips donde el contenido real es mas angosto que
+    16:9 y viene con franjas negras "horneadas" en el propio video (no es
+    aspect-ratio del contenedor: los pixeles negros ya estan en el frame) --
+    caso real encontrado el 8-ago-2026 con un clip de Alibaba de categoria
+    AGRO: video cuadrado 720x720 con el contenido real en una franja vertical
+    angosta al centro (medido con `ffmpeg -vf cropdetect`: crop=548:720:86:0).
+
+    Ni el crop+scale normal (recortaria la mitad del producto en vertical
+    para llenar 1920 de ancho) ni zoom_extra (disenado para sacar UNA franja
+    quemada cerca de un borde, no para reencuadrar contenido angosto)
+    resuelven esto sin perder el producto.
+
+    La tecnica es la misma que usan las herramientas de "vertical a
+    horizontal" para redes sociales: 1) recortar las franjas negras
+    horneadas (crop_ancho/alto/x/y, medidos con cropdetect contra el clip
+    real); 2) esa franja recortada se escala para llenar 1080 de alto SIN
+    recortar nada (se ve completa, angosta, al centro); 3) los costados que
+    quedan libres hasta los 1920 de ancho se rellenan con una copia
+    desenfocada (`gblur`) del mismo video, escalada para cubrir todo el
+    cuadro -- asi no quedan barras negras ni se pierde nada del producto.
+
+    Logica pura (arma el string del filtro); no ejecuta ffmpeg."""
+    return (
+        f"crop={crop_ancho}:{crop_alto}:{crop_x}:{crop_y},split=2[fg][bgsrc];"
+        "[bgsrc]scale=1920:1080:force_original_aspect_ratio=increase,"
+        "crop=1920:1080,gblur=sigma=20[bg];"
+        "[fg]scale=-2:1080[fgs];"
+        "[bg][fgs]overlay=(W-w)/2:0"
+    )
+
+
 def generar_a_archivo(ruta_entrada: Path, ruta_salida: Path,
-                      zoom_extra: float = 0.0) -> Path:
+                      zoom_extra: float = 0.0,
+                      fondo_difuminado: tuple[int, int, int, int] | None = None
+                      ) -> Path:
     """Normaliza el clip a 1920x1080 y lo guarda en ruta_salida. Devuelve
     ruta_salida. Guardado atomico (temporal + os.replace): si el proceso
     muere a mitad de camino no queda un archivo a medias pisando uno previo
@@ -142,6 +177,14 @@ def generar_a_archivo(ruta_entrada: Path, ruta_salida: Path,
     cerca de los bordes en clips de Alibaba (pedido de Angie). Default 0.0:
     no cambia el comportamiento de las llamadas existentes.
 
+    fondo_difuminado (crop_ancho, crop_alto, crop_x, crop_y), si se pasa,
+    reemplaza el scale+crop normal por la tecnica de fondo desenfocado (ver
+    _filtro_fondo_difuminado): para clips angostos con franjas negras
+    horneadas donde recortar/estirar perderia parte del producto. Los 4
+    numeros salen de medir el clip real con `ffmpeg -vf cropdetect` (no se
+    adivinan a ojo). Incompatible con zoom_extra (no tiene sentido pedir las
+    dos cosas a la vez).
+
     Lanza ErrorRecurso si ffmpeg/ffprobe no estan disponibles, la entrada no
     es un video legible, o ffmpeg falla al re-codificar.
 
@@ -156,6 +199,24 @@ def generar_a_archivo(ruta_entrada: Path, ruta_salida: Path,
     # matchea ningun muxer conocido.
     temporal = ruta_salida.with_name(ruta_salida.stem + ".tmp" + ruta_salida.suffix)
     try:
+        if fondo_difuminado is not None:
+            filtro = _filtro_fondo_difuminado(*fondo_difuminado)
+            comando = [
+                "ffmpeg", "-y", "-i", str(ruta_entrada),
+                "-filter_complex", filtro,
+                "-c:v", "libx264", "-crf", "19", "-preset", "fast",
+                "-c:a", "copy",
+                str(temporal),
+            ]
+            resultado = subprocess.run(comando, capture_output=True, text=True)
+            if resultado.returncode != 0:
+                raise ErrorRecurso(
+                    f"ffmpeg fallo al normalizar '{ruta_entrada}' (fondo "
+                    f"difuminado): {resultado.stderr.strip()[-800:]}"
+                )
+            os.replace(temporal, ruta_salida)
+            return ruta_salida
+
         filtros = []
         if necesita_reescalar(ancho, alto):
             filtros.append("scale=1920:-1,crop=1920:1080")
@@ -202,6 +263,14 @@ def main() -> None:
                         "llegar a 1920x1080. Usar cuando el clip trae "
                         "subtitulos quemados cerca de los bordes (default "
                         "0.0: sin zoom extra)")
+    parser.add_argument("--fondo-difuminado", nargs=4, type=int, default=None,
+                        metavar=("ANCHO", "ALTO", "X", "Y"),
+                        help="ancho alto x y del recorte del contenido real "
+                        "(medidos con 'ffmpeg -vf cropdetect' contra el "
+                        "clip), para clips angostos con franjas negras "
+                        "horneadas -- rellena los costados con fondo "
+                        "desenfocado en vez de recortar/estirar el "
+                        "producto. Incompatible con --zoom-extra.")
     args = parser.parse_args()
 
     ruta_entrada = Path(args.entrada).resolve()
@@ -209,7 +278,11 @@ def main() -> None:
         ruta_entrada.with_name(ruta_entrada.stem + "_1080p.mp4")
 
     try:
-        generar_a_archivo(ruta_entrada, ruta_salida, zoom_extra=args.zoom_extra)
+        generar_a_archivo(
+            ruta_entrada, ruta_salida, zoom_extra=args.zoom_extra,
+            fondo_difuminado=tuple(args.fondo_difuminado)
+            if args.fondo_difuminado else None,
+        )
         ancho, alto = _dimensiones_video(ruta_salida)
     except ErrorRecurso as error:
         print(f"ERROR DE ARCHIVO: {error}")

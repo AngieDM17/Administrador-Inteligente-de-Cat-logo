@@ -1,0 +1,156 @@
+{
+  "_version_ficha": "1.4",
+  "_uso": "Ficha investigada por Camino A (link exacto de Alibaba, sesion de Angie). Extraccion de la fuente, 8-ago-2026. Parte de la prueba de escalado del pipeline de VIDEO (3 productos nuevos): el trabajo de galeria completa (motor_galeria.py) NO se corrio en esta pasada, solo el recorte necesario para la portada del video. Categoria GIMNASIO (producto sin motor).",
+  "modo_entrada": "investigacion_web",
+  "entrada_original": {
+    "nombre_dado": "Gimnasio multifuncional 2 en 1",
+    "codigo_proveedor": "MHG1301",
+    "foto_referencia": "No hubo foto de referencia aparte: la entrada fue el link exacto del producto (Camino A).",
+    "link_producto": "https://www.alibaba.com/product-detail/2-in-1-Single-Comprehensive-Training_1600946138168.html"
+  },
+  "fecha_investigacion": "2026-08-08",
+  "estado": "pendiente_revision",
+  "identificacion_del_producto": {
+    "resultado": "IDENTIFICADO",
+    "detalle": "Estacion de gimnasio multifuncional 2 en 1 (fuerza + cardio), modelo MHG1301, marca Luckystars (proveedor Xiamen Lucky Stars Imp. & Exp. Co., Ltd.). Multi-estacion con pila de pesas de 72 kg, extraida del listing exacto de Alibaba.",
+    "fuente_principal": "Alibaba.com — Xiamen Lucky Stars Imp. & Exp. Co., Ltd., producto 1600946138168 (modelo MHG1301), consultado 8-ago-2026.",
+    "advertencias": [
+      "El precio publicado en Alibaba es precio de fabrica/mayorista (30-199 unidades), NO el precio de venta al publico en Colombia."
+    ],
+    "estado_en_proveedor": "Publicado, 50 vendido/s, calificacion 4.9/5 del proveedor (876 resenas). Consultado 8-ago-2026.",
+    "origen_identificacion": "link"
+  },
+  "producto": {
+    "nombre_propuesto": "GIMNASIO MULTIFUNCIONAL 2 EN 1 – ESTACION DE FUERZA PILA 72 KG",
+    "nombre_origen": "generado_ia (formato de nombres Ekipon)",
+    "modelo": "MHG1301",
+    "sku": "AUTOMATICO — lo asigna el sistema de la tienda, no se muestra al publico",
+    "es_motorizado": false,
+    "categoria_propuesta": "Gimnasio",
+    "categoria_confianza": "encontrado_web — se propone reusar la categoria 'Gimnasio' ya creada en la tienda de pruebas (id 465, 30-jul-2026) por ser el mismo tipo de producto; no hay confirmacion de Angie especifica para ESTE producto.",
+    "etiquetas_propuestas": [
+      "gimnasio multifuncional",
+      "estacion de fuerza",
+      "gimnasio en casa",
+      "pila de pesas",
+      "entrenamiento de fuerza"
+    ],
+    "garantia": "1 año (política fija de la tienda)"
+  },
+  "precios": {
+    "precio": null,
+    "precio_origen": "PENDIENTE_ANGIE — REGLA FIJA: el precio SIEMPRE lo define Angie manualmente. El sistema solo aporta referencias.",
+    "referencias_mercado": [
+      {
+        "fuente": "Alibaba.com (proveedor Xiamen Lucky Stars, modelo MHG1301)",
+        "precio": "COP 649.014 (30-199 unidades) / COP 584.113 (≥200 unidades) — precio de fabrica, no de venta al publico",
+        "fecha": "2026-08-08",
+        "existencias": "No publicado (fabricante bajo pedido, tiempo de entrega 30 dias)"
+      }
+    ],
+    "nota_envio": "Se publica 'Envío GRATIS a todo el país' + pago contra entrega, según política fija de la tienda",
+    "moneda": "COP"
+  },
+  "descripcion_principal": "Estación de gimnasio multifuncional 2 en 1 pensada para entrenar fuerza y resistencia en un solo equipo compacto, combinando entrenamiento de fuerza con ejercicios cardiovasculares. Su pila de pesas de 72 kg permite ajustar la carga al instante sin cambiar discos, y soporta usuarios de hasta 150 kg. El marco de metal duradero está pensado para el uso constante en el hogar, en un diseño compacto que ahorra espacio frente a tener varias máquinas por separado.",
+  "descripcion_origen": "encontrado_web (redactado a partir de la descripción del listing)",
+  "caracteristicas": [
+    "Diseño 2 en 1: combina entrenamiento de fuerza con ejercicios cardiovasculares",
+    "Pila de pesas de 72 kg, ajuste instantáneo sin cambiar discos",
+    "Soporta usuarios de hasta 150 kg",
+    "Marco de metal duradero",
+    "Diseño compacto, ahorra espacio"
+  ],
+  "caracteristicas_origen": "encontrado_web",
+  "ficha_tecnica": {
+    "_origen_global": "encontrado_web — Alibaba.com, listing 1600946138168 (modelo MHG1301), 8-ago-2026",
+    "_nota": "Claves en MAYÚSCULAS. Producto SIN motor (es de fuerza por pila de pesas). Datos extraídos de la fuente.",
+    "MODELO": "MHG1301",
+    "MARCA (interno, no va en el nombre publico)": "Luckystars",
+    "TIPO": "Gimnasio multifuncional 2 en 1 (fuerza + cardio)",
+    "USO": "Uso en el hogar",
+    "PILA DE PESAS": "72 kg",
+    "PESO MAXIMO DEL USUARIO": "150 kg",
+    "PESO BRUTO DE EMPAQUE": "165 kg",
+    "DIMENSIONES DE EMPAQUE": "187 x 50 x 21 cm (esto es la caja de embarque, NO las medidas del equipo armado — la fuente no publica las medidas del equipo ya montado)"
+  },
+  "criterio_verificacion_visual": {
+    "definido_por": "Investigador (Camino A); pendiente de confirmación de Angie",
+    "SI_es": "Estación multi-función con torre de pesas perforada a la derecha, brazo de pec-deck/jalón en la parte superior, asiento acolchado central, y accesorio de extensión/curl de pierna a la izquierda con reposapiés.",
+    "NO_es": "Racks de sentadilla, máquinas Smith, o estaciones de una sola función (solo jalón o solo press) — son equipos distintos aunque se vean parecidos en fotos chicas.",
+    "rasgo_decisivo": "Combinación de las 3 estaciones (jalón/pec-deck arriba, asiento con pila de pesas al centro, extensión de pierna a la izquierda) en un solo bastidor. NUNCA el color (viene en negro y en rojo/negro).",
+    "uso": "criterio para aceptar/rechazar imágenes; revisión final siempre humana"
+  },
+  "multimedia": {
+    "imagenes_galeria_confirmadas": [],
+    "imagenes_nota": "Pasada de video (8-ago-2026): se descargaron 3 fotos reales de la fuente y se generó el recorte de fondo transparente para la portada del video (MHG1301_recorte.png). NO se corrió el motor de galería completo (motor_galeria.py) — eso queda pendiente para cuando este producto se prepare para publicar en la tienda, no forma parte de esta prueba de video.",
+    "briefs_generacion_ia": [],
+    "regla_generacion": "PROHIBIDO inventar textos, etiquetas, modelos o conectores que no estén en las fotos reales. Ante duda, la toma se descarta. Sufijo _IA en el archivo.",
+    "formato_destino": "WebP 1080x1080 (estándar de la tienda) — pendiente de generar",
+    "video_youtube": null,
+    "video_nota": "Clip de producto real descargado de Alibaba (proveedor Xiamen Lucky Stars), 44.3s, 1280x720, fondo de estudio blanco, sin subtítulos quemados. Video final de Ekipon armado con generador_portada+preparar_video_producto+voz_en_off+musica+subtitulos+marca_agua+ensamblar_video_producto, 8-ago-2026.",
+    "galeria_tomas": {
+      "_comentario": "No se completó esta pasada (ver imagenes_nota) — no hay callouts ni dimensiones del equipo verificadas para dibujar tomas generadas."
+    },
+    "plan_galeria": {
+      "_slots_omitidos_y_por_que": [
+        "medidas: la fuente solo publica las dimensiones del embalaje de envío, no las del equipo ya armado — no hay dato real para esta toma",
+        "partes_senaladas: no se ubicaron los puntos de los callouts sobre la imagen en esta pasada (foco en video, no en galería)",
+        "accesorios: la fuente no menciona que el producto incluya accesorios aparte del propio equipo"
+      ],
+      "imagen_base": "_productos_nuevos/MHG1301/foto3_producto_angulo.jpg",
+      "imagen_base_origen": "encontrado_web",
+      "slots": [
+        {
+          "tipo": "producto_limpio",
+          "fuente": "generado_motor",
+          "deriva_de": "_productos_nuevos/MHG1301/foto3_producto_angulo.jpg",
+          "nota": "Recorte de fondo transparente del equipo, usado en la portada del video",
+          "archivo": "MHG1301_recorte.png",
+          "origen": "encontrado_web"
+        },
+        {
+          "tipo": "foto_real",
+          "fuente": "foto_real",
+          "origen": "encontrado_web",
+          "archivo": "_productos_nuevos/MHG1301/foto3_producto_angulo.jpg",
+          "deriva_de": null,
+          "nota": "Foto de estudio del equipo en colorway rojo/negro, ángulo 3/4"
+        },
+        {
+          "tipo": "foto_real",
+          "fuente": "foto_real",
+          "origen": "encontrado_web",
+          "archivo": "_productos_nuevos/MHG1301/foto2_producto_negro.jpg",
+          "deriva_de": null,
+          "nota": "Foto de estudio del equipo en colorway negro, ángulo lateral"
+        }
+      ]
+    }
+  },
+  "seo": {
+    "meta_titulo": "Gimnasio Multifuncional 2 en 1 Pila 72 kg | Ekipon",
+    "meta_descripcion": "Estación de gimnasio 2 en 1, fuerza y cardio, pila de 72 kg, soporta hasta 150 kg. Envío GRATIS a todo el país y pago contra entrega",
+    "palabras_clave": [
+      "gimnasio multifuncional",
+      "estacion de fuerza gimnasio en casa",
+      "maquina de pila de pesas",
+      "gimnasio 2 en 1",
+      "comprar gimnasio en casa colombia"
+    ],
+    "texto_alt_base": "Estación de gimnasio multifuncional 2 en 1 con pila de pesas de 72 kg, marco de metal duradero",
+    "origen": "generado_ia"
+  },
+  "campos_por_confirmar": [
+    "Precio (lo define Angie — regla fija)",
+    "Categoría (confirmar 'Gimnasio' para este producto puntual, o revisar árbol EN VIVO de WooCommerce)",
+    "Dimensiones del equipo ya armado (la fuente solo publica dimensiones de embalaje)",
+    "Galería completa de imágenes (motor_galeria.py no se corrió en esta pasada)"
+  ],
+  "fuentes_consultadas": [
+    {
+      "fuente": "Alibaba.com — Xiamen Lucky Stars Imp. & Exp. Co., Ltd., producto 1600946138168 (modelo MHG1301)",
+      "uso": "Fuente principal: identificación, ficha técnica, fotos y video reales.",
+      "fecha": "2026-08-08"
+    }
+  ]
+}

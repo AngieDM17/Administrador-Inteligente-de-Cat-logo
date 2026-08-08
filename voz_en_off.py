@@ -96,12 +96,20 @@ PRESUPUESTO_CARACTERES_DEFECTO = round(
 # musica de fondo (musica.py), nunca el audio original del clip (6-ago-2026).
 VOLUMEN_AMBIENTE = 0.0
 
-# Volumen de la VOZ en la mezcla final. Por encima de 1.0 (a proposito): tras
-# silenciar el ambiente y bajar la musica (ver musica.VOLUMEN_MUSICA_DEFECTO),
-# Angie pidio que la voz sea la que "se lleve el protagonismo" -- 1.0 ya
-# quedaba correcta en volumen absoluto (maximo medido -15dB, lejos de saturar,
-# ver memoria de sesion) pero sonaba pareja con la musica en vez de dominarla.
-VOLUMEN_VOZ = 1.4
+# Sonoridad objetivo de la VOZ en la mezcla final, normalizada con el filtro
+# `loudnorm` de ffmpeg (EBU R128: LUFS integrados + techo de pico real), NO
+# con un factor fijo de `volume=`. Se detecto el 8-ago-2026 probando un
+# segundo producto (voz de Gonzalo) que un factor fijo (antes 1.4x sobre
+# volumen normal) rompe apenas cambia la voz: la muestra de Carlos del primer
+# video salio de ElevenLabs a -33dB de promedio, pero la de Gonzalo para este
+# producto salio a -17dB -- el MISMO 1.4x que en Carlos dejaba margen de sobra
+# en Gonzalo casi tocaba 0dB (saturacion). loudnorm targetea una sonoridad
+# fija sin importar en que nivel haya salido la sintesis, asi que la voz
+# "lleva el protagonismo" (pedido de Angie) de forma pareja entre voces.
+# LOUDNORM_I = sonoridad integrada objetivo (LUFS); LOUDNORM_TP = techo de
+# pico real (dBTP), con margen bajo 0dB para no saturar nunca.
+LOUDNORM_VOZ_I = -14
+LOUDNORM_VOZ_TP = -1.5
 
 
 class ErrorRecurso(Exception):
@@ -409,18 +417,25 @@ def preparar_clip_con_voz(ruta_clip_normalizado: Path, ruta_voz: Path,
         ruta_salida.stem + ".tmp" + ruta_salida.suffix
     )
     # [0:a] = audio original del clip, silenciado (VOLUMEN_AMBIENTE=0.0) y
-    # estirado si hace falta; [1:a] = la voz, a volumen normal, NUNCA se
-    # estira. amix con duration=first porque el video ya se recorta
-    # (-t duracion_voz) a la duracion de la voz. normalize=0 es necesario:
-    # sin el, amix baja TODOS los inputs (la voz incluida) para que la suma
-    # no sature, aunque el ambiente ya este en silencio -- eso fue lo que
-    # dejaba la voz mas floja de lo esperado.
+    # estirado si hace falta; [1:a] = la voz, normalizada a sonoridad fija
+    # con loudnorm (ver LOUDNORM_VOZ_I/TP) en vez de un factor `volume=` fijo
+    # -- distintas voces/textos de ElevenLabs salen de la sintesis a niveles
+    # muy distintos (verificado: Carlos a -33dB, Gonzalo a -17dB de promedio
+    # crudo), asi que un mismo multiplicador satura una y deja floja la otra.
+    # amix con duration=first porque el video ya se recorta (-t duracion_voz)
+    # a la duracion de la voz. normalize=0 es necesario: sin el, amix baja
+    # TODOS los inputs (la voz incluida) para que la suma no sature, aunque
+    # el ambiente ya este en silencio -- eso fue lo que dejaba la voz mas
+    # floja de lo esperado.
+    filtro_loudnorm_voz = (
+        f"loudnorm=I={LOUDNORM_VOZ_I}:TP={LOUDNORM_VOZ_TP}:LRA=11"
+    )
     if estirar:
         cadena_atempo = _cadena_atempo(1 / factor)
         filtro_video = f"[0:v]setpts={factor}*PTS[video_final]"
         filtro_audio = (
             f"[0:a]{cadena_atempo},volume={VOLUMEN_AMBIENTE}[ambiente];"
-            f"[1:a]volume={VOLUMEN_VOZ}[voz];"
+            f"[1:a]{filtro_loudnorm_voz}[voz];"
             "[ambiente][voz]amix=inputs=2:duration=first:dropout_transition=0"
             ":normalize=0[audio_final]"
         )
@@ -429,7 +444,7 @@ def preparar_clip_con_voz(ruta_clip_normalizado: Path, ruta_voz: Path,
     else:
         filtro_complejo = (
             f"[0:a]volume={VOLUMEN_AMBIENTE}[ambiente];"
-            f"[1:a]volume={VOLUMEN_VOZ}[voz];"
+            f"[1:a]{filtro_loudnorm_voz}[voz];"
             "[ambiente][voz]amix=inputs=2:duration=first:dropout_transition=0"
             ":normalize=0[audio_final]"
         )

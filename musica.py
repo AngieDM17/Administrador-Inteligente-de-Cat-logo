@@ -56,12 +56,12 @@ DURACION_MAXIMA_MS = 600_000
 MARGEN_EXTRA_MS = 2000
 
 # Volumen de la musica de fondo durante la mezcla (amix), como factor sobre
-# el audio ya generado por ElevenLabs. El audio YA EXISTENTE del video (voz a
-# volumen normal + ambiente ya bajado por voz_en_off.preparar_clip_con_voz)
-# NO se toca. Bajado de 0.12 a 0.06 (6-ago-2026): Angie escucho la primera
-# mezcla completa y la musica todavia le competia protagonismo a la voz --
-# "la voz es la que debe llevarse el protagonismo". Ver tambien
-# voz_en_off.VOLUMEN_VOZ (subida en la misma correccion).
+# el audio ya generado por ElevenLabs. El audio YA EXISTENTE del video (voz
+# normalizada con loudnorm + ambiente en silencio, ver
+# voz_en_off.preparar_clip_con_voz) NO se toca. Bajado de 0.12 a 0.06
+# (6-ago-2026): Angie escucho la primera mezcla completa y la musica todavia
+# le competia protagonismo a la voz -- "la voz es la que debe llevarse el
+# protagonismo".
 VOLUMEN_MUSICA_DEFECTO = 0.06
 
 

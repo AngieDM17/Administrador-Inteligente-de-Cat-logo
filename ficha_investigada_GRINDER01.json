@@ -1,0 +1,147 @@
+{
+  "_version_ficha": "1.4",
+  "_uso": "Ficha investigada por Camino A (link exacto de Alibaba, sesion de Angie). Extraccion de la fuente, 8-ago-2026. Parte de la prueba de escalado del pipeline de VIDEO (3 productos nuevos): el trabajo de galeria completa (motor_galeria.py) NO se corrio en esta pasada. Categoria AGRO (producto con motor). Fuente delgada (specs minimas, tipico de Alibaba en esta categoria segun la auditoria del 27-28 jul).",
+  "modo_entrada": "investigacion_web",
+  "entrada_original": {
+    "nombre_dado": "Molino/trituradora de alimento animal",
+    "codigo_proveedor": "GRINDER01 (el listing no trae un codigo de modelo propio)",
+    "foto_referencia": "No hubo foto de referencia aparte: la entrada fue el link exacto del producto (Camino A).",
+    "link_producto": "https://www.alibaba.com/product-detail/Wet-and-Dry-Animal-Feeding-Grinding_1601425872039.html"
+  },
+  "fecha_investigacion": "2026-08-08",
+  "estado": "pendiente_revision",
+  "identificacion_del_producto": {
+    "resultado": "IDENTIFICADO",
+    "detalle": "Molino/trituradora electrica de granos para alimento animal (via humeda y seca), con tolva de acero inoxidable y motor electrico montado sobre patas. Proveedor Zhengzhou Yingwang Machinery Co., Ltd. El listing NO trae un numero de modelo propio.",
+    "fuente_principal": "Alibaba.com — Zhengzhou Yingwang Machinery Co., Ltd., producto 1601425872039, consultado 8-ago-2026.",
+    "advertencias": [
+      "Listing con specs muy delgadas: no publica potencia (HP/kW), capacidad (kg/h), ni dimensiones del equipo — solo peso (26 kg) y componentes principales ('Motor'). Consistente con el patron ya documentado de fuentes Alibaba en categoria agro (ver AUDITORIA_ABOGADO_DEL_DIABLO.md).",
+      "El precio publicado es precio de fabrica/mayorista, NO el precio de venta al publico en Colombia."
+    ],
+    "estado_en_proveedor": "Publicado, sin reseñas. Consultado 8-ago-2026.",
+    "origen_identificacion": "link"
+  },
+  "producto": {
+    "nombre_propuesto": "MOLINO TRITURADOR DE GRANOS PARA ALIMENTO ANIMAL",
+    "nombre_origen": "generado_ia (formato de nombres Ekipon)",
+    "modelo": "PENDIENTE_ANGIE — el listing no publica un numero de modelo",
+    "sku": "AUTOMATICO — lo asigna el sistema de la tienda, no se muestra al publico",
+    "es_motorizado": true,
+    "categoria_propuesta": "Agro",
+    "categoria_confianza": "generado_ia_sin_verificar — no hay una categoria 'Agro' confirmada en la tienda de pruebas todavia (a diferencia de 'Gimnasio', que ya existe); propuesta a partir del tipo de producto, pendiente de creacion/confirmacion.",
+    "etiquetas_propuestas": [
+      "molino de granos",
+      "trituradora de alimento animal",
+      "molino electrico",
+      "maquinaria agropecuaria",
+      "molino de maiz"
+    ],
+    "garantia": "1 año (política fija de la tienda)"
+  },
+  "precios": {
+    "precio": null,
+    "precio_origen": "PENDIENTE_ANGIE — REGLA FIJA: el precio SIEMPRE lo define Angie manualmente. El sistema solo aporta referencias.",
+    "referencias_mercado": [
+      {
+        "fuente": "Alibaba.com (proveedor Zhengzhou Yingwang Machinery)",
+        "precio": "COP 288.812 (1-9 conjuntos) hasta COP 191.459 (≥50 conjuntos) — precio de fabrica, no de venta al publico",
+        "fecha": "2026-08-08",
+        "existencias": "No publicado"
+      }
+    ],
+    "nota_envio": "Se publica 'Envío GRATIS a todo el país' + pago contra entrega, según política fija de la tienda",
+    "moneda": "COP"
+  },
+  "descripcion_principal": "Molino triturador de granos pensado para preparar alimento animal a partir de maíz y otros granos, con capacidad de trabajar en vía húmeda y seca. Su tolva de acero inoxidable facilita la carga del grano, y el motor eléctrico entrega la fuerza para una molienda constante. El grado de molienda (más fino o más grueso) se ajusta con un mando giratorio en el cuerpo de la máquina, pensado para adaptarse a distintos tipos de alimento.",
+  "descripcion_origen": "encontrado_web (redactado a partir de la descripción e imágenes del listing; el listing no detalla mucho texto)",
+  "caracteristicas": [
+    "Muele en vía húmeda y seca",
+    "Tolva de acero inoxidable",
+    "Grado de molienda ajustable (mando giratorio)",
+    "Motor eléctrico",
+    "Montado sobre patas independientes"
+  ],
+  "caracteristicas_origen": "encontrado_web + observado en el video del proveedor",
+  "ficha_tecnica": {
+    "_origen_global": "encontrado_web — Alibaba.com, listing 1601425872039, 8-ago-2026",
+    "_nota": "Claves en MAYÚSCULAS. Producto CON motor. La fuente es muy delgada en specs: no publica potencia ni capacidad, solo lo que sigue.",
+    "TIPO": "Molino/trituradora de granos para alimento animal, vía húmeda y seca",
+    "COMPONENTE PRINCIPAL": "Motor eléctrico",
+    "PESO": "26 kg",
+    "GARANTIA": "1 año",
+    "LUGAR DE ORIGEN": "China"
+  },
+  "criterio_verificacion_visual": {
+    "definido_por": "Investigador (Camino A); pendiente de confirmación de Angie",
+    "SI_es": "Cuerpo azul de fundición con tolva cónica de acero inoxidable en la parte superior, motor eléctrico cilíndrico montado horizontalmente al costado, sobre un soporte de patas independientes (no de ruedas).",
+    "NO_es": "Molinos de martillo de mayor tamaño industrial, picadoras de forraje/paja (cortan tallos, no muelen grano), o trituradoras de piedra para minería — son equipos distintos aunque compartan la palabra 'trituradora'.",
+    "rasgo_decisivo": "Tolva cónica de acero inoxidable + cuerpo azul con el motor lateral cilíndrico visible. NUNCA el color del cuerpo.",
+    "uso": "criterio para aceptar/rechazar imágenes; revisión final siempre humana"
+  },
+  "multimedia": {
+    "imagenes_galeria_confirmadas": [],
+    "imagenes_nota": "Pasada de video (8-ago-2026): se descargó 1 foto real de la fuente (la única disponible en el listing con buena resolución) y se generó el recorte de fondo transparente para la portada del video. La foto real incluye granos/legumbres de utilería alrededor del equipo (parte de la composición original del proveedor, no agregados por nosotros) — el recorte de rembg los conservó como parte del primer plano. NO se corrió el motor de galería completo (motor_galeria.py).",
+    "briefs_generacion_ia": [],
+    "regla_generacion": "PROHIBIDO inventar textos, etiquetas, modelos o conectores que no estén en las fotos reales. Ante duda, la toma se descarta. Sufijo _IA en el archivo.",
+    "formato_destino": "WebP 1080x1080 (estándar de la tienda) — pendiente de generar",
+    "video_youtube": null,
+    "video_nota": "Clip de producto real descargado de Alibaba (proveedor Zhengzhou Yingwang Machinery), 42.1s, formato cuadrado 720x720 con el contenido real en una franja vertical angosta (franjas negras horneadas en el propio video) y subtítulos quemados en chino. Se normalizó con la técnica de fondo desenfocado (ver preparar_video_producto.py, _filtro_fondo_difuminado) para llenar 1920x1080 sin recortar el producto — primera vez que se usa esta técnica, agregada específicamente para este caso.",
+    "galeria_tomas": {
+      "_comentario": "No se completó esta pasada (ver imagenes_nota) — no hay callouts ni dimensiones verificadas."
+    },
+    "plan_galeria": {
+      "_slots_omitidos_y_por_que": [
+        "medidas: la fuente no publica ninguna dimensión del equipo, solo el peso (26 kg)",
+        "partes_senaladas: no se ubicaron los puntos de los callouts sobre la imagen en esta pasada (foco en video, no en galería)",
+        "accesorios: la fuente no menciona accesorios incluidos"
+      ],
+      "imagen_base": "_productos_nuevos/GRINDER01/foto1.jpg",
+      "imagen_base_origen": "encontrado_web",
+      "slots": [
+        {
+          "tipo": "producto_limpio",
+          "fuente": "generado_motor",
+          "deriva_de": "_productos_nuevos/GRINDER01/foto1.jpg",
+          "nota": "Recorte de fondo transparente del equipo (incluye granos/legumbres de utilería de la foto original), usado en la portada del video",
+          "archivo": "GRINDER01_recorte.png",
+          "origen": "encontrado_web"
+        },
+        {
+          "tipo": "foto_real",
+          "fuente": "foto_real",
+          "origen": "encontrado_web",
+          "archivo": "_productos_nuevos/GRINDER01/foto1.jpg",
+          "deriva_de": null,
+          "nota": "Foto de estudio del equipo con granos y legumbres de muestra"
+        }
+      ]
+    }
+  },
+  "seo": {
+    "meta_titulo": "Molino Triturador de Granos para Alimento Animal | Ekipon",
+    "meta_descripcion": "Molino eléctrico para moler granos, vía húmeda y seca, ideal para preparar alimento animal. Envío GRATIS a todo el país y pago contra entrega",
+    "palabras_clave": [
+      "molino de granos",
+      "trituradora de alimento animal",
+      "molino de maiz electrico",
+      "maquinaria agropecuaria",
+      "comprar molino de granos colombia"
+    ],
+    "texto_alt_base": "Molino triturador eléctrico de granos con tolva de acero inoxidable, para preparar alimento animal",
+    "origen": "generado_ia"
+  },
+  "campos_por_confirmar": [
+    "Precio (lo define Angie — regla fija)",
+    "Categoría 'Agro' (crear/confirmar en el árbol EN VIVO de WooCommerce, no existe todavía en la tienda de pruebas)",
+    "Modelo del equipo (el listing no publica uno)",
+    "Potencia del motor y capacidad de molienda (la fuente no las publica)",
+    "Galería completa de imágenes (motor_galeria.py no se corrió en esta pasada)"
+  ],
+  "fuentes_consultadas": [
+    {
+      "fuente": "Alibaba.com — Zhengzhou Yingwang Machinery Co., Ltd., producto 1601425872039",
+      "uso": "Fuente principal: identificación, ficha técnica (limitada), fotos y video reales.",
+      "fecha": "2026-08-08"
+    }
+  ]
+}

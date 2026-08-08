@@ -1,0 +1,157 @@
+{
+  "_version_ficha": "1.4",
+  "_uso": "Ficha investigada por Camino A (link exacto de Alibaba, sesion de Angie). Extraccion de la fuente, 8-ago-2026. Parte de la prueba de escalado del pipeline de VIDEO (3 productos nuevos): el trabajo de galeria completa (motor_galeria.py) NO se corrio en esta pasada. Categoria CONSTRUCCION (producto con motor).",
+  "modo_entrada": "investigacion_web",
+  "entrada_original": {
+    "nombre_dado": "Mezcladora de concreto electrica",
+    "codigo_proveedor": "JQ140",
+    "foto_referencia": "No hubo foto de referencia aparte: la entrada fue el link exacto del producto (Camino A).",
+    "link_producto": "https://www.alibaba.com/product-detail/New-Sale-Electric-Concrete-Mixer-Truck_1601369905697.html"
+  },
+  "fecha_investigacion": "2026-08-08",
+  "estado": "pendiente_revision",
+  "identificacion_del_producto": {
+    "resultado": "IDENTIFICADO",
+    "detalle": "Mezcladora de concreto electrica portatil, tambor basculante de 140 litros con manivela de inclinacion, montada sobre chasis de dos ruedas. Modelo JQ140, marca Jiqian, proveedor Baoding City Jiqian Metal Products Co., Ltd. (fabricante, 6 anos en Alibaba, #1 mas populares en Mezcladoras de concreto).",
+    "fuente_principal": "Alibaba.com — Baoding City Jiqian Metal Products Co., Ltd., producto 1601369905697 (modelo JQ140), consultado 8-ago-2026.",
+    "advertencias": [
+      "El precio publicado en Alibaba es precio de fabrica/mayorista (1-49 unidades), NO el precio de venta al publico en Colombia.",
+      "La fuente trae dos cifras de velocidad distintas para el tambor ('Velocidad del tambor de mezcla: 30/minuto' y 'Potencia de mezcla: 28r/minuto') sin aclarar si son la misma medida con traduccion inconsistente o dos cosas distintas — se registran ambas tal cual figuran, sin resolver la contradiccion."
+    ],
+    "estado_en_proveedor": "Publicado, sin reseñas para este modelo puntual (si las tiene la tienda del proveedor en general, 4.6/5 sobre 46). Consultado 8-ago-2026.",
+    "origen_identificacion": "link"
+  },
+  "producto": {
+    "nombre_propuesto": "MEZCLADORA DE CONCRETO ELECTRICA 140 LITROS – TAMBOR BASCULANTE",
+    "nombre_origen": "generado_ia (formato de nombres Ekipon)",
+    "modelo": "JQ140",
+    "sku": "AUTOMATICO — lo asigna el sistema de la tienda, no se muestra al publico",
+    "es_motorizado": true,
+    "categoria_propuesta": "Construccion",
+    "categoria_confianza": "generado_ia_sin_verificar — no hay una categoria 'Construccion' confirmada especificamente para este producto en la tienda de pruebas; propuesta a partir del tipo de producto, pendiente de confirmacion.",
+    "etiquetas_propuestas": [
+      "mezcladora de concreto",
+      "hormigonera electrica",
+      "mezcladora 140 litros",
+      "maquinaria de construccion",
+      "mezcladora portatil"
+    ],
+    "garantia": "1 año (política fija de la tienda)"
+  },
+  "precios": {
+    "precio": null,
+    "precio_origen": "PENDIENTE_ANGIE — REGLA FIJA: el precio SIEMPRE lo define Angie manualmente. El sistema solo aporta referencias.",
+    "referencias_mercado": [
+      {
+        "fuente": "Alibaba.com (proveedor Baoding City Jiqian Metal Products, modelo JQ140)",
+        "precio": "COP 377.694 (1-49 unidades) hasta COP 348.359 (≥100 unidades) — precio de fabrica, no de venta al publico",
+        "fecha": "2026-08-08",
+        "existencias": "No publicado"
+      }
+    ],
+    "nota_envio": "Se publica 'Envío GRATIS a todo el país' + pago contra entrega, según política fija de la tienda",
+    "moneda": "COP"
+  },
+  "descripcion_principal": "Mezcladora de concreto eléctrica de 140 litros de capacidad de descarga, pensada para obras pequeñas y medianas. Su tambor basculante se inclina con una manivela manual para facilitar la descarga, y se desplaza fácilmente gracias a su chasis de dos ruedas. Cuenta con un motor eléctrico de 550W que entrega una productividad de 2 metros cúbicos por hora, y viene certificada CE.",
+  "descripcion_origen": "encontrado_web (redactado a partir de la descripción del listing)",
+  "caracteristicas": [
+    "Capacidad de descarga de 140 litros",
+    "Tambor basculante con manivela de inclinación manual",
+    "Motor eléctrico de 550W",
+    "Productividad de 2 m³/hora",
+    "Chasis de dos ruedas para desplazarla",
+    "Certificación CE"
+  ],
+  "caracteristicas_origen": "encontrado_web",
+  "ficha_tecnica": {
+    "_origen_global": "encontrado_web — Alibaba.com, listing 1601369905697 (modelo JQ140), 8-ago-2026",
+    "_nota": "Claves en MAYÚSCULAS. Producto CON motor.",
+    "MODELO": "JQ140",
+    "MARCA": "Jiqian",
+    "TIPO": "Mezcladora de concreto eléctrica, tambor basculante",
+    "CAPACIDAD DE DESCARGA": "140 litros",
+    "POTENCIA DEL MOTOR": "550 W",
+    "PRODUCTIVIDAD": "2 m³/hora",
+    "VELOCIDAD DEL TAMBOR": "30/minuto (la fuente tambien menciona '28r/minuto' bajo otro campo, ver advertencias)",
+    "MODO DE ABASTECIMIENTO DE AGUA": "Manual",
+    "MANERA DE DESCARGA": "Mango de punta (manivela de inclinación)",
+    "PESO": "53 kg",
+    "APLICACION": "Vivienda / obra pequeña",
+    "CERTIFICACION": "CE",
+    "GARANTIA": "1 año",
+    "LUGAR DE ORIGEN": "Hebei, China"
+  },
+  "criterio_verificacion_visual": {
+    "definido_por": "Investigador (Camino A); pendiente de confirmación de Angie",
+    "SI_es": "Tambor cónico naranja con rueda de manivela lateral para inclinarlo, montado sobre un chasis de patas en forma de A con dos ruedas de goma, y una caja de control eléctrica negra al costado del tambor.",
+    "NO_es": "Mezcladoras a gasolina/diésel (sin caja eléctrica visible, con motor de combustión expuesto), o mezcladoras estacionarias grandes sin ruedas — son equipos distintos.",
+    "rasgo_decisivo": "Rueda de manivela lateral + caja de control eléctrica negra junto al tambor + chasis de dos ruedas. NUNCA el color del tambor (viene en naranja y otros colores).",
+    "uso": "criterio para aceptar/rechazar imágenes; revisión final siempre humana"
+  },
+  "multimedia": {
+    "imagenes_galeria_confirmadas": [],
+    "imagenes_nota": "Pasada de video (8-ago-2026): se descargó 1 foto real de la fuente y se generó el recorte de fondo transparente para la portada del video. NO se corrió el motor de galería completo (motor_galeria.py).",
+    "briefs_generacion_ia": [],
+    "regla_generacion": "PROHIBIDO inventar textos, etiquetas, modelos o conectores que no estén en las fotos reales. Ante duda, la toma se descarta. Sufijo _IA en el archivo.",
+    "formato_destino": "WebP 1080x1080 (estándar de la tienda) — pendiente de generar",
+    "video_youtube": null,
+    "video_nota": "Clip de producto real descargado de Alibaba (proveedor Baoding City Jiqian Metal Products), 18.2s, 1280x720, sin franjas ni subtítulos quemados — clip limpio. Por ser mas corto que la voz en off, se uso el estiramiento en camara lenta (preparar_clip_con_voz con permitir_estirar=True) para cubrir la duracion completa.",
+    "galeria_tomas": {
+      "_comentario": "No se completó esta pasada (ver imagenes_nota) — no hay callouts ni dimensiones del equipo (mas alla del peso) verificadas."
+    },
+    "plan_galeria": {
+      "_slots_omitidos_y_por_que": [
+        "medidas: la fuente no publica dimensiones del equipo armado, solo el peso (53 kg)",
+        "partes_senaladas: no se ubicaron los puntos de los callouts sobre la imagen en esta pasada (foco en video, no en galería)",
+        "accesorios: la fuente no menciona accesorios incluidos"
+      ],
+      "imagen_base": "_productos_nuevos/JQ140/foto1.jpg",
+      "imagen_base_origen": "encontrado_web",
+      "slots": [
+        {
+          "tipo": "producto_limpio",
+          "fuente": "generado_motor",
+          "deriva_de": "_productos_nuevos/JQ140/foto1.jpg",
+          "nota": "Recorte de fondo transparente del equipo, usado en la portada del video",
+          "archivo": "JQ140_recorte.png",
+          "origen": "encontrado_web"
+        },
+        {
+          "tipo": "foto_real",
+          "fuente": "foto_real",
+          "origen": "encontrado_web",
+          "archivo": "_productos_nuevos/JQ140/foto1.jpg",
+          "deriva_de": null,
+          "nota": "Foto de estudio de la mezcladora sobre fondo blanco"
+        }
+      ]
+    }
+  },
+  "seo": {
+    "meta_titulo": "Mezcladora de Concreto Eléctrica 140L | Ekipon",
+    "meta_descripcion": "Mezcladora de concreto eléctrica de 140 litros, tambor basculante, 2m³/h. Envío GRATIS a todo el país y pago contra entrega",
+    "palabras_clave": [
+      "mezcladora de concreto",
+      "hormigonera electrica",
+      "mezcladora de cemento 140 litros",
+      "maquinaria de construccion",
+      "comprar mezcladora de concreto colombia"
+    ],
+    "texto_alt_base": "Mezcladora de concreto eléctrica de 140 litros con tambor basculante naranja sobre chasis de dos ruedas",
+    "origen": "generado_ia"
+  },
+  "campos_por_confirmar": [
+    "Precio (lo define Angie — regla fija)",
+    "Categoría 'Construccion' (confirmar en el árbol EN VIVO de WooCommerce)",
+    "Aclarar la contradicción entre las dos cifras de velocidad del tambor que trae la fuente (30/min vs 28r/min)",
+    "Voltaje de operación (la fuente lo deja como 'requisitos del cliente', sin valor fijo)",
+    "Galería completa de imágenes (motor_galeria.py no se corrió en esta pasada)"
+  ],
+  "fuentes_consultadas": [
+    {
+      "fuente": "Alibaba.com — Baoding City Jiqian Metal Products Co., Ltd., producto 1601369905697 (modelo JQ140)",
+      "uso": "Fuente principal: identificación, ficha técnica, fotos y video reales.",
+      "fecha": "2026-08-08"
+    }
+  ]
+}
