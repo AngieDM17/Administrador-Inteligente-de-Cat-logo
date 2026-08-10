@@ -16,19 +16,27 @@ import voz_en_off as vo
 
 
 class PruebasElegirVoz(unittest.TestCase):
-    def test_indice_par_devuelve_carlos(self):
+    def test_indice_0_devuelve_carlos(self):
         self.assertEqual(vo.elegir_voz(0), "carlos")
-        self.assertEqual(vo.elegir_voz(2), "carlos")
-        self.assertEqual(vo.elegir_voz(10), "carlos")
+        self.assertEqual(vo.elegir_voz(3), "carlos")
+        self.assertEqual(vo.elegir_voz(9), "carlos")
 
-    def test_indice_impar_devuelve_gonzalo(self):
+    def test_indice_1_devuelve_gonzalo(self):
         self.assertEqual(vo.elegir_voz(1), "gonzalo")
-        self.assertEqual(vo.elegir_voz(3), "gonzalo")
-        self.assertEqual(vo.elegir_voz(11), "gonzalo")
+        self.assertEqual(vo.elegir_voz(4), "gonzalo")
+        self.assertEqual(vo.elegir_voz(10), "gonzalo")
+
+    def test_indice_2_devuelve_santiago(self):
+        self.assertEqual(vo.elegir_voz(2), "santiago")
+        self.assertEqual(vo.elegir_voz(5), "santiago")
+        self.assertEqual(vo.elegir_voz(11), "santiago")
 
     def test_alterna_en_secuencia(self):
-        voces = [vo.elegir_voz(i) for i in range(4)]
-        self.assertEqual(voces, ["carlos", "gonzalo", "carlos", "gonzalo"])
+        voces = [vo.elegir_voz(i) for i in range(6)]
+        self.assertEqual(
+            voces,
+            ["carlos", "gonzalo", "santiago", "carlos", "gonzalo", "santiago"],
+        )
 
 
 class PruebasArmarGuion(unittest.TestCase):

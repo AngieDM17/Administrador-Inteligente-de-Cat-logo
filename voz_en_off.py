@@ -47,12 +47,19 @@ FRASE_FIJA = (
 )
 
 # Voces fijas confirmadas con Angie, alternadas por producto (no dentro del
-# mismo video). El orden de esta lista es el orden de alternancia par/impar.
+# mismo video). El orden de esta lista es el orden de alternancia (indice %
+# len(_ORDEN_VOCES), ver elegir_voz). "santiago" sumado el 10-ago-2026: Angie
+# pidio voces con mas fuerza/mas llamativas, escucho 3 candidatas de la
+# libreria publica de ElevenLabs (busqueda por descriptivos
+# confident/powerful/energetic en espanol) y eligio esta ("Enthusiastic,
+# Assertive") para que las 3 alternen y den variedad, no para reemplazar a
+# Carlos o Gonzalo.
 VOCES = {
     "carlos": "4PN5DHmrfIgZksvIrawS",
     "gonzalo": "UUj9OsNVMEpYEFSA8ZI8",
+    "santiago": "w7IU2bIH6xHcyfkUUWi3",
 }
-_ORDEN_VOCES = ["carlos", "gonzalo"]
+_ORDEN_VOCES = ["carlos", "gonzalo", "santiago"]
 
 MODEL_ID = "eleven_multilingual_v2"
 OUTPUT_FORMAT = "mp3_44100_128"
@@ -108,7 +115,11 @@ VOLUMEN_AMBIENTE = 0.0
 # "lleva el protagonismo" (pedido de Angie) de forma pareja entre voces.
 # LOUDNORM_I = sonoridad integrada objetivo (LUFS); LOUDNORM_TP = techo de
 # pico real (dBTP), con margen bajo 0dB para no saturar nunca.
-LOUDNORM_VOZ_I = -14
+# Subido de -14 a -12 (8-ago-2026): tras resolver que la musica tapaba la voz
+# (6-ago), Angie escucho los 3 videos de la prueba de escala y el balance se
+# sintio plano/sin fuerza -- "esa voz no la da tanto". TP se mantiene: sigue
+# habiendo margen bajo el techo de pico.
+LOUDNORM_VOZ_I = -12
 LOUDNORM_VOZ_TP = -1.5
 
 
@@ -121,9 +132,8 @@ class ErrorRecurso(Exception):
 
 def elegir_voz(indice_producto: int) -> str:
     """Devuelve el NOMBRE de la voz que le toca a indice_producto, alternando
-    por paridad: indices pares -> primera voz de _ORDEN_VOCES (carlos),
-    impares -> la segunda (gonzalo). Logica pura, sin red: se prueba con
-    unit tests."""
+    en el orden de _ORDEN_VOCES por resto de la division (indice_producto %
+    len(_ORDEN_VOCES)). Logica pura, sin red: se prueba con unit tests."""
     return _ORDEN_VOCES[indice_producto % len(_ORDEN_VOCES)]
 
 

@@ -61,8 +61,10 @@ MARGEN_EXTRA_MS = 2000
 # voz_en_off.preparar_clip_con_voz) NO se toca. Bajado de 0.12 a 0.06
 # (6-ago-2026): Angie escucho la primera mezcla completa y la musica todavia
 # le competia protagonismo a la voz -- "la voz es la que debe llevarse el
-# protagonismo".
-VOLUMEN_MUSICA_DEFECTO = 0.06
+# protagonismo". Subido de 0.06 a 0.08 (8-ago-2026): con la voz ya reforzada
+# (ver LOUDNORM_VOZ_I en voz_en_off.py), Angie pidio "un poco mas de volumen
+# a la musica para que se sienta mas energico".
+VOLUMEN_MUSICA_DEFECTO = 0.08
 
 
 class ErrorRecurso(Exception):
