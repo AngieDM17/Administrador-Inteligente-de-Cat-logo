@@ -109,6 +109,25 @@ class PruebasSystemPrompt(unittest.TestCase):
         self.assertIn("9060C", prompt)
         self.assertIn("MercadoLibre", prompt)
 
+    def test_apendice_explica_las_tools_de_video(self):
+        # El apendice tiene que ensenar el nombre EXACTO del contrato de
+        # archivo que orquestador.py espera, y las tres ramas de decision
+        # segun lo que devuelva extraer_video (archivo mp4, archivo en otro
+        # formato, embed de YouTube/Vimeo, o nada).
+        prompt = ai._armar_system_prompt()
+        self.assertIn("extraer_video", prompt)
+        self.assertIn("descargar_video", prompt)
+        self.assertIn("_clip_original.mp4", prompt)
+
+    def test_apendice_prohibe_descargar_embeds_de_youtube_o_vimeo(self):
+        prompt = ai._armar_system_prompt()
+        self.assertIn("YouTube", prompt)
+        self.assertIn("Vimeo", prompt)
+        self.assertIn("video_nota", prompt)
+        # La instruccion tiene que ser explicita en no bajar el embed, no
+        # solo mencionar las plataformas de pasada.
+        self.assertIn("NO lo descargues", prompt)
+
 
 class PruebasMensajeClaroParaErrorSdk(unittest.TestCase):
     """_mensaje_claro_para_error_sdk traduce excepciones crudas del SDK/CLI

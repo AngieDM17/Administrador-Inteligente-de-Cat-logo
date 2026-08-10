@@ -53,6 +53,21 @@ corrida). Si este agente investiga un producto MIENTRAS Angie usa el chat,
 se pisan el mismo cupo -- no hay una cuenta de facturacion separada que lo
 aisle.
 
+--- Video (10-ago-2026) ---
+
+Ademas de las 3 tools de imagen, este agente trae 2 tools de video sobre
+herramientas_navegador.extraer_video/descargar_video, mismo patron exacto:
+`extraer_video` detecta si la pagina publica un archivo real y descargable
+(mp4/webm/...) o un embed de YouTube/Vimeo; `descargar_video` baja el
+archivo real (nunca el embed) a la carpeta del producto. Si la fuente es
+.mp4 real, el apendice de modo headless (mas abajo) le exige al agente
+guardarlo con el nombre EXACTO '<codigo>_clip_original.mp4' -- ese es el
+contrato literal que orquestador.py busca (`_ruta_clip_original`) antes de
+poder armar el video final del producto. Scraping de YouTube/Vimeo queda
+deliberadamente FUERA de alcance (zona gris de terminos de servicio): un
+embed se anota en `multimedia.video_nota` para que Angie lo revise a mano,
+nunca se descarga.
+
 --- Verificacion ---
 
 NO se prueba con la API real en unit tests (corrida real que gastaria cupo
@@ -185,6 +200,34 @@ Recorda ademas, siempre (regla fija, no se relaja en este modo):
   que trae, y descargar una puntual. Toda imagen de la galeria que planifiques
   tiene que anclarse a una foto real descargada (regla del contrato de
   multimedia.plan_galeria).
+
+Para VIDEO (novedad 10-ago-2026) tenes dos herramientas mas: `extraer_video`
+busca en la pagina un archivo real y descargable, o si no hay, un embed de
+YouTube/Vimeo; `descargar_video` baja el archivo real a un archivo dentro de
+la carpeta del producto. Igual que con las imagenes: nunca generes ni
+inventes un video, solo bajas lo que YA existe real en la fuente. Reglas
+exactas segun lo que devuelva `extraer_video`:
+
+- `{"tipo": "archivo", "url": ...}` y la URL termina en `.mp4`: descargalo
+  con `descargar_video` y guardalo con el nombre EXACTO
+  `<codigo>_clip_original.mp4` (el mismo `codigo` que usas para el nombre
+  de las fotos) -- ese nombre literal, sin sufijos ni cambios de extension,
+  es lo que orquestador.py busca despues para armar el video final. Es la
+  UNICA forma en la que el resto del pipeline encuentra el clip solo.
+- `{"tipo": "archivo", "url": ...}` pero la URL NO termina en `.mp4` (ej.
+  `.webm`, `.mov`): podes descargarlo igual, pero guardalo con su extension
+  REAL (nunca renombres el contenido a `.mp4`: no es lo que dice ser) y
+  anota en `multimedia.video_nota` que hay un video real ya descargado pero
+  en otro formato, que hace falta convertirlo a mp4 a mano antes de que el
+  orquestador lo encuentre -- no lo cuentes como resuelto.
+- `{"tipo": "embed", "url": ...}` (YouTube/Vimeo): NO lo descargues bajo
+  ninguna circunstancia -- scraping de esas plataformas queda fuera de
+  alcance de este agente (zona gris de terminos de servicio, decision
+  explicita, no la relajes "para que funcione mejor"). Anota la URL en
+  `multimedia.video_nota` (ej. "La pagina tiene un video embebido de
+  YouTube: <url> -- no se descarga automatico, revisar a mano si sirve").
+- `null` (no hay ningun video, el caso mas comun): seguis reportandolo en
+  `video_nota` tal como ya haces, sin inventar nada.
 
 Tres campos de `producto` tienen un FORMATO LITERAL fijo que el validador
 del contrato v1.4 (esquema_ficha.py) exige exacto -- si no calzan asi, la
@@ -320,14 +363,74 @@ async def _correr_agente(link: str, carpeta_destino: Path,
             }
         return {"content": [{"type": "text", "text": f"Guardada como {destino.name}"}]}
 
+    @tool(
+        "extraer_video",
+        "Busca el video de una pagina de producto: primero un archivo real "
+        "y descargable (mp4/webm/...), si no hay, un embed de YouTube/"
+        "Vimeo. Devuelve {\"tipo\": \"archivo\"|\"embed\", \"url\": ...} o "
+        "null si no hay ningun video.",
+        {"url": str},
+    )
+    async def _tool_extraer_video(args: dict) -> dict:
+        try:
+            resultado = await asyncio.to_thread(nav.extraer_video, args["url"])
+        except nav.ErrorRecurso as error:
+            return {
+                "content": [{"type": "text", "text": f"ERROR: {error}"}],
+                "is_error": True,
+            }
+        return {
+            "content": [
+                {"type": "text", "text": json.dumps(resultado, ensure_ascii=False)}
+            ]
+        }
+
+    @tool(
+        "descargar_video",
+        "Descarga un video real (por su URL) a un archivo dentro de la "
+        "carpeta del producto. NUNCA la uses con un embed de YouTube/Vimeo "
+        "(eso no se descarga, se anota en video_nota). nombre_archivo va "
+        "SIN ruta, solo el nombre -- para el clip principal del producto, "
+        "si la fuente es .mp4, usa EXACTO '<codigo>_clip_original.mp4' "
+        "(ver apendice).",
+        {"url_video": str, "nombre_archivo": str},
+    )
+    async def _tool_descargar_video(args: dict) -> dict:
+        # Path(...).name descarta cualquier componente de ruta que venga en
+        # nombre_archivo: la descarga nunca puede salir de carpeta_destino
+        # (mismo resguardo que _tool_descargar_imagen).
+        nombre = Path(args["nombre_archivo"]).name
+        if not nombre:
+            return {
+                "content": [{"type": "text", "text": "ERROR: nombre_archivo vacio."}],
+                "is_error": True,
+            }
+        destino = carpeta_destino / nombre
+        try:
+            await asyncio.to_thread(nav.descargar_video, args["url_video"], destino)
+        except nav.ErrorRecurso as error:
+            return {
+                "content": [{"type": "text", "text": f"ERROR: {error}"}],
+                "is_error": True,
+            }
+        return {"content": [{"type": "text", "text": f"Guardado como {destino.name}"}]}
+
     servidor = create_sdk_mcp_server(
         name="navegador_ekipon",
-        tools=[_tool_navegar, _tool_extraer_imagenes, _tool_descargar_imagen],
+        tools=[
+            _tool_navegar,
+            _tool_extraer_imagenes,
+            _tool_descargar_imagen,
+            _tool_extraer_video,
+            _tool_descargar_video,
+        ],
     )
     nombres_tools = [
         "mcp__navegador_ekipon__navegar",
         "mcp__navegador_ekipon__extraer_imagenes",
         "mcp__navegador_ekipon__descargar_imagen",
+        "mcp__navegador_ekipon__extraer_video",
+        "mcp__navegador_ekipon__descargar_video",
     ]
 
     # El system prompt (SKILL.md completo + apendice, ~18KB) se escribe a un
