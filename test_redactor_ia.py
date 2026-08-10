@@ -1,13 +1,14 @@
-"""Pruebas de redactor_ia. Offline: no llaman a la API real de Anthropic (ver
-docstring del modulo — NO se prueba con la API real en unit tests, mismo
-criterio que voz_en_off.py/musica.py con ElevenLabs). Solo se prueba la
-logica pura: el presupuesto de caracteres, la extraccion de datos seguros
-para el prompt, y la degradacion a None cuando falta la clave o no hay nada
-real que redactar.
+"""Pruebas de redactor_ia. Offline: no llaman a claude_agent_sdk.query() ni
+al CLI de Claude Code real (ver docstring del modulo — NO se prueba con el
+SDK/CLI real en unit tests: gastaria cupo real de la suscripcion de Angie,
+mismo criterio que voz_en_off.py/musica.py con ElevenLabs). Solo se prueba
+la logica pura: el presupuesto de caracteres, la extraccion de datos
+seguros para el prompt, y la degradacion a None cuando no hay nada real
+que redactar o cuando la consulta a la IA falla (simulado parcheando
+_consultar_ia_sincrono, nunca llamando al SDK real).
 """
 
 import unittest
-from pathlib import Path
 from unittest import mock
 
 import redactor_ia
@@ -54,34 +55,41 @@ class PruebasDatosSegurosParaGuion(unittest.TestCase):
         self.assertEqual(datos["ficha_tecnica"], {})
 
 
-class PruebasDegradacionSinRed(unittest.TestCase):
-    """Ambas funciones publicas devuelven None sin tocar la red cuando falta
-    la clave o no hay nada real que redactar — se verifica parcheando
-    cargar_env para simular un .env sin ANTHROPIC_API_KEY."""
+class PruebasConsultarIaSincrono(unittest.TestCase):
+    """_consultar_ia_sincrono envuelve el _consultar_ia asincrono con
+    asyncio.run() y degrada a None ante CUALQUIER excepcion -- se prueba
+    parcheando _consultar_ia (una funcion async propia del modulo), nunca
+    tocando claude_agent_sdk ni el CLI real."""
 
-    def setUp(self):
-        parche = mock.patch.object(redactor_ia, "cargar_env", return_value={})
-        parche.start()
-        self.addCleanup(parche.stop)
+    def test_devuelve_lo_que_resuelve_consultar_ia(self):
+        async def _consultar_ia_falso(prompt):
+            return "Un guion redactado."
 
-    def test_redactar_guion_sin_clave_devuelve_none(self):
-        ficha = {"descripcion_principal": "Algo real."}
-        self.assertIsNone(redactor_ia.redactar_guion_voz(ficha))
+        with mock.patch.object(redactor_ia, "_consultar_ia", _consultar_ia_falso):
+            self.assertEqual(
+                redactor_ia._consultar_ia_sincrono("prompt"),
+                "Un guion redactado.",
+            )
 
-    def test_redactar_prompt_musica_sin_clave_devuelve_none(self):
-        ficha = {"producto": {"categoria_propuesta": "Gimnasio"}}
-        self.assertIsNone(redactor_ia.redactar_prompt_musica(ficha))
+    def test_excepcion_de_consultar_ia_degrada_a_none(self):
+        # CLI ausente, sin sesion iniciada, cupo agotado, red caida: da
+        # igual el motivo especifico, _consultar_ia_sincrono nunca lanza.
+        with mock.patch.object(
+            redactor_ia, "_consultar_ia", side_effect=RuntimeError("sin sesion"),
+        ):
+            self.assertIsNone(redactor_ia._consultar_ia_sincrono("prompt"))
 
 
-class PruebasDegradacionSinDatos(unittest.TestCase):
-    """Con clave presente pero sin datos reales que citar, ninguna funcion
-    debe siquiera intentar la llamada de red (se verifica con una clave falsa
-    y sin parchear anthropic: si intentara importar/llamar, fallaria o
-    tardaria; en cambio devuelve None de inmediato por la guarda temprana)."""
+class PruebasDegradacionSinDatosReales(unittest.TestCase):
+    """Sin datos reales que citar (guion) o sin categoria (musica), ninguna
+    funcion debe siquiera intentar consultar la IA -- se verifica
+    parcheando _consultar_ia_sincrono para que reviente si llega a
+    invocarse (mismo patron que agente_investigador con _correr_agente)."""
 
     def setUp(self):
         parche = mock.patch.object(
-            redactor_ia, "cargar_env", return_value={"ANTHROPIC_API_KEY": "clave-falsa"}
+            redactor_ia, "_consultar_ia_sincrono",
+            side_effect=AssertionError("no deberia consultar la IA"),
         )
         parche.start()
         self.addCleanup(parche.stop)
@@ -93,6 +101,40 @@ class PruebasDegradacionSinDatos(unittest.TestCase):
     def test_musica_sin_categoria_devuelve_none(self):
         ficha = {"producto": {"nombre_propuesto": "X"}}
         self.assertIsNone(redactor_ia.redactar_prompt_musica(ficha))
+
+
+class PruebasRedactarConDatosReales(unittest.TestCase):
+    """Con datos reales presentes, ambas funciones publicas delegan en
+    _consultar_ia_sincrono y devuelven su resultado tal cual (incluido
+    None, la misma degradacion de siempre si la IA no responde) -- se
+    verifica parcheando _consultar_ia_sincrono, nunca el SDK real."""
+
+    def test_guion_devuelve_lo_que_responde_la_ia(self):
+        with mock.patch.object(
+            redactor_ia, "_consultar_ia_sincrono", return_value="Guion redactado.",
+        ) as parche:
+            ficha = {"descripcion_principal": "Un taladro robusto."}
+            self.assertEqual(redactor_ia.redactar_guion_voz(ficha), "Guion redactado.")
+        parche.assert_called_once()
+
+    def test_musica_devuelve_lo_que_responde_la_ia(self):
+        with mock.patch.object(
+            redactor_ia, "_consultar_ia_sincrono",
+            return_value="ambient background music, no vocals",
+        ) as parche:
+            ficha = {"producto": {"categoria_propuesta": "Gimnasio"}}
+            self.assertEqual(
+                redactor_ia.redactar_prompt_musica(ficha),
+                "ambient background music, no vocals",
+            )
+        parche.assert_called_once()
+
+    def test_guion_propaga_none_si_la_ia_no_responde(self):
+        with mock.patch.object(
+            redactor_ia, "_consultar_ia_sincrono", return_value=None,
+        ):
+            ficha = {"descripcion_principal": "Un taladro robusto."}
+            self.assertIsNone(redactor_ia.redactar_guion_voz(ficha))
 
 
 class PruebasPromptMusicaGenerico(unittest.TestCase):

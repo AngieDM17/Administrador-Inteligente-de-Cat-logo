@@ -21,34 +21,48 @@ vision disponible, a proposito NO el economico de redactor_ia.py
 ("rasgos estructurales, nunca color"; anti-contaminacion de fuentes sucias)
 que genero los bugs reales que SKILL.md existe para prevenir.
 
---- Hallazgo real de esta sesion (verificado corriendo el paquete instalado
-de PyPI, NO de la documentacion, que la investigacion previa pudo haber
-resumido de forma incompleta) ---
+--- Autenticacion: suscripcion de Claude Code, NO clave de API (10-ago-2026) ---
 
-`claude_agent_sdk` NO habla con la API de Anthropic directo: internamente
-lanza el binario nativo del CLI de Claude Code (`claude`) como subproceso
-(ver `claude_agent_sdk/_internal/transport/subprocess_cli.py`) y le pasa
-`ANTHROPIC_API_KEY` por variable de entorno para que el CLI use auth por
-clave de API en vez de login OAuth. Osea que "standalone, sin necesitar
-Claude Code activo" es correcto en el sentido de "sin sesion de Claude Code
-logueada / sin suscripcion" -- pero SI hace falta tener el CLI de Claude
-Code INSTALADO Y FUNCIONAL en la maquina (`npm install -g
-@anthropic-ai/claude-code`, con su postinstall del binario nativo corrido
-bien), ademas del paquete de PyPI `claude-agent-sdk`. En la maquina de esta
-sesion el binario esta presente en el PATH pero roto (postinstall no
-completo): no bloquea esta tarea (no hay ANTHROPIC_API_KEY todavia para
-probar igual), pero es un requisito real de infraestructura que el plan
-original no dejaba tan explicito. Ver el reporte final de la sesion.
+Este agente corre `claude_agent_sdk.query()` SIN pasar
+`env={"ANTHROPIC_API_KEY": ...}` a ClaudeAgentOptions -- a proposito. Sin esa
+variable, el CLI de Claude Code que el SDK lanza por debajo (verificado
+leyendo `claude_agent_sdk/_internal/transport/subprocess_cli.py`: el
+subproceso hereda el entorno del proceso padre y SOLO agrega lo que venga en
+`options.env`) usa la sesion YA LOGUEADA en esta maquina -- la misma cuenta
+con la que Angie habla en el chat -- en vez de facturar por token de una
+clave de API aparte. Confirmado corriendo exactamente esto en esta maquina:
+
+    opciones = ClaudeAgentOptions(model='claude-opus-5',
+                                   permission_mode='bypassPermissions')
+    async for msg in query(prompt='responde solo con la palabra OK',
+                            options=opciones):
+        ...
+    # resultado: is_error=False, result='OK' -- funciono, con Opus 5, en un
+    # plan Pro (NO hace falta Max).
+
+Sigue haciendo falta el CLI de Claude Code INSTALADO y con sesion iniciada
+(`claude login`) -- eso NO cambio, solo dejo de exigir la clave de API. Si
+el CLI falta o no hay sesion iniciada, `query()` falla con una excepcion del
+SDK: `investigar_producto()` la atrapa y devuelve un mensaje claro en
+espanol en vez de un traceback crudo (ver `_mensaje_claro_para_error_sdk`).
+
+OJO -- cupo compartido, no facturacion por uso: el limite pasa a ser la
+ventana de 5 horas que Angie ya usa hablando con Claude Code normalmente
+(`RateLimitEvent.rate_limit_type == 'five_hour'`, verificado en esta misma
+corrida). Si este agente investiga un producto MIENTRAS Angie usa el chat,
+se pisan el mismo cupo -- no hay una cuenta de facturacion separada que lo
+aisle.
 
 --- Verificacion ---
 
-NO se prueba con la API real en unit tests (llamada de red paga que ademas
-requiere el CLI de Claude Code instalado y funcional): ver
-test_agente_investigador.py, que cubre solo la logica pura -- deteccion
-link-vs-ruta-de-archivo, deteccion de dominio Alibaba, armado del
-system_prompt (incluye el contenido real de SKILL.md leido del disco) y la
-degradacion cuando falta la clave. Se verifica a mano/CLI con un link real
-de una fuente no-Alibaba, cuando Angie de de alta su ANTHROPIC_API_KEY.
+NO se prueba con la API real en unit tests (corrida real que gastaria cupo
+de la suscripcion de Angie, y ademas requiere el CLI de Claude Code
+instalado y con sesion iniciada): ver test_agente_investigador.py, que cubre
+solo la logica pura -- deteccion link-vs-ruta-de-archivo, deteccion de
+dominio Alibaba, armado del system_prompt (incluye el contenido real de
+SKILL.md leido del disco) y la traduccion de errores del SDK/CLI a mensajes
+en espanol. Se verifica a mano/CLI con un link real de una fuente
+no-Alibaba.
 """
 
 from __future__ import annotations
@@ -61,13 +75,11 @@ from typing import Callable
 
 from pydantic import ValidationError
 
-from cliente_tienda import cargar_env
 from esquema_ficha import FichaEkipon
 
 Notificador = Callable[[str], None]
 
 CARPETA_PROYECTO = Path(__file__).parent
-RUTA_ENV_DEFECTO = CARPETA_PROYECTO / ".env"
 RUTA_SKILL = (
     CARPETA_PROYECTO / "investigador_v0.3" / "investigador-ekipon" / "SKILL.md"
 )
@@ -173,6 +185,25 @@ Recorda ademas, siempre (regla fija, no se relaja en este modo):
   que trae, y descargar una puntual. Toda imagen de la galeria que planifiques
   tiene que anclarse a una foto real descargada (regla del contrato de
   multimedia.plan_galeria).
+
+Tres campos de `producto` tienen un FORMATO LITERAL fijo que el validador
+del contrato v1.4 (esquema_ficha.py) exige exacto -- si no calzan asi, la
+ficha entera se rechaza y no se guarda (verificado 10-ago-2026: una primera
+corrida real fallo por esto exacto, no lo repitas):
+- `sku`: el SKU real lo asigna WooCommerce, nunca vos. El valor tiene que
+  EMPEZAR con el literal `AUTOMATICO` (podes agregar texto aclaratorio
+  despues, ej. "AUTOMATICO — lo asigna el sistema al crear el producto").
+  Nunca pongas ahi el codigo de proveedor ni el modelo.
+- `garantia`: es politica FIJA de la tienda, no un dato de la fuente ni algo
+  pendiente de Angie -- el texto tiene que CONTENER literal "1 año" (ej.
+  "1 año de garantia del fabricante").
+- `categoria_confianza`: es un campo de ORIGEN (como `nombre_origen`), no una
+  etiqueta libre de confianza. Tiene que CONTENER uno de estos textos exactos:
+  verificado | encontrado_web | generado_ia | generado_ia_sin_verificar |
+  confirmado_por_angie | PENDIENTE_ANGIE. Si la categoria te la dio el arbol
+  real de WooCommerce, es "verificado" o "encontrado_web"; si la inferiste
+  vos del rubro del producto sin confirmarla contra la tienda, es
+  "generado_ia_sin_verificar".
 """
 
 
@@ -184,15 +215,29 @@ def _armar_system_prompt() -> str:
     return _leer_skill() + _APENDICE_MODO_HEADLESS
 
 
-def _clave_api() -> str | None:
-    """Mismo patron que redactor_ia._clave_api() / voz_en_off._clave_api():
-    lee ANTHROPIC_API_KEY del .env del proyecto via cargar_env() de
-    cliente_tienda.py (nunca os.environ directo). None si falta o esta
-    vacia -- la senal que usa investigar_producto() para no intentar
-    correr el agente sin clave."""
-    env = cargar_env(RUTA_ENV_DEFECTO)
-    clave = env.get("ANTHROPIC_API_KEY", "").strip()
-    return clave or None
+def _mensaje_claro_para_error_sdk(error: Exception) -> str:
+    """Traduce una excepcion cruda de claude_agent_sdk/CLI de Claude Code
+    (CLI no instalado, sin sesion iniciada, cupo agotado, red caida, etc.)
+    a un mensaje en espanol que Angie pueda leer y accionar -- nunca un
+    traceback crudo. Compara por NOMBRE de tipo (`type(error).__name__`) en
+    vez de importar claude_agent_sdk._errors a nivel de modulo: asi el
+    camino de Alibaba (rechazo temprano, sin tocar el SDK) no paga el costo
+    de ese import solo para poder reconocer sus excepciones."""
+    tipo = type(error).__name__
+    if tipo == "CLINotFoundError":
+        return (
+            "No encuentro el CLI de Claude Code instalado en esta maquina "
+            "-- hace falta para que el agente investigador corra con tu "
+            "suscripcion. Instalalo (`npm install -g @anthropic-ai/"
+            "claude-code`) y confirma que `claude --version` funciona en "
+            "una terminal."
+        )
+    return (
+        "El agente investigador no pudo correr -- lo mas probable es que "
+        "falte iniciar sesion del CLI de Claude Code en esta maquina. Corre "
+        "`claude login` en una terminal y volve a intentar. (Detalle "
+        f"tecnico: {tipo}: {error})"
+    )
 
 
 def _slug_codigo(ficha: dict) -> str:
@@ -207,8 +252,7 @@ def _slug_codigo(ficha: dict) -> str:
 
 
 async def _correr_agente(link: str, carpeta_destino: Path,
-                          publicar_notificacion: Notificador,
-                          clave: str) -> dict | None:
+                          publicar_notificacion: Notificador) -> dict | None:
     """Corre claude_agent_sdk.query() con las tools de navegador propias y
     el output_format del contrato v1.4. Import diferido de
     claude_agent_sdk/herramientas_navegador: asi quien solo usa el camino
@@ -286,8 +330,24 @@ async def _correr_agente(link: str, carpeta_destino: Path,
         "mcp__navegador_ekipon__descargar_imagen",
     ]
 
+    # El system prompt (SKILL.md completo + apendice, ~18KB) se escribe a un
+    # archivo y se pasa por RUTA, no como string: verificado en esta sesion
+    # que claude_agent_sdk pasa system_prompt Y el JSON schema de
+    # output_format enteros como argumentos de linea de comando
+    # (subprocess_cli.py: --system-prompt / --json-schema). En Windows, la
+    # combinacion de ambos (system_prompt largo + schema de FichaEkipon,
+    # ~13KB) supera el limite practico de linea de comando y el spawn del
+    # CLI falla con "Claude Code not found" -- un mensaje enganoso que en
+    # realidad es un fallo de creacion del proceso, no que falte el binario
+    # (se confirmo ejecutando el mismo .exe a mano, sin problema). El SDK
+    # SI soporta system_prompt={"type": "file", "path": ...} para este caso
+    # exacto; el schema no tiene un equivalente por archivo, pero por si
+    # solo (13KB) no rompe el limite -- solo la suma de los dos lo hacia.
+    ruta_prompt = carpeta_destino / "_system_prompt.md"
+    ruta_prompt.write_text(_armar_system_prompt(), encoding="utf-8")
+
     opciones = ClaudeAgentOptions(
-        system_prompt=_armar_system_prompt(),
+        system_prompt={"type": "file", "path": str(ruta_prompt)},
         mcp_servers={"navegador_ekipon": servidor},
         # tools=[] apaga el set de herramientas por defecto de Claude Code
         # (Bash, Read, Write, Edit, WebSearch, etc: --tools ""). Este agente
@@ -302,7 +362,12 @@ async def _correr_agente(link: str, carpeta_destino: Path,
         # carpeta_destino.
         permission_mode="bypassPermissions",
         model=MODELO_AGENTE,
-        env={"ANTHROPIC_API_KEY": clave},
+        # SIN env={"ANTHROPIC_API_KEY": ...} a proposito: el CLI hereda el
+        # entorno del proceso padre y usa la sesion de Claude Code YA
+        # LOGUEADA en esta maquina (suscripcion de Angie), no una clave de
+        # API facturada aparte -- ver el docstring del modulo. El cupo es
+        # la ventana compartida de 5 horas: si esto corre mientras Angie
+        # usa el chat, se pisan el mismo cupo.
         output_format={
             "type": "json_schema",
             "schema": FichaEkipon.model_json_schema(),
@@ -312,24 +377,45 @@ async def _correr_agente(link: str, carpeta_destino: Path,
     publicar_notificacion(f"Investigando el producto: {link}")
     resultado_estructurado: dict | None = None
     ultimo_mensaje_error: str | None = None
+    llego_resultado = False
 
-    async for mensaje in query(
-        prompt=(
-            "Investiga este producto siguiendo el SKILL.md y el apendice de "
-            "arriba, y arma su ficha v1.4 completa. Camino A (con link): "
-            "extrae directo de la fuente. Link del producto:\n\n"
-            f"{link}\n\n"
-            "Guarda este mismo link en entrada_original.link_producto."
-        ),
-        options=opciones,
-    ):
-        tipo = type(mensaje).__name__
-        if tipo == "ResultMessage":
-            resultado_estructurado = getattr(mensaje, "structured_output", None)
-            if getattr(mensaje, "is_error", False):
-                ultimo_mensaje_error = str(
-                    getattr(mensaje, "result", None) or "sin detalle"
-                )
+    # Verificado en esta sesion: claude_agent_sdk (0.2.134, todavia en 0.x)
+    # a veces emite, DESPUES de un ResultMessage real y exitoso, un mensaje
+    # de control espurio {"type": "error", "error": "success"} durante el
+    # cierre del stream -- query.py lo traduce a una excepcion generica que,
+    # sin este manejo, tira a la basura una investigacion que en realidad
+    # SI termino bien (y ya gasto el consumo real de la API). Por eso: (1)
+    # se corta el loop apenas llega el ResultMessage real, en vez de seguir
+    # consumiendo el generador de mas; (2) si igual algo revienta DESPUES de
+    # tener ya un resultado, se ignora ese error espurio -- solo se relanza
+    # si la excepcion llego ANTES de ver un ResultMessage real.
+    try:
+        async for mensaje in query(
+            prompt=(
+                "Investiga este producto siguiendo el SKILL.md y el apendice de "
+                "arriba, y arma su ficha v1.4 completa. Camino A (con link): "
+                "extrae directo de la fuente. Link del producto:\n\n"
+                f"{link}\n\n"
+                "Guarda este mismo link en entrada_original.link_producto."
+            ),
+            options=opciones,
+        ):
+            tipo = type(mensaje).__name__
+            if tipo == "ResultMessage":
+                llego_resultado = True
+                resultado_estructurado = getattr(mensaje, "structured_output", None)
+                if getattr(mensaje, "is_error", False):
+                    ultimo_mensaje_error = str(
+                        getattr(mensaje, "result", None) or "sin detalle"
+                    )
+                break
+    except Exception as error:
+        if not llego_resultado:
+            raise
+        publicar_notificacion(
+            f"(aviso interno, sin impacto: el SDK cerro con un mensaje "
+            f"espurio despues del resultado real: {error})"
+        )
 
     if ultimo_mensaje_error is not None:
         raise ErrorInvestigacion(
@@ -351,8 +437,9 @@ def investigar_producto(link: str, carpeta_destino: Path,
 
       {"estado": "ficha_lista", "ruta_ficha": Path}  -> exito
       {"estado": "error", "motivo": str}               -> fallo (Alibaba,
-                                                           sin clave, SDK/CLI
-                                                           ausente, ficha
+                                                           SDK/CLI ausente o
+                                                           sin sesion
+                                                           iniciada, ficha
                                                            invalida, error
                                                            real del agente)
 
@@ -372,35 +459,26 @@ def investigar_producto(link: str, carpeta_destino: Path,
         publicar_notificacion(motivo)
         return {"estado": "error", "motivo": motivo}
 
-    clave = _clave_api()
-    if clave is None:
-        motivo = (
-            f"Falta ANTHROPIC_API_KEY en '{RUTA_ENV_DEFECTO}': no se puede "
-            "correr el agente investigador. Da de alta la clave, o "
-            "investiga este producto a mano como hoy."
-        )
-        publicar_notificacion(motivo)
-        return {"estado": "error", "motivo": motivo}
-
     carpeta_destino.mkdir(parents=True, exist_ok=True)
 
     try:
         ficha = asyncio.run(
-            _correr_agente(link, carpeta_destino, publicar_notificacion, clave)
+            _correr_agente(link, carpeta_destino, publicar_notificacion)
         )
     except ErrorInvestigacion as error:
         publicar_notificacion(f"ERROR: {error}")
         return {"estado": "error", "motivo": str(error)}
     except ImportError as error:
         motivo = (
-            "Falta claude-agent-sdk (o el CLI de Claude Code que usa por "
-            f"debajo -- ver el modulo agente_investigador.py): {error}"
+            "Falta el paquete claude-agent-sdk instalado (`pip install "
+            f"claude-agent-sdk`): {error}"
         )
         publicar_notificacion(motivo)
         return {"estado": "error", "motivo": motivo}
     except Exception as error:  # ultima red de seguridad: nunca se escapa
-        # un traceback crudo hacia el hilo del servidor.
-        motivo = f"El agente investigador fallo inesperadamente: {error}"
+        # un traceback crudo hacia el hilo del servidor -- CLI ausente, sin
+        # sesion iniciada, cupo agotado, red caida, etc.
+        motivo = _mensaje_claro_para_error_sdk(error)
         publicar_notificacion(motivo)
         return {"estado": "error", "motivo": motivo}
 

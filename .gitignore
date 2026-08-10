@@ -21,6 +21,10 @@ _tmp/
 _final/
 _productos_nuevos/
 
+# Salida del agente investigador (Fase 2a): ficha + fotos reales descargadas
+# por producto, regenerable corriendo investigar_producto() de nuevo.
+investigaciones/
+
 # Estado local
 *.db
 

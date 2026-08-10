@@ -5,7 +5,6 @@ rembg
 elevenlabs
 fastapi
 uvicorn[standard]
-anthropic
 claude-agent-sdk
 playwright
 httpx

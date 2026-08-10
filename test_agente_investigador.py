@@ -1,20 +1,24 @@
 """Pruebas de agente_investigador.py. Offline: no llaman a la API real de
-Anthropic ni corren el CLI de Claude Code ni Playwright (ver docstring del
-modulo — el agente NO se prueba de punta a punta con la API real en unit
-tests, mismo criterio que redactor_ia.py/voz_en_off.py con sus servicios
-externos: llamada de red paga, y ademas requiere el CLI de Claude Code
-instalado y funcional). Se prueba SOLO la logica pura:
+Anthropic (ni con clave ni con la suscripcion de Claude Code) ni corren el
+CLI de Claude Code ni Playwright (ver docstring del modulo — el agente NO se
+prueba de punta a punta con la API real en unit tests, mismo criterio que
+redactor_ia.py/voz_en_off.py con sus servicios externos: eso gastaria cupo
+real de la suscripcion de Angie, y ademas requiere el CLI de Claude Code
+instalado y con sesion iniciada). Se prueba SOLO la logica pura:
 
 - es_url: distinguir un link de una ruta de archivo local.
 - es_alibaba: deteccion de dominio, por hostname exacto (no substring).
 - _armar_system_prompt / _leer_skill: el SKILL.md real se lee del disco
   (no se copia a mano) y el apendice de modo headless queda anexado.
-- _clave_api: degradacion a None cuando falta ANTHROPIC_API_KEY.
+- _mensaje_claro_para_error_sdk: traduccion de excepciones crudas del SDK/
+  CLI a mensajes en espanol accionables.
 - _slug_codigo: saneamiento del codigo de proveedor para nombre de archivo.
-- investigar_producto: rechazo temprano de Alibaba y de falta de clave,
-  SIN tocar la red ni importar claude_agent_sdk en esos dos casos.
+- investigar_producto: rechazo temprano de Alibaba SIN tocar la red ni
+  importar claude_agent_sdk, y traduccion de errores del SDK/CLI cuando
+  _correr_agente revienta (simulado con mocks, nunca con la API real).
 """
 
+import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -106,20 +110,23 @@ class PruebasSystemPrompt(unittest.TestCase):
         self.assertIn("MercadoLibre", prompt)
 
 
-class PruebasClaveApi(unittest.TestCase):
-    def test_sin_clave_devuelve_none(self):
-        with mock.patch.object(ai, "cargar_env", return_value={}):
-            self.assertIsNone(ai._clave_api())
+class PruebasMensajeClaroParaErrorSdk(unittest.TestCase):
+    """_mensaje_claro_para_error_sdk traduce excepciones crudas del SDK/CLI
+    a mensajes en espanol accionables -- logica pura, compara por nombre de
+    tipo de excepcion, sin tocar el SDK real."""
 
-    def test_clave_vacia_devuelve_none(self):
-        with mock.patch.object(ai, "cargar_env", return_value={"ANTHROPIC_API_KEY": "   "}):
-            self.assertIsNone(ai._clave_api())
+    def test_cli_no_encontrado_pide_instalar_el_cli(self):
+        class CLINotFoundError(Exception):
+            pass
 
-    def test_con_clave_la_devuelve(self):
-        with mock.patch.object(
-            ai, "cargar_env", return_value={"ANTHROPIC_API_KEY": "sk-ant-falsa"},
-        ):
-            self.assertEqual(ai._clave_api(), "sk-ant-falsa")
+        mensaje = ai._mensaje_claro_para_error_sdk(CLINotFoundError("no bin"))
+        self.assertIn("Claude Code", mensaje)
+        self.assertIn("npm install", mensaje)
+
+    def test_error_generico_pide_claude_login_y_conserva_el_detalle(self):
+        mensaje = ai._mensaje_claro_para_error_sdk(RuntimeError("sin sesion activa"))
+        self.assertIn("claude login", mensaje)
+        self.assertIn("sin sesion activa", mensaje)
 
 
 class PruebasSlugCodigo(unittest.TestCase):
@@ -140,10 +147,10 @@ class PruebasSlugCodigo(unittest.TestCase):
 
 
 class PruebasInvestigarProductoRechazoTemprano(unittest.TestCase):
-    """Los dos casos que se deciden ANTES de tocar el SDK/la red: link de
-    Alibaba, y falta de clave. Ninguno de los dos debe importar
-    claude_agent_sdk ni Playwright -- se verifica parcheando
-    _correr_agente para que reviente si llega a invocarse."""
+    """El unico caso que se decide ANTES de tocar el SDK/la red: link de
+    Alibaba (Fase 2a no lo soporta). Ya NO hace falta clave de API para
+    llegar a correr el agente -- eso se verifica parcheando _correr_agente
+    para que reviente si llega a invocarse en el caso Alibaba."""
 
     def setUp(self):
         parche = mock.patch.object(
@@ -163,15 +170,40 @@ class PruebasInvestigarProductoRechazoTemprano(unittest.TestCase):
         self.assertIn("Alibaba", resultado["motivo"])
         self.assertTrue(any("Alibaba" in m for m in mensajes))
 
-    def test_sin_clave_se_rechaza_sin_tocar_la_red(self):
-        with mock.patch.object(ai, "cargar_env", return_value={}):
-            mensajes = []
-            resultado = ai.investigar_producto(
-                "https://www.fitnessmarket.com.co/producto/x",
-                Path("carpeta_no_usada"), mensajes.append,
-            )
+
+class PruebasInvestigarProductoTraduceErroresDelSdk(unittest.TestCase):
+    """Cuando _correr_agente revienta con una excepcion del SDK/CLI (CLI
+    ausente, sin sesion iniciada, cupo agotado, red caida), investigar_
+    producto la traduce a un mensaje claro en espanol -- nunca deja pasar
+    un traceback crudo. Se simula la excepcion parcheando _correr_agente;
+    en NINGUN caso se toca la API/CLI real."""
+
+    def test_excepcion_del_sdk_se_traduce_a_mensaje_claro(self):
+        with mock.patch.object(
+            ai, "_correr_agente", side_effect=RuntimeError("sin sesion activa"),
+        ):
+            with tempfile.TemporaryDirectory() as carpeta:
+                mensajes = []
+                resultado = ai.investigar_producto(
+                    "https://www.fitnessmarket.com.co/producto/x",
+                    Path(carpeta), mensajes.append,
+                )
         self.assertEqual(resultado["estado"], "error")
-        self.assertIn("ANTHROPIC_API_KEY", resultado["motivo"])
+        self.assertIn("claude login", resultado["motivo"])
+        self.assertTrue(any("claude login" in m for m in mensajes))
+
+    def test_import_error_avisa_que_falta_el_paquete(self):
+        with mock.patch.object(
+            ai, "_correr_agente", side_effect=ImportError("no module named x"),
+        ):
+            with tempfile.TemporaryDirectory() as carpeta:
+                mensajes = []
+                resultado = ai.investigar_producto(
+                    "https://www.fitnessmarket.com.co/producto/x",
+                    Path(carpeta), mensajes.append,
+                )
+        self.assertEqual(resultado["estado"], "error")
+        self.assertIn("claude-agent-sdk", resultado["motivo"])
 
 
 if __name__ == "__main__":

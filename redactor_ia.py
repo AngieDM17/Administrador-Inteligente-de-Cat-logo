@@ -2,11 +2,11 @@
 (etapa Video, orquestador Fase 1).
 
 Dos funciones puras de cara afuera, ambas con la misma regla de degradacion:
-si falta la clave de Anthropic o la llamada falla por CUALQUIER motivo (red,
-limite de uso, clave invalida, SDK no instalado), devuelven None y NUNCA
-lanzan. El orquestador (orquestador.py) cae entonces al camino automatico ya
-existente: `cuerpo_manual=None` en voz_en_off.generar_a_archivo (recorte de la
-ficha) y PROMPT_MUSICA_GENERICO para la musica.
+si la llamada falla por CUALQUIER motivo (CLI de Claude Code ausente, sin
+sesion iniciada, cupo agotado, red caida), devuelven None y NUNCA lanzan. El
+orquestador (orquestador.py) cae entonces al camino automatico ya existente:
+`cuerpo_manual=None` en voz_en_off.generar_a_archivo (recorte de la ficha) y
+PROMPT_MUSICA_GENERICO para la musica.
 
 Regla fija del negocio (reglas_negocio.md): la ficha tecnica nunca se infla.
 `redactar_guion_voz` solo puede citar datos que YA estan en la ficha
@@ -15,22 +15,32 @@ prohibe explicitamente y la funcion no le pasa ningun otro campo interno
 (advertencias, origenes) que pudiera filtrarse a un guion publico.
 
 Modelo: claude-haiku-4-5 (el Haiku mas barato disponible) — tarea corta de
-redaccion, no ameritaba un modelo mayor.
+redaccion, no ameritaba un modelo mayor. Ademas, al ser el modelo mas rapido/
+liviano, pisa MENOS la ventana de 5 horas compartida (ver mas abajo) que si
+esto corriera con Opus.
 
-Lectura de la clave: mismo patron que voz_en_off._clave_api() /
-musica._clave_api() (cargar_env de cliente_tienda.py sobre el .env del
-proyecto), para no inventar un mecanismo nuevo de leer el .env.
+--- Autenticacion: suscripcion de Claude Code, NO clave de API dedicada ---
+
+Igual que agente_investigador.py: corre `claude_agent_sdk.query()` SIN pasar
+`env={"ANTHROPIC_API_KEY": ...}`, asi el CLI de Claude Code que el SDK lanza
+por debajo hereda el entorno del proceso padre y usa la sesion YA LOGUEADA en
+esta maquina (la misma cuenta con la que Angie habla en el chat) en vez de
+facturar por token de una clave de API aparte. El requisito real que sigue
+en pie es tener el CLI instalado y con sesion iniciada (`claude login`) —
+si falta, `_consultar_ia_sincrono` degrada a None como cualquier otro fallo.
+
+OJO -- cupo compartido, no facturacion por uso: el limite es la ventana de
+5 horas que Angie ya usa hablando con Claude Code normalmente
+(`RateLimitEvent.rate_limit_type == 'five_hour'`). Si esto corre pesado
+MIENTRAS Angie usa el chat, se pisan el mismo cupo — por eso el modelo mas
+liviano (Haiku) y `max_turns=1` (una sola vuelta, sin loop agentico).
 """
 
 from __future__ import annotations
 
-from pathlib import Path
+import asyncio
 
 import voz_en_off
-from cliente_tienda import cargar_env
-
-CARPETA_PROYECTO = Path(__file__).parent
-RUTA_ENV_DEFECTO = CARPETA_PROYECTO / ".env"
 
 MODELO = "claude-haiku-4-5"
 
@@ -44,8 +54,8 @@ PRESUPUESTO_CUERPO_GUION = max(
     0, voz_en_off.PRESUPUESTO_CARACTERES_DEFECTO - _OVERHEAD_FRASE_FIJA
 )
 
-# Prompt de respaldo cuando no hay clave, la llamada falla, o la ficha no
-# trae categoria: generico pero nunca vacio (musica.py exige un prompt).
+# Prompt de respaldo cuando la llamada a la IA falla o la ficha no trae
+# categoria: generico pero nunca vacio (musica.py exige un prompt).
 PROMPT_MUSICA_GENERICO = (
     "energetic upbeat corporate background music, motivational, no vocals"
 )
@@ -68,13 +78,63 @@ _ESTILOS_POR_CATEGORIA = (
 )
 
 
-def _clave_api() -> str | None:
-    """Lee ANTHROPIC_API_KEY del .env del proyecto. Devuelve None si falta o
-    esta vacia — NUNCA lanza: es la senal que usan ambas funciones publicas
-    para degradar al camino automatico sin IA."""
-    env = cargar_env(RUTA_ENV_DEFECTO)
-    clave = env.get("ANTHROPIC_API_KEY", "").strip()
-    return clave or None
+async def _consultar_ia(prompt: str) -> str | None:
+    """Corre claude_agent_sdk.query() con MODELO y devuelve el texto plano
+    final (ResultMessage.result), o None si el SDK/CLI no esta disponible,
+    no hay sesion iniciada, se agoto el cupo compartido, o cualquier otro
+    fallo. NUNCA lanza -- funcion async interna, compartida por
+    redactar_guion_voz y redactar_prompt_musica via _consultar_ia_sincrono.
+
+    Sin system_prompt ni output_format: ambos prompts piden texto plano
+    corto, no hace falta ninguno de los dos (a diferencia de
+    agente_investigador.py, que si necesita el contrato de ficha v1.4).
+    tools=[] + permission_mode='bypassPermissions': esto es copywriting de
+    una sola vuelta, nunca debe poder tocar el filesystem ni colgarse
+    esperando una aprobacion que nadie va a dar en modo headless."""
+    try:
+        from claude_agent_sdk import ClaudeAgentOptions, query
+    except Exception:
+        return None
+
+    opciones = ClaudeAgentOptions(
+        model=MODELO,
+        permission_mode="bypassPermissions",
+        tools=[],
+        max_turns=1,
+    )
+
+    texto: str | None = None
+    llego_resultado = False
+    try:
+        async for mensaje in query(prompt=prompt, options=opciones):
+            if type(mensaje).__name__ == "ResultMessage":
+                llego_resultado = True
+                if not getattr(mensaje, "is_error", False):
+                    texto = (str(getattr(mensaje, "result", None) or "")).strip() or None
+                break
+    except Exception:
+        # Mismo mensaje de control espurio que agente_investigador.
+        # _correr_agente atrapa tras un ResultMessage real (ver su
+        # docstring): si ya se vio el resultado, se ignora; si revento
+        # ANTES de ver ninguno (CLI ausente, sin sesion, cupo agotado, red
+        # caida), degrada a None como cualquier otro fallo.
+        if not llego_resultado:
+            return None
+    return texto
+
+
+def _consultar_ia_sincrono(prompt: str) -> str | None:
+    """Envoltorio sincrono de _consultar_ia -- mismo patron que
+    agente_investigador.investigar_producto() envolviendo _correr_agente:
+    redactar_guion_voz/redactar_prompt_musica son funciones sincronas (asi
+    las llama orquestador.py), asyncio.run() cierra la brecha en un solo
+    lugar en vez de en cada funcion publica. Cualquier excepcion que se
+    escape igual degrada a None -- ninguna funcion publica de este modulo
+    lanza nunca."""
+    try:
+        return asyncio.run(_consultar_ia(prompt))
+    except Exception:
+        return None
 
 
 def _datos_seguros_para_guion(ficha: dict) -> dict:
@@ -111,15 +171,12 @@ def redactar_guion_voz(ficha: dict) -> str | None:
     caracteristicas, ficha_tecnica) — el prompt prohibe explicitamente
     inventar specs, en linea con la regla fija del negocio.
 
-    Devuelve None si falta la clave, la ficha no trae nada real que citar, o
-    la llamada falla por cualquier motivo (red, limite de uso, SDK ausente).
-    NUNCA lanza. Quien llama pasa el resultado como `cuerpo_manual` a
-    voz_en_off.generar_a_archivo(); con None, ese modulo cae solo a su
-    recorte automatico de la ficha (comportamiento ya existente, sin cambios)."""
-    clave = _clave_api()
-    if clave is None:
-        return None
-
+    Devuelve None si la ficha no trae nada real que citar, o la llamada
+    falla por cualquier motivo (CLI de Claude Code ausente, sin sesion
+    iniciada, cupo agotado, red caida). NUNCA lanza. Quien llama pasa el
+    resultado como `cuerpo_manual` a voz_en_off.generar_a_archivo(); con
+    None, ese modulo cae solo a su recorte automatico de la ficha
+    (comportamiento ya existente, sin cambios)."""
     datos = _datos_seguros_para_guion(ficha)
     if not (datos["descripcion_principal"] or datos["caracteristicas"]):
         return None  # nada real de la ficha que el guion pueda citar
@@ -142,25 +199,7 @@ def redactar_guion_voz(ficha: dict) -> str | None:
         f"Ficha tecnica: {datos['ficha_tecnica']}\n"
     )
 
-    try:
-        from anthropic import Anthropic
-
-        cliente = Anthropic(api_key=clave)
-        respuesta = cliente.messages.create(
-            model=MODELO,
-            max_tokens=400,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        texto = next(
-            (bloque.text for bloque in respuesta.content if bloque.type == "text"),
-            "",
-        ).strip()
-        return texto or None
-    except Exception:
-        # Cualquier fallo (red, limite de uso, clave invalida, SDK no
-        # instalado) degrada a None: el camino automatico de voz_en_off
-        # sigue funcionando sin este redactor.
-        return None
+    return _consultar_ia_sincrono(prompt)
 
 
 def redactar_prompt_musica(ficha: dict) -> str | None:
@@ -168,13 +207,8 @@ def redactar_prompt_musica(ficha: dict) -> str | None:
     cliente.music.compose() de ElevenLabs, ver musica.py) adaptado a la
     categoria del producto.
 
-    Devuelve None si falta la clave, la ficha no trae categoria, o la
-    llamada falla por cualquier motivo. Quien llama cae entonces a
-    PROMPT_MUSICA_GENERICO."""
-    clave = _clave_api()
-    if clave is None:
-        return None
-
+    Devuelve None si la ficha no trae categoria, o la llamada falla por
+    cualquier motivo. Quien llama cae entonces a PROMPT_MUSICA_GENERICO."""
     categoria = ((ficha.get("producto") or {}).get("categoria_propuesta") or "").strip()
     if not categoria:
         return None
@@ -193,19 +227,4 @@ def redactar_prompt_musica(ficha: dict) -> str | None:
         f"{ejemplos}\n"
     )
 
-    try:
-        from anthropic import Anthropic
-
-        cliente = Anthropic(api_key=clave)
-        respuesta = cliente.messages.create(
-            model=MODELO,
-            max_tokens=150,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        texto = next(
-            (bloque.text for bloque in respuesta.content if bloque.type == "text"),
-            "",
-        ).strip()
-        return texto or None
-    except Exception:
-        return None
+    return _consultar_ia_sincrono(prompt)
