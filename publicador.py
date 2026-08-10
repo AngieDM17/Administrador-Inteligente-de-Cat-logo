@@ -542,10 +542,20 @@ def simular_publicacion(datos: dict, codigo: str, slug: str,
     return 0
 
 
-def resolver_categoria_en_vivo(cliente, datos: dict) -> dict | None:
+def resolver_categoria_en_vivo(cliente, datos: dict,
+                               resultado: dict | None = None) -> dict | None:
     """Lee el arbol de categorias de la tienda y resuelve la propuesta.
 
     Devuelve la categoria, o None (con el error ya impreso) si no existe.
+
+    `resultado`, si se pasa, es un dict de salida (mutado in-place) donde se
+    anota 'categoria_buscada' y 'categoria_sugerencias' cuando NO hay match.
+    Es aditivo a proposito (parametro opcional, default None, nada cambia
+    para quien no lo pasa — CLI y tests existentes intactos): lo usa
+    orquestador.py para distinguir el CHECKPOINT 2 (categoria sin match) de
+    cualquier otro motivo por el que publicar() devuelva 1, algo que el
+    codigo original no exponia de forma programatica (solo imprimia a
+    stdout). Ver mismatch documentado en el reporte final del orquestador.
     """
     print("Leyendo el arbol de categorias en vivo...")
     categorias = cliente.obtener_paginado(
@@ -559,10 +569,30 @@ def resolver_categoria_en_vivo(cliente, datos: dict) -> dict | None:
             "en la tienda."
         )
         if sugerencias:
-            imprimir_lista("Nombres mas parecidos en la tienda:", sugerencias)
+            imprimir_lista("Nombres mas parecidas en la tienda:", sugerencias)
+        if resultado is not None:
+            resultado["categoria_buscada"] = nombre_categoria
+            resultado["categoria_sugerencias"] = sugerencias
         return None
     print(f"Categoria resuelta: {categoria['name']} (id {categoria['id']})")
     return categoria
+
+
+def _adjuntar_video(cliente, product_id: int, ruta_video: Path, codigo: str) -> dict:
+    """Sube el video del producto y lo asocia via meta_data
+    (ekipon_video_id/ekipon_video_url), mismo patron que el banner
+    (generar_y_subir_banner). A diferencia del banner, un fallo de la tienda
+    ACA se propaga (no se degrada en silencio): si el orquestador llego hasta
+    ofrecer un video, es porque ya se genero con exito; perderlo en silencio
+    seria peor que fallar en voz alta."""
+    print("Subiendo el video del producto...")
+    medio = cliente.subir_video(ruta_video, product_id, titulo=f"{codigo}-video")
+    meta_video = [
+        {"key": "ekipon_video_id", "value": medio.get("id") or ""},
+        {"key": "ekipon_video_url", "value": medio.get("source_url") or ""},
+    ]
+    cliente.actualizar_borrador(product_id, {"meta_data": meta_video})
+    return medio
 
 
 def generar_y_subir_banner(datos: dict, codigo: str, slug: str,
@@ -594,7 +624,9 @@ def generar_y_subir_banner(datos: dict, codigo: str, slug: str,
 
 def actualizar_existente(datos: dict, codigo: str, slug: str, existente: dict,
                          cliente, carpeta_ficha: Path, ruta_db=None,
-                         refrescar_galeria: bool = False) -> int:
+                         refrescar_galeria: bool = False,
+                         ruta_video: Path | None = None,
+                         resultado: dict | None = None) -> int:
     """Actualiza el TEXTO de un borrador existente (--actualizar).
 
     Las imagenes de la galeria no se tocan: solo se suben al crear. El banner
@@ -604,6 +636,10 @@ def actualizar_existente(datos: dict, codigo: str, slug: str, existente: dict,
     Con refrescar_galeria=True (--refrescar-galeria) se vuelve a subir la
     galeria y viaja en el payload, REEMPLAZANDO la de la tienda. Es la unica
     forma de que una actualizacion toque imagenes, y hay que pedirla a mano.
+
+    `ruta_video`/`resultado`: ver publicar() — mismos parametros aditivos,
+    mismo comportamiento (video opcional, resultado opcional de solo
+    lectura para quien orquesta).
     """
     print(f"Actualizando el borrador existente (id {existente['id']})...")
     subidas = None
@@ -616,7 +652,7 @@ def actualizar_existente(datos: dict, codigo: str, slug: str, existente: dict,
         anunciar_reemplazo_de_galeria(preparadas)
     else:
         print("Solo texto: las imagenes de la galeria no se tocan.")
-    categoria = resolver_categoria_en_vivo(cliente, datos)
+    categoria = resolver_categoria_en_vivo(cliente, datos, resultado=resultado)
     if categoria is None:
         return 1
 
@@ -626,6 +662,11 @@ def actualizar_existente(datos: dict, codigo: str, slug: str, existente: dict,
     payload = construir_payload_actualizacion(
         datos, codigo, categoria["id"], banner, imagenes=subidas)
     producto = cliente.actualizar_borrador(existente["id"], payload)
+
+    if resultado is not None:
+        resultado["producto_id"] = existente["id"]
+    if ruta_video is not None:
+        _adjuntar_video(cliente, existente["id"], ruta_video, codigo)
 
     registro.registrar_publicacion(
         codigo, existente["id"], existente.get("slug") or slug,
@@ -647,8 +688,21 @@ def actualizar_existente(datos: dict, codigo: str, slug: str, existente: dict,
 
 def publicar(datos: dict, codigo: str, slug: str, carpeta_ficha: Path,
              cliente, ruta_db=None, actualizar: bool = False,
-             refrescar_galeria: bool = False) -> int:
-    """Ejecuta la publicacion real (siempre como borrador)."""
+             refrescar_galeria: bool = False,
+             ruta_video: Path | None = None,
+             resultado: dict | None = None) -> int:
+    """Ejecuta la publicacion real (siempre como borrador).
+
+    `ruta_video` (opcional): si se pasa, DESPUES de crear/actualizar el
+    producto se sube el video y se asocia via meta_data (ekipon_video_id/
+    ekipon_video_url) — ver _adjuntar_video. Parametro aditivo: None (el
+    default) no cambia nada del comportamiento existente.
+
+    `resultado` (opcional): dict de salida que orquestador.py usa para leer
+    el producto_id creado/actualizado y, si el checkpoint de categoria
+    dispara, sus sugerencias — ver resolver_categoria_en_vivo(). Tambien
+    aditivo: nada cambia para quien no lo pasa (todos los tests existentes).
+    """
     print("Verificando que el producto no exista ya...")
     existente = buscar_existente(cliente, codigo, slug, ruta_db)
     if existente:
@@ -656,15 +710,18 @@ def publicar(datos: dict, codigo: str, slug: str, carpeta_ficha: Path,
             return actualizar_existente(
                 datos, codigo, slug, existente, cliente, carpeta_ficha, ruta_db,
                 refrescar_galeria=refrescar_galeria,
+                ruta_video=ruta_video, resultado=resultado,
             )
         print(f"El producto ya existe (id {existente['id']}), no se duplica.")
+        if resultado is not None:
+            resultado["producto_id"] = existente["id"]
         registro.registrar_publicacion(
             codigo, existente["id"], existente.get("slug") or slug,
             existente.get("status") or "existente", ruta_db,
         )
         return 0
 
-    categoria = resolver_categoria_en_vivo(cliente, datos)
+    categoria = resolver_categoria_en_vivo(cliente, datos, resultado=resultado)
     if categoria is None:
         return 1
 
@@ -674,6 +731,11 @@ def publicar(datos: dict, codigo: str, slug: str, carpeta_ficha: Path,
     payload = construir_payload(datos, codigo, slug, categoria["id"], subidas, banner)
     print("Creando el producto como BORRADOR...")
     producto = cliente.crear_producto(payload)
+
+    if resultado is not None:
+        resultado["producto_id"] = producto["id"]
+    if ruta_video is not None:
+        _adjuntar_video(cliente, producto["id"], ruta_video, codigo)
 
     registro.registrar_publicacion(
         codigo, producto["id"], slug, "borrador_creado", ruta_db
@@ -692,8 +754,16 @@ def publicar(datos: dict, codigo: str, slug: str, carpeta_ficha: Path,
 
 def ejecutar(ruta_ficha: Path, simular: bool,
              fabrica_cliente=ClienteTienda.desde_env, ruta_db=None,
-             actualizar: bool = False, refrescar_galeria: bool = False) -> int:
-    """Punto de entrada del pipeline; separa el simulacro de la ejecucion real."""
+             actualizar: bool = False, refrescar_galeria: bool = False,
+             ruta_video: Path | None = None,
+             resultado: dict | None = None) -> int:
+    """Punto de entrada del pipeline; separa el simulacro de la ejecucion real.
+
+    `ruta_video`/`resultado`: parametros aditivos (ambos None por defecto,
+    igual que antes de que existieran) pensados para orquestador.py — ver
+    publicar(). El CLI (main(), abajo) no los usa y su comportamiento no
+    cambia.
+    """
     # La consola de Windows no siempre esta en UTF-8; sin esto, imprimir la
     # ficha tecnica (simbolos como ≤) rompe con UnicodeEncodeError.
     if hasattr(sys.stdout, "reconfigure"):
@@ -726,6 +796,7 @@ def ejecutar(ruta_ficha: Path, simular: bool,
     return publicar(
         datos, codigo, slug, ruta_ficha.parent, cliente, ruta_db,
         actualizar=actualizar, refrescar_galeria=refrescar_galeria,
+        ruta_video=ruta_video, resultado=resultado,
     )
 
 

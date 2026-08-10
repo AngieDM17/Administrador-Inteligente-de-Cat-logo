@@ -14,8 +14,10 @@ sin espera real.
 
 import json
 import socket
+import tempfile
 import unittest
 import urllib.error
+from pathlib import Path
 from unittest import mock
 
 import cliente_tienda
@@ -127,6 +129,69 @@ class PruebasReintentos(unittest.TestCase):
         resultado = self.cli._solicitar("/wp-json/wc/v3/products")
         self.assertEqual(resultado, {"ok": True})
         self.assertEqual(caja["n"], 2)
+
+
+class _ClienteSubirVideoSinRed(ClienteTienda):
+    """ClienteTienda REAL con el transporte reemplazado: cero red. Registra
+    cada solicitud para poder verificar la ruta, el metodo implicito
+    (POST via datos=) y el cuerpo enviado."""
+
+    def __init__(self, medios_existentes=None):
+        super().__init__(dict(_ENV))
+        self.medios_existentes = medios_existentes or []
+        self.solicitudes = []
+
+    def _solicitar(self, ruta, datos=None, cabeceras_extra=None, metodo=None):
+        self.solicitudes.append({
+            "ruta": ruta, "datos": datos, "cabeceras": cabeceras_extra,
+        })
+        if "media?search=" in ruta:
+            return self.medios_existentes
+        if ruta.startswith("/wp-json/wp/v2/media?post="):
+            return {"id": 900}
+        if ruta == "/wp-json/wp/v2/media/900":
+            return {"id": 900, "title": {"rendered": "4212-video"}}
+        return {}
+
+
+class PruebasSubirVideo(unittest.TestCase):
+    """subir_video: mismo patron de idempotencia por titulo que
+    subir_imagen, pero con Content-Type de video y asociado al producto via
+    ?post=<id> en la subida (ver docstring de subir_video)."""
+
+    def test_sube_con_content_type_video_y_post_id(self):
+        with tempfile.TemporaryDirectory() as carpeta:
+            ruta_video = Path(carpeta) / "final.mp4"
+            ruta_video.write_bytes(b"contenido-de-prueba")
+
+            cliente = _ClienteSubirVideoSinRed()
+            medio = cliente.subir_video(ruta_video, product_id=9001, titulo="4212-video")
+
+            self.assertEqual(medio["id"], 900)
+            subida = next(
+                s for s in cliente.solicitudes
+                if s["ruta"].startswith("/wp-json/wp/v2/media?post=")
+            )
+            self.assertEqual(subida["ruta"], "/wp-json/wp/v2/media?post=9001")
+            self.assertEqual(subida["cabeceras"]["Content-Type"], "video/mp4")
+
+    def test_idempotente_por_titulo_no_sube_de_nuevo(self):
+        cliente = _ClienteSubirVideoSinRed(
+            medios_existentes=[{"id": 700, "title": {"rendered": "4212-video"}}]
+        )
+        medio = cliente.subir_video(
+            Path("no-existe.mp4"), product_id=9001, titulo="4212-video"
+        )
+        self.assertEqual(medio["id"], 700)
+        # Ninguna solicitud de subida real: solo la busqueda por titulo.
+        self.assertEqual(len(cliente.solicitudes), 1)
+
+    def test_archivo_faltante_lanza_error_tienda(self):
+        cliente = _ClienteSubirVideoSinRed()
+        with self.assertRaises(ErrorTienda):
+            cliente.subir_video(
+                Path("no-existe.mp4"), product_id=9001, titulo="titulo-nuevo"
+            )
 
 
 if __name__ == "__main__":

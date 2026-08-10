@@ -51,6 +51,7 @@ class ClienteFalso:
         self.creaciones = []
         self.subidas = []
         self.actualizaciones = []
+        self.videos_subidos = []
 
     def obtener(self, ruta):
         self.llamadas_obtener.append(ruta)
@@ -74,6 +75,10 @@ class ClienteFalso:
         seguro = forzar_borrador(payload)
         self.actualizaciones.append((product_id, seguro))
         return {"id": product_id, "status": "draft", "name": seguro.get("name")}
+
+    def subir_video(self, ruta_archivo, product_id, titulo):
+        self.videos_subidos.append((Path(ruta_archivo).name, product_id, titulo))
+        return {"id": 800, "source_url": f"https://pruebas.ekipon.co/media/{titulo}.mp4"}
 
 
 class ClienteTiendaSinRed(ClienteTienda):
@@ -848,6 +853,78 @@ class PruebasCorreccionesReview(unittest.TestCase):
             ruta_imposible = archivo / "sub.db"
             with self.assertRaises(registro.ErrorRegistro):
                 registro.obtener_publicacion("4212", ruta_imposible)
+
+
+class PruebasResultadoYVideo(unittest.TestCase):
+    """Los parametros aditivos `resultado`/`ruta_video` de publicar(): sirven
+    para que orquestador.py distinga el CHECKPOINT 2 (categoria sin match)
+    de cualquier otro motivo de fallo, y obtenga el producto_id para subir el
+    video. Ninguno de los dos cambia el contrato int existente (codigo_salida
+    sigue siendo 0/1): se leen del dict aparte."""
+
+    def setUp(self):
+        self._carpeta = tempfile.TemporaryDirectory()
+        self.ruta_db = Path(self._carpeta.name) / "prueba.db"
+
+    def tearDown(self):
+        self._carpeta.cleanup()
+
+    def test_categoria_sin_match_anota_sugerencias_en_resultado(self):
+        slug = generar_slug("4212", FICHA_4212["producto"]["nombre_propuesto"])
+        cliente = ClienteFalso(categorias=[{"id": 1, "name": "Compresores usados"}])
+        resultado = {}
+        codigo_salida = publicar(
+            FICHA_4212, "4212", slug, RAIZ, cliente, self.ruta_db,
+            resultado=resultado,
+        )
+        self.assertEqual(codigo_salida, 1)
+        self.assertEqual(resultado["categoria_buscada"], "Compresores")
+        self.assertIn("Compresores usados", resultado["categoria_sugerencias"])
+        # Checkpoint de categoria: nunca se creo el producto.
+        self.assertNotIn("producto_id", resultado)
+
+    def test_creacion_completa_anota_producto_id_en_resultado(self):
+        slug = generar_slug("4212", FICHA_4212["producto"]["nombre_propuesto"])
+        cliente = ClienteFalso(categorias=[{"id": 428, "name": "Compresores"}])
+        resultado = {}
+        codigo_salida = publicar(
+            FICHA_4212, "4212", slug, RAIZ, cliente, self.ruta_db,
+            resultado=resultado,
+        )
+        self.assertEqual(codigo_salida, 0)
+        self.assertEqual(resultado["producto_id"], 9001)
+        self.assertNotIn("categoria_sugerencias", resultado)
+
+    def test_con_ruta_video_sube_y_asocia_meta_al_crear(self):
+        slug = generar_slug("4212", FICHA_4212["producto"]["nombre_propuesto"])
+        cliente = ClienteFalso(categorias=[{"id": 428, "name": "Compresores"}])
+        with tempfile.TemporaryDirectory() as carpeta:
+            ruta_video = Path(carpeta) / "final.mp4"
+            ruta_video.write_bytes(b"x")
+            codigo_salida = publicar(
+                FICHA_4212, "4212", slug, RAIZ, cliente, self.ruta_db,
+                ruta_video=ruta_video,
+            )
+        self.assertEqual(codigo_salida, 0)
+        self.assertEqual(len(cliente.videos_subidos), 1)
+        nombre, product_id, titulo = cliente.videos_subidos[0]
+        self.assertEqual(product_id, 9001)
+        self.assertEqual(titulo, "4212-video")
+        # La asociacion via meta_data llega como una actualizacion aparte.
+        metas_de_video = [
+            m for (pid, payload) in cliente.actualizaciones if pid == 9001
+            for m in payload["meta_data"] if m["key"] == "ekipon_video_id"
+        ]
+        self.assertEqual(len(metas_de_video), 1)
+
+    def test_sin_ruta_video_no_sube_nada(self):
+        slug = generar_slug("4212", FICHA_4212["producto"]["nombre_propuesto"])
+        cliente = ClienteFalso(categorias=[{"id": 428, "name": "Compresores"}])
+        codigo_salida = publicar(
+            FICHA_4212, "4212", slug, RAIZ, cliente, self.ruta_db,
+        )
+        self.assertEqual(codigo_salida, 0)
+        self.assertEqual(cliente.videos_subidos, [])
 
 
 if __name__ == "__main__":

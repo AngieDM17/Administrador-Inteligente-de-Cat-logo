@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ekipon — Generador de video y publicación</title>
+<link rel="icon" type="image/png" href="/assets/icono.png">
+<style>
+  @font-face {
+    font-family: "Montserrat";
+    src: url("/assets/fonts/Montserrat-Regular.ttf") format("truetype");
+    font-weight: 400 700;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Anton";
+    src: url("/assets/fonts/Anton-Regular.ttf") format("truetype");
+    font-weight: 400;
+    font-display: swap;
+  }
+
+  :root {
+    /* Naranja principal: el mismo ya usado en subtitulos.py (borde de
+       marca) y en el banner — se mantiene como acento de accion (boton,
+       titular). Magenta y turquesa: tomados de pixel real del logo
+       "Ekipon, marca de agua .png" (el icono de personas es magenta/
+       naranja/turquesa) — la fila de iconos usa estos 3 colores REALES de
+       la marca, no un arcoiris generico. */
+    --naranja: #FF4E03;
+    --naranja-suave: #FFF1EA;
+    --naranja-logo: #FD9336;
+    --magenta: #C62672;
+    --magenta-suave: #FBEAF2;
+    --magenta-oscuro: #9E1D5A;
+    --turquesa: #1FA8AD;
+    --turquesa-suave: #E7F7F7;
+    --oscuro: #17171A;
+    --crema: #FBF8F5;
+    --gris-borde: #E7E2DD;
+    --gris-texto: #6B6560;
+    --verde: #1E8E3E;
+    --verde-suave: #E6F4EA;
+    --rojo: #C62828;
+    --rojo-suave: #FCE8E6;
+    --ambar: #B25E00;
+    --ambar-suave: #FFF4E5;
+    --sombra: 0 10px 32px rgba(23,23,26,.10);
+    --sombra-chica: 0 2px 8px rgba(23,23,26,.06);
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Montserrat", -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--crema);
+    color: var(--oscuro);
+    margin: 0;
+    min-height: 100vh;
+  }
+
+  /* ---------- Hero oscuro ---------- */
+  header.hero {
+    position: relative;
+    background:
+      radial-gradient(700px 420px at 82% 8%, rgba(255,78,3,.20), transparent 62%),
+      radial-gradient(520px 380px at 100% 55%, rgba(198,38,114,.16), transparent 60%),
+      linear-gradient(180deg, #17171A 0%, #1D1D21 100%);
+    padding: 34px 24px 96px;
+    overflow: hidden;
+  }
+  .hero-fila {
+    max-width: 1120px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.05fr .95fr;
+    gap: 32px;
+    align-items: center;
+  }
+  .hero-texto img.logo {
+    height: 30px;
+    display: block;
+    margin-bottom: 22px;
+  }
+  h1.titular {
+    font-family: "Anton", "Montserrat", sans-serif;
+    font-weight: 400;
+    letter-spacing: .3px;
+    color: #fff;
+    font-size: clamp(1.7rem, 3.1vw, 2.5rem);
+    line-height: 1.14;
+    margin: 0 0 14px;
+    text-transform: uppercase;
+  }
+  h1.titular span { color: var(--naranja); }
+  p.epigrafe {
+    color: #C9C4BF;
+    max-width: 480px;
+    margin: 0;
+    font-size: .98rem;
+    line-height: 1.55;
+  }
+
+  /* ---------- Ilustracion del hero (abstracta, sin foto de producto: la
+     herramienta sirve para CUALQUIER producto, no uno solo) ---------- */
+  .hero-ilustracion {
+    position: relative;
+    height: 340px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .resplandor {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,78,3,.35), transparent 68%);
+    filter: blur(6px);
+    animation: respirar 4.5s ease-in-out infinite;
+  }
+  @keyframes respirar {
+    0%, 100% { transform: scale(1); opacity: .85; }
+    50% { transform: scale(1.08); opacity: 1; }
+  }
+  .icono-central {
+    position: relative;
+    width: 132px;
+    height: 132px;
+    z-index: 2;
+    filter: drop-shadow(0 10px 26px rgba(0,0,0,.45));
+    animation: flotar 5s ease-in-out infinite;
+  }
+  @keyframes flotar {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  svg.hilos { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  svg.hilos path {
+    fill: none;
+    stroke-width: 1.6;
+    stroke: url(#degradadoHilo);
+    opacity: .8;
+  }
+  .chip-flotante {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.14);
+    backdrop-filter: blur(6px);
+    padding: 9px 13px;
+    border-radius: 12px;
+    font-size: .78rem;
+    font-weight: 600;
+    color: #EDEBE9;
+    box-shadow: 0 6px 18px rgba(0,0,0,.25);
+    z-index: 2;
+  }
+  .chip-flotante .marca-chip {
+    width: 22px; height: 22px;
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .chip-flotante svg { width: 13px; height: 13px; }
+  .chip-ficha { top: 4%; left: 2%; animation: flotar 6s ease-in-out infinite; animation-delay: .2s; }
+  .chip-galeria { top: 10%; right: 0%; animation: flotar 5.5s ease-in-out infinite; animation-delay: .8s; }
+  .chip-video { bottom: 8%; left: 6%; animation: flotar 6.2s ease-in-out infinite; animation-delay: .4s; }
+  .chip-musica { bottom: 2%; right: 4%; animation: flotar 5.8s ease-in-out infinite; animation-delay: 1s; }
+
+  /* ---------- Curva de transicion hero -> contenido ---------- */
+  .curva { position: absolute; left: 0; right: 0; bottom: -1px; line-height: 0; }
+  .curva svg { display: block; width: 100%; height: 64px; }
+
+  /* ---------- Cuerpo ---------- */
+  main.contenedor {
+    max-width: 1120px;
+    margin: -58px auto 0;
+    padding: 0 24px 48px;
+    position: relative;
+    z-index: 3;
+  }
+  .barra-entrada {
+    background: #fff;
+    border: 1px solid var(--gris-borde);
+    border-radius: 20px;
+    padding: 26px 28px;
+    box-shadow: var(--sombra);
+    margin-bottom: 34px;
+  }
+  .etiqueta-campo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: .92rem;
+    margin-bottom: 14px;
+  }
+  .etiqueta-campo .numero {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--naranja-suave);
+    color: var(--naranja);
+    font-size: .74rem;
+    font-weight: 800;
+  }
+  .fila-entrada {
+    display: flex;
+    gap: 10px;
+  }
+  .campo-con-icono {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .campo-con-icono svg {
+    position: absolute;
+    left: 18px;
+    width: 18px;
+    height: 18px;
+    color: #B8B0A8;
+    pointer-events: none;
+  }
+  input[type="text"] {
+    width: 100%;
+    padding: 15px 18px 15px 46px;
+    font-family: "Montserrat", sans-serif;
+    font-size: .96rem;
+    color: var(--oscuro);
+    border: 1.5px solid var(--gris-borde);
+    border-radius: 16px;
+    background: var(--crema);
+    transition: border-color .15s, box-shadow .15s, background .15s;
+  }
+  input[type="text"]::placeholder { color: #B8B0A8; }
+  input[type="text"]:focus {
+    outline: none;
+    border-color: var(--naranja);
+    background: #fff;
+    box-shadow: 0 0 0 4px var(--naranja-suave);
+  }
+  p.ayuda {
+    font-size: .84rem;
+    color: var(--gris-texto);
+    margin: 12px 0 0;
+    line-height: 1.5;
+  }
+  button#boton-generar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--naranja);
+    color: #fff;
+    border: none;
+    padding: 15px 24px;
+    font-family: "Montserrat", sans-serif;
+    font-size: .95rem;
+    font-weight: 700;
+    letter-spacing: .2px;
+    border-radius: 16px;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: 0 4px 14px rgba(255,78,3,.32);
+    transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+  }
+  button#boton-generar svg { width: 17px; height: 17px; }
+  button#boton-generar:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(255,78,3,.4);
+  }
+  button#boton-generar:active:not(:disabled) { transform: translateY(0); }
+  button#boton-generar:disabled {
+    background: #E3DED8;
+    color: #A39C94;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  /* ---------- Fila de features ---------- */
+  .fila-features {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 18px;
+    margin-bottom: 34px;
+  }
+  .feature {
+    text-align: center;
+  }
+  .feature .insignia {
+    width: 52px;
+    height: 52px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    box-shadow: var(--sombra-chica);
+  }
+  .feature .insignia svg { width: 24px; height: 24px; color: #fff; }
+  .feature .nombre-feature {
+    font-weight: 700;
+    font-size: .88rem;
+    margin-bottom: 3px;
+  }
+  .feature .detalle-feature {
+    font-size: .78rem;
+    color: var(--gris-texto);
+    line-height: 1.4;
+  }
+  .bg-naranja { background: var(--naranja); }
+  .bg-magenta { background: var(--magenta); }
+  .bg-turquesa { background: var(--turquesa); }
+  .bg-naranja-logo { background: var(--naranja-logo); }
+  .bg-magenta-oscuro { background: var(--magenta-oscuro); }
+
+  /* ---------- Panel de progreso (tarjeta comun) ---------- */
+  .tarjeta {
+    background: #fff;
+    border: 1px solid var(--gris-borde);
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: var(--sombra);
+    margin-bottom: 22px;
+  }
+  #panel-progreso { display: none; }
+  .cabecera-progreso {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+  }
+  .cabecera-progreso h2 {
+    font-family: "Anton", sans-serif;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: .3px;
+    font-size: 1.05rem;
+    margin: 0;
+    color: var(--oscuro);
+  }
+  .etiqueta-estado {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 13px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: .78rem;
+    letter-spacing: .2px;
+  }
+  .etiqueta-estado.listo { background: var(--verde-suave); color: var(--verde); }
+  .etiqueta-estado.revisar { background: var(--ambar-suave); color: var(--ambar); }
+  .etiqueta-estado.error { background: var(--rojo-suave); color: var(--rojo); }
+  .etiqueta-estado.en-curso { background: var(--naranja-suave); color: var(--naranja); }
+
+  /* Recorrido por etapas (stepper) */
+  .recorrido { margin: 0 0 6px; }
+  .etapa {
+    display: flex;
+    gap: 14px;
+    position: relative;
+  }
+  .etapa .riel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 22px;
+    flex-shrink: 0;
+  }
+  .etapa .marcador {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--gris-borde);
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: border-color .2s, background .2s;
+    z-index: 1;
+  }
+  .etapa .linea {
+    width: 2px;
+    flex: 1;
+    background: var(--gris-borde);
+    margin: 2px 0;
+    min-height: 14px;
+    transition: background .2s;
+  }
+  .etapa:last-child .linea { display: none; }
+  .etapa.hecha .marcador { border-color: var(--verde); background: var(--verde); }
+  .etapa.hecha .marcador::after { content: "✓"; color: #fff; font-size: .68rem; font-weight: 900; }
+  .etapa.hecha .linea { background: var(--verde); }
+  .etapa.activa .marcador { border-color: var(--naranja); }
+  .etapa.activa .marcador::after {
+    content: "";
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--naranja);
+    animation: pulso 1.1s ease-in-out infinite;
+  }
+  .etapa.atencion .marcador { border-color: var(--rojo); background: var(--rojo); }
+  .etapa.atencion .marcador::after { content: "!"; color: #fff; font-size: .74rem; font-weight: 900; }
+  .etapa.atencion .linea { background: var(--rojo); }
+  @keyframes pulso {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: .55; }
+  }
+  .etapa .cuerpo {
+    flex: 1;
+    padding-bottom: 20px;
+    min-width: 0;
+  }
+  .etapa .nombre {
+    font-weight: 700;
+    font-size: .92rem;
+    color: #B8B0A8;
+    transition: color .2s;
+    padding-top: 1px;
+  }
+  .etapa.activa .nombre, .etapa.hecha .nombre { color: var(--oscuro); }
+  .etapa.atencion .nombre { color: var(--rojo); }
+  .etapa .detalle {
+    margin-top: 6px;
+    font-size: .82rem;
+    color: var(--gris-texto);
+    line-height: 1.55;
+    display: none;
+  }
+  .etapa.activa .detalle, .etapa.atencion .detalle { display: block; }
+  .etapa .detalle .linea-detalle {
+    animation: aparecer .25s ease;
+  }
+  .etapa .detalle .linea-detalle.motivo {
+    color: var(--ambar);
+    font-weight: 600;
+  }
+  .etapa .detalle .linea-detalle.error-texto {
+    color: var(--rojo);
+    font-weight: 600;
+  }
+  @keyframes aparecer {
+    from { opacity: 0; transform: translateY(-2px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ---------- Resultado final ---------- */
+  .caja-resultado {
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-top: 4px;
+  }
+  .caja-resultado.listo { background: var(--verde-suave); }
+  .caja-resultado.revisar { background: var(--ambar-suave); }
+  .caja-resultado.error { background: var(--rojo-suave); }
+  .caja-resultado ul { margin: 10px 0 0 18px; padding: 0; }
+  .caja-resultado li { margin-bottom: 4px; line-height: 1.45; }
+  .caja-resultado strong { display: block; margin-bottom: 2px; }
+  .boton-resultado {
+    display: inline-block;
+    margin-top: 14px;
+    background: var(--oscuro);
+    color: #fff !important;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: .88rem;
+    padding: 10px 18px;
+    border-radius: 8px;
+    transition: background .15s;
+  }
+  .boton-resultado:hover { background: #000; }
+
+  footer.pie {
+    text-align: center;
+    color: #B8B0A8;
+    font-size: .78rem;
+    padding: 8px 24px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+  }
+  footer.pie svg { width: 13px; height: 13px; }
+
+  @media (max-width: 960px) {
+    .hero-fila { grid-template-columns: 1fr; }
+    .hero-ilustracion { display: none; }
+    header.hero { padding-bottom: 84px; }
+    .fila-features { grid-template-columns: repeat(3, 1fr); row-gap: 22px; }
+  }
+  @media (max-width: 560px) {
+    .fila-entrada { flex-direction: column; }
+    button#boton-generar { width: 100%; justify-content: center; }
+    main.contenedor { padding: 0 14px 40px; }
+    .fila-features { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-fila">
+    <div class="hero-texto">
+      <img class="logo" src="/assets/logo.png" alt="Ekipon">
+      <h1 class="titular">Un link.<br>La ficha, la galería<br>y el video, <span>de un tirón</span>.</h1>
+      <p class="epigrafe">
+        Pegá la ruta de una ficha ya investigada y el sistema arma el resto solo:
+        recorte, galería, guion y música con IA, video completo, y el borrador
+        publicado en la tienda de pruebas con el video adjunto.
+      </p>
+    </div>
+
+    <div class="hero-ilustracion" aria-hidden="true">
+      <div class="resplandor"></div>
+      <svg class="hilos" viewBox="0 0 340 340">
+        <defs>
+          <linearGradient id="degradadoHilo" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#FF4E03" stop-opacity=".9"/>
+            <stop offset="100%" stop-color="#FF4E03" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path d="M170,170 C120,120 90,90 40,55"/>
+        <path d="M170,170 C220,120 260,95 300,60"/>
+        <path d="M170,170 C120,210 90,240 45,275"/>
+        <path d="M170,170 C225,215 255,235 300,285"/>
+      </svg>
+      <img class="icono-central" src="/assets/icono.png" alt="">
+
+      <div class="chip-flotante chip-ficha">
+        <span class="marca-chip bg-naranja">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>
+        </span>
+        Ficha técnica
+      </div>
+      <div class="chip-flotante chip-galeria">
+        <span class="marca-chip bg-magenta">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>
+        </span>
+        Galería
+      </div>
+      <div class="chip-flotante chip-video">
+        <span class="marca-chip bg-turquesa">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M10 8l6 4-6 4z" fill="#fff" stroke="none"/></svg>
+        </span>
+        Video
+      </div>
+      <div class="chip-flotante chip-musica">
+        <span class="marca-chip bg-naranja-logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        </span>
+        Música IA
+      </div>
+    </div>
+  </div>
+
+  <div class="curva">
+    <svg viewBox="0 0 1440 64" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="degradadoBorde" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#C62672"/>
+          <stop offset="50%" stop-color="#FF4E03"/>
+          <stop offset="100%" stop-color="#1FA8AD"/>
+        </linearGradient>
+      </defs>
+      <path d="M0,20 C360,70 1080,-10 1440,26 L1440,64 L0,64 Z" fill="#FBF8F5"/>
+      <path d="M0,20 C360,70 1080,-10 1440,26" fill="none" stroke="url(#degradadoBorde)" stroke-width="4"/>
+    </svg>
+  </div>
+</header>
+
+<main class="contenedor">
+  <div class="barra-entrada">
+    <div class="etiqueta-campo"><span class="numero">1</span> Link del producto o ruta de la ficha</div>
+    <div class="fila-entrada">
+      <div class="campo-con-icono">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <input type="text" id="ruta-ficha"
+               placeholder="https://tienda.com/producto  ó  C:\ruta\a\la\carpeta\del\producto\ficha.json">
+      </div>
+      <button id="boton-generar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M3 12h4M19 12h2M5.6 5.6l1.4 1.4M12 19v2M18.4 5.6 17 7"/><path d="M12 8l1.6 3.4L17 13l-3.4 1.6L12 18l-1.6-3.4L7 13l3.4-1.6z"/></svg>
+        Generar y publicar
+      </button>
+    </div>
+    <p class="ayuda">
+      Pegá el link del producto (de una tienda que NO sea Alibaba) y el
+      sistema lo investiga solo — o, si ya tenés la ficha investigada,
+      pegá la ruta completa al archivo <code>.json</code> que armó el
+      Investigador: la "ficha técnica" digital del equipo, con sus fotos y
+      datos.
+    </p>
+  </div>
+
+  <div class="fila-features">
+    <div class="feature">
+      <div class="insignia bg-naranja">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>
+      </div>
+      <div class="nombre-feature">Ficha técnica</div>
+      <div class="detalle-feature">Colador de calidad</div>
+    </div>
+    <div class="feature">
+      <div class="insignia bg-magenta">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>
+      </div>
+      <div class="nombre-feature">Galería de fotos</div>
+      <div class="detalle-feature">Recorte y banner</div>
+    </div>
+    <div class="feature">
+      <div class="insignia bg-turquesa">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      </div>
+      <div class="nombre-feature">Guion y música</div>
+      <div class="detalle-feature">Redactado con IA</div>
+    </div>
+    <div class="feature">
+      <div class="insignia bg-naranja-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M10 8l6 4-6 4z" fill="#fff" stroke="none"/></svg>
+      </div>
+      <div class="nombre-feature">Video completo</div>
+      <div class="detalle-feature">Voz + música + subtítulos</div>
+    </div>
+    <div class="feature">
+      <div class="insignia bg-magenta-oscuro">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1-5h16l1 5"/><path d="M4 9v10a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9"/><path d="M9 21V13h6v8"/></svg>
+      </div>
+      <div class="nombre-feature">Borrador en la tienda</div>
+      <div class="detalle-feature">Con video adjunto</div>
+    </div>
+  </div>
+
+  <div class="tarjeta" id="panel-progreso">
+    <div class="cabecera-progreso">
+      <h2>Armando el producto</h2>
+      <span class="etiqueta-estado en-curso" id="etiqueta-estado">Trabajando</span>
+    </div>
+    <div class="recorrido" id="recorrido"></div>
+    <div id="caja-resultado"></div>
+  </div>
+</main>
+
+<footer class="pie">
+  <img src="/assets/icono.png" alt="" style="height:14px;width:auto;">
+  Administrador Inteligente de Catálogo — Ekipon
+</footer>
+
+<script>
+// Las etiquetas de cada etapa y el mensaje EXACTO con el que orquestador.py
+// arranca cada una (ver los publicar_notificacion(...) literales del
+// modulo): mapear por prefijo en vez de inventar una barra de progreso
+// generica evita mostrar un avance que no corresponde a lo que el pipeline
+// esta haciendo de verdad.
+const ETAPAS = [
+  { nombre: 'Ficha y colador', inicio: ['Leyendo la ficha'] },
+  { nombre: 'Imágenes', inicio: ['Recortando el fondo del producto', 'Armando la galeria de fotos', 'Generando la portada del video'] },
+  { nombre: 'Guion y música (IA)', inicio: ['Redactando el guion de la voz con IA', 'Redactando el estilo de musica con IA'] },
+  { nombre: 'Video', inicio: ['Normalizando el clip de video', 'Generando la voz en off', 'Mezclando la voz con el video', 'Agregando musica de fondo', 'Quemando los subtitulos', 'Agregando la marca de agua', 'Armando el video final'] },
+  { nombre: 'Publicación', inicio: ['Publicando el borrador'] },
+];
+
+const inputRuta = document.getElementById('ruta-ficha');
+const boton = document.getElementById('boton-generar');
+const panel = document.getElementById('panel-progreso');
+const etiqueta = document.getElementById('etiqueta-estado');
+const recorrido = document.getElementById('recorrido');
+const cajaResultado = document.getElementById('caja-resultado');
+
+let elementosEtapa = [];
+let indiceEtapaActiva = 0;
+
+function construirRecorrido() {
+  recorrido.innerHTML = '';
+  elementosEtapa = ETAPAS.map((etapa) => {
+    const fila = document.createElement('div');
+    fila.className = 'etapa';
+    fila.innerHTML = `
+      <div class="riel"><div class="marcador"></div><div class="linea"></div></div>
+      <div class="cuerpo">
+        <div class="nombre">${etapa.nombre}</div>
+        <div class="detalle"></div>
+      </div>`;
+    recorrido.appendChild(fila);
+    return fila;
+  });
+  indiceEtapaActiva = 0;
+  if (elementosEtapa.length) elementosEtapa[0].classList.add('activa');
+}
+
+function indiceEtapaDe(mensaje) {
+  for (let i = 0; i < ETAPAS.length; i++) {
+    if (ETAPAS[i].inicio.some((prefijo) => mensaje.startsWith(prefijo))) return i;
+  }
+  return -1;
+}
+
+function agregarDetalle(indice, texto, clase) {
+  const detalle = elementosEtapa[indice].querySelector('.detalle');
+  const linea = document.createElement('div');
+  linea.className = 'linea-detalle' + (clase ? ' ' + clase : '');
+  linea.textContent = texto;
+  detalle.appendChild(linea);
+  linea.scrollIntoView({ block: 'nearest' });
+}
+
+function procesarMensaje(mensaje) {
+  const esMotivo = mensaje.trim().startsWith('•');
+  const esError = mensaje.startsWith('ERROR');
+  const nuevoIndice = indiceEtapaDe(mensaje);
+
+  if (nuevoIndice !== -1 && nuevoIndice !== indiceEtapaActiva) {
+    // Todas las etapas entre la anterior activa y la nueva quedan "hechas".
+    for (let i = indiceEtapaActiva; i < nuevoIndice; i++) {
+      elementosEtapa[i].classList.remove('activa');
+      elementosEtapa[i].classList.add('hecha');
+    }
+    indiceEtapaActiva = nuevoIndice;
+    elementosEtapa[indiceEtapaActiva].classList.add('activa');
+  }
+
+  if (esError) {
+    elementosEtapa[indiceEtapaActiva].classList.remove('activa');
+    elementosEtapa[indiceEtapaActiva].classList.add('atencion');
+  }
+
+  agregarDetalle(indiceEtapaActiva, mensaje, esMotivo ? 'motivo' : (esError ? 'error-texto' : null));
+}
+
+function marcarEstado(clase, texto) {
+  etiqueta.className = 'etiqueta-estado ' + clase;
+  etiqueta.textContent = texto;
+}
+
+function marcarTodoHecho() {
+  elementosEtapa.forEach((el) => {
+    if (!el.classList.contains('atencion')) {
+      el.classList.remove('activa');
+      el.classList.add('hecha');
+    }
+  });
+}
+
+function armarListaMotivos(motivos) {
+  const ul = document.createElement('ul');
+  motivos.forEach((motivo) => {
+    const li = document.createElement('li');
+    li.textContent = motivo;
+    ul.appendChild(li);
+  });
+  return ul;
+}
+
+function mostrarResultadoFinal(resultado) {
+  cajaResultado.innerHTML = '';
+  const caja = document.createElement('div');
+
+  if (resultado.estado === 'publicado') {
+    marcarTodoHecho();
+    marcarEstado('listo', '✓ Publicado');
+    caja.className = 'caja-resultado listo';
+    let html = '<strong>Listo — el borrador quedó creado con el video adjunto.</strong>';
+    caja.innerHTML = html;
+    if (resultado.url_revisar) {
+      const link = document.createElement('a');
+      link.href = resultado.url_revisar;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.className = 'boton-resultado';
+      link.textContent = 'Abrir el producto en la tienda →';
+      caja.appendChild(link);
+    } else if (resultado.producto_id) {
+      const p = document.createElement('div');
+      p.style.marginTop = '10px';
+      p.textContent = `Producto id: ${resultado.producto_id}`;
+      caja.appendChild(p);
+    }
+  } else if (resultado.estado === 'revisar') {
+    marcarEstado('revisar', '⚠ Necesita revisión');
+    caja.className = 'caja-resultado revisar';
+    const explicacion = resultado.etapa === 'categoria'
+      ? 'La categoría del producto no coincide con ninguna de la tienda. Corregí el nombre de la categoría en la ficha y volvé a intentar.'
+      : 'Hay datos por confirmar antes de seguir. Revisá la ficha con estos motivos y volvé a intentar.';
+    const intro = document.createElement('div');
+    intro.innerHTML = `<strong>${explicacion}</strong>`;
+    caja.appendChild(intro);
+    caja.appendChild(armarListaMotivos(resultado.motivos || []));
+  } else {
+    marcarEstado('error', '✕ Error');
+    caja.className = 'caja-resultado error';
+    caja.innerHTML = `<strong>Algo falló:</strong><br>${resultado.motivo || 'Error sin detalle.'}`;
+  }
+
+  cajaResultado.appendChild(caja);
+}
+
+async function generar() {
+  const rutaFicha = inputRuta.value.trim();
+  if (!rutaFicha) {
+    alert('Pegá la ruta del archivo de la ficha primero.');
+    return;
+  }
+
+  boton.disabled = true;
+  panel.style.display = 'block';
+  cajaResultado.innerHTML = '';
+  construirRecorrido();
+  marcarEstado('en-curso', 'Trabajando');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  let respuesta;
+  try {
+    respuesta = await fetch('/generar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ruta_ficha: rutaFicha }),
+    });
+  } catch (error) {
+    marcarEstado('error', '✕ Error');
+    agregarDetalle(0, 'No se pudo conectar con el servidor local: ' + error, 'error-texto');
+    boton.disabled = false;
+    return;
+  }
+
+  if (!respuesta.ok) {
+    const detalle = await respuesta.json().catch(() => ({}));
+    marcarEstado('error', '✕ Error');
+    agregarDetalle(0, detalle.detail || 'No se pudo iniciar la generación.', 'error-texto');
+    boton.disabled = false;
+    return;
+  }
+
+  const { job_id: jobId } = await respuesta.json();
+  const fuente = new EventSource(`/eventos/${jobId}`);
+
+  fuente.onmessage = (evento) => {
+    const datos = JSON.parse(evento.data);
+    if (datos.tipo === 'progreso') {
+      procesarMensaje(datos.mensaje);
+    } else if (datos.tipo === 'final') {
+      mostrarResultadoFinal(datos.resultado);
+      fuente.close();
+      boton.disabled = false;
+    }
+  };
+
+  fuente.onerror = () => {
+    if (cajaResultado.innerHTML === '') {
+      marcarEstado('error', '✕ Error');
+      agregarDetalle(indiceEtapaActiva, 'Se perdió la conexión con el servidor antes de terminar.', 'error-texto');
+      boton.disabled = false;
+    }
+    fuente.close();
+  };
+}
+
+boton.addEventListener('click', generar);
+inputRuta.addEventListener('keydown', (evento) => {
+  if (evento.key === 'Enter') generar();
+});
+</script>
+</body>
+</html>

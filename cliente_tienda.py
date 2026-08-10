@@ -50,6 +50,10 @@ _TIPOS_IMAGEN = {
     ".jpeg": "image/jpeg",
 }
 
+# Tipo de contenido para subir el video de producto (siempre mp4: es lo que
+# entrega ensamblar_video_producto.generar_a_archivo()).
+_TIPOS_VIDEO = {".mp4": "video/mp4"}
+
 
 class ErrorTienda(Exception):
     """Fallo al hablar con la tienda, con mensaje ya redactado en español."""
@@ -359,6 +363,43 @@ class ClienteTienda:
         if slug_medio:
             cuerpo_detalle["slug"] = slug_medio
         detalle = json.dumps(cuerpo_detalle, ensure_ascii=False).encode("utf-8")
+        return self._solicitar(
+            f"/wp-json/wp/v2/media/{medio['id']}",
+            datos=detalle,
+            cabeceras_extra={"Content-Type": "application/json; charset=utf-8"},
+        )
+
+    def subir_video(self, ruta_archivo: Path, product_id: int, titulo: str) -> dict:
+        """Sube el video de producto a la mediateca (wp/v2), asociado
+        DIRECTAMENTE al producto via el parametro 'post' (asi la tienda lo
+        deja adjunto al producto sin un paso aparte). Devuelve el medio.
+
+        Mismo patron que subir_imagen: IDEMPOTENTE por titulo (busca un medio
+        existente con ese titulo exacto antes de subir, para que un reintento
+        tras un fallo no duplique el video en la mediateca).
+        """
+        previos = self.obtener(f"/wp-json/wp/v2/media?search={quote(titulo)}")
+        if isinstance(previos, list):
+            for medio in previos:
+                titulo_medio = (medio.get("title") or {}).get("rendered", "")
+                if titulo_medio.strip() == titulo.strip():
+                    return medio
+
+        ruta_archivo = Path(ruta_archivo)
+        if not ruta_archivo.is_file():
+            raise ErrorTienda(f"no existe el archivo de video: {ruta_archivo}")
+        binario = ruta_archivo.read_bytes()
+        tipo = _TIPOS_VIDEO.get(ruta_archivo.suffix.lower(), "video/mp4")
+        nombre = _nombre_archivo_ascii(ruta_archivo.name)
+        medio = self._solicitar(
+            f"/wp-json/wp/v2/media?post={product_id}",
+            datos=binario,
+            cabeceras_extra={
+                "Content-Type": tipo,
+                "Content-Disposition": f'attachment; filename="{nombre}"',
+            },
+        )
+        detalle = json.dumps({"title": titulo}, ensure_ascii=False).encode("utf-8")
         return self._solicitar(
             f"/wp-json/wp/v2/media/{medio['id']}",
             datos=detalle,

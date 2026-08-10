@@ -1,2 +1,11 @@
 pydantic~=2.13.0
 Pillow~=12.3.0
+numpy
+rembg
+elevenlabs
+fastapi
+uvicorn[standard]
+anthropic
+claude-agent-sdk
+playwright
+httpx
