@@ -3,6 +3,8 @@
 .env.*
 !.env.example
 claves_pruebas.txt
+credenciales_youtube.json
+token_youtube.json
 
 # === Python ===
 __pycache__/
