@@ -160,7 +160,8 @@ def ficha_tecnica_publica(datos: dict) -> dict:
     }
 
 
-def generar_descripcion_html(datos: dict, banner: dict | None = None) -> str:
+def generar_descripcion_html(datos: dict, banner: dict | None = None,
+                             video_url_subido: str | None = None) -> str:
     """Arma el HTML de la descripcion: ficha tecnica + banner (2 columnas) +
     caracteristicas, con estilos EN LINEA.
 
@@ -168,13 +169,21 @@ def generar_descripcion_html(datos: dict, banner: dict | None = None) -> str:
     pestana Descripcion SIN depender de Elementor, ningun shortcode ni snippet.
     Asi cada producto sale completo solo: la duenia solo revisa y publica. Los
     estilos son inline a proposito: no dependen de que ningun CSS externo cargue.
-    """
+
+    `video_url_subido` (opcional): la URL REAL del video propio ya subido a
+    la mediateca (ver _adjuntar_video / publicar()) -- distinto de
+    multimedia.video_youtube (un link EXTERNO opcional que puede traer la
+    ficha). Si se pasa, se incrusta un <video> reproducible nativo en vez
+    del link de texto que se usaba para el caso YouTube. Bug real
+    encontrado 11-ago-2026: el video se subia y quedaba en meta_data
+    (ekipon_video_url), pero la descripcion nunca lo mostraba -- el video
+    quedaba "adjunto" sin estar visible en ningun lado de la pagina."""
     producto = datos.get("producto") or {}
     titulo = str(producto.get("nombre_propuesto") or "").strip()
     filas = ficha_tecnica_publica(datos)
     caracteristicas = [c.strip() for c in (datos.get("caracteristicas") or [])
                        if isinstance(c, str) and c.strip()]
-    video_url = (datos.get("multimedia") or {}).get("video_youtube") or ""
+    video_youtube = (datos.get("multimedia") or {}).get("video_youtube") or ""
 
     # Ficha tecnica (columna izquierda, arriba).
     tabla = ""
@@ -192,11 +201,18 @@ def generar_descripcion_html(datos: dict, banner: dict | None = None) -> str:
         tabla = ('<table style="width:100%;border-collapse:collapse">'
                  '<tbody>' + cuerpo + '</tbody></table>')
 
-    # Video (columna izquierda, debajo de la ficha).
+    # Video (columna izquierda, debajo de la ficha). El video propio ya
+    # subido (reproducible nativo) tiene prioridad sobre un link externo de
+    # YouTube que pudiera traer la ficha -- no tiene sentido mostrar los dos.
     video = ""
-    if isinstance(video_url, str) and video_url.strip():
+    if video_url_subido:
+        video = ('<video controls preload="metadata" style="width:100%;'
+                 'height:auto;display:block;margin-top:16px;border-radius:8px" '
+                 'src="' + html.escape(video_url_subido, quote=True)
+                 + '"></video>')
+    elif isinstance(video_youtube, str) and video_youtube.strip():
         video = ('<p style="margin-top:16px"><a href="'
-                 + html.escape(video_url.strip(), quote=True)
+                 + html.escape(video_youtube.strip(), quote=True)
                  + '" target="_blank" rel="noopener noreferrer">'
                  'Ver video del producto</a></p>')
 
@@ -679,7 +695,16 @@ def actualizar_existente(datos: dict, codigo: str, slug: str, existente: dict,
     if resultado is not None:
         resultado["producto_id"] = existente["id"]
     if ruta_video is not None:
-        _adjuntar_video(cliente, existente["id"], ruta_video, codigo)
+        medio_video = _adjuntar_video(cliente, existente["id"], ruta_video, codigo)
+        # Mismo bug/fix que en publicar(): sin esto el video queda subido
+        # pero invisible en la descripcion.
+        if medio_video.get("source_url"):
+            descripcion_con_video = generar_descripcion_html(
+                datos, banner, video_url_subido=medio_video["source_url"],
+            )
+            cliente.actualizar_borrador(
+                existente["id"], {"description": descripcion_con_video},
+            )
 
     registro.registrar_publicacion(
         codigo, existente["id"], existente.get("slug") or slug,
@@ -755,7 +780,20 @@ def publicar(datos: dict, codigo: str, slug: str, carpeta_ficha: Path,
     if resultado is not None:
         resultado["producto_id"] = producto["id"]
     if ruta_video is not None:
-        _adjuntar_video(cliente, producto["id"], ruta_video, codigo)
+        medio_video = _adjuntar_video(cliente, producto["id"], ruta_video, codigo)
+        # El video se sube DESPUES de crear el producto (necesita el
+        # product_id para asociarlo) -- la descripcion ya se armo antes,
+        # sin saber esa URL. Sin este paso el video queda "adjunto" en
+        # meta_data pero invisible en la pagina (bug real, 11-ago-2026):
+        # se regenera la descripcion con el <video> real incrustado y se
+        # actualiza el producto.
+        if medio_video.get("source_url"):
+            descripcion_con_video = generar_descripcion_html(
+                datos, banner, video_url_subido=medio_video["source_url"],
+            )
+            cliente.actualizar_borrador(
+                producto["id"], {"description": descripcion_con_video},
+            )
 
     registro.registrar_publicacion(
         codigo, producto["id"], slug, "borrador_creado", ruta_db

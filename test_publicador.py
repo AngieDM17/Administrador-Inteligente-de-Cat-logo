@@ -911,11 +911,26 @@ class PruebasResultadoYVideo(unittest.TestCase):
         self.assertEqual(product_id, 9001)
         self.assertEqual(titulo, "4212-video")
         # La asociacion via meta_data llega como una actualizacion aparte.
+        actualizaciones_9001 = [
+            payload for (pid, payload) in cliente.actualizaciones if pid == 9001
+        ]
         metas_de_video = [
-            m for (pid, payload) in cliente.actualizaciones if pid == 9001
-            for m in payload["meta_data"] if m["key"] == "ekipon_video_id"
+            m for payload in actualizaciones_9001
+            for m in payload.get("meta_data", []) if m["key"] == "ekipon_video_id"
         ]
         self.assertEqual(len(metas_de_video), 1)
+        # Bug real del 11-ago-2026: el video se subia pero la descripcion
+        # nunca lo mostraba (quedaba "adjunto" e invisible). Ahora una
+        # SEGUNDA actualizacion trae la descripcion regenerada con el
+        # <video> real incrustado (la URL que devuelve el subir_video falso
+        # de arriba, no un link de YouTube).
+        descripciones_con_video = [
+            payload["description"] for payload in actualizaciones_9001
+            if "description" in payload
+            and "<video" in payload["description"]
+            and "https://pruebas.ekipon.co/media/4212-video.mp4" in payload["description"]
+        ]
+        self.assertEqual(len(descripciones_con_video), 1)
 
     def test_sin_ruta_video_no_sube_nada(self):
         slug = generar_slug("4212", FICHA_4212["producto"]["nombre_propuesto"])
