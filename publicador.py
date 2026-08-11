@@ -185,21 +185,30 @@ def generar_descripcion_html(datos: dict, banner: dict | None = None,
                        if isinstance(c, str) and c.strip()]
     video_youtube = (datos.get("multimedia") or {}).get("video_youtube") or ""
 
-    # Ficha tecnica (columna izquierda, arriba).
+    # Ficha tecnica (columna izquierda, arriba). Cada fila lleva la clase
+    # ekipon-fila-dato: la regla CSS de mas abajo (tr:has(td:empty)) hace
+    # que, si Angie entra a editar el HTML y borra el VALOR de una celda
+    # (dejando el <td> vacio), la fila entera se oculte sola en vez de
+    # quedar con el titulo pegado y nada al lado -- pedido explicito de
+    # Angie (11-ago-2026) tras ver un dato dudoso en un borrador real.
     tabla = ""
     if filas:
         cuerpo = ""
         for clave, valor in filas.items():
             cuerpo += (
-                '<tr><th style="text-align:left;padding:8px 12px;border-bottom:'
-                '1px solid rgba(0,0,0,.08);width:40%;white-space:nowrap;'
-                'vertical-align:top">' + html.escape(str(clave)) + '</th>'
+                '<tr class="ekipon-fila-dato"><th style="text-align:left;'
+                'padding:8px 12px;border-bottom:1px solid rgba(0,0,0,.08);'
+                'width:40%;white-space:nowrap;vertical-align:top">'
+                + html.escape(str(clave)) + '</th>'
                 '<td style="padding:8px 12px;border-bottom:1px solid '
                 'rgba(0,0,0,.08);vertical-align:top">'
                 + html.escape(str(valor)) + '</td></tr>'
             )
-        tabla = ('<table style="width:100%;border-collapse:collapse">'
-                 '<tbody>' + cuerpo + '</tbody></table>')
+        tabla = (
+            '<style>tr.ekipon-fila-dato:has(td:empty){display:none}</style>'
+            '<table style="width:100%;border-collapse:collapse">'
+            '<tbody>' + cuerpo + '</tbody></table>'
+        )
 
     # Video (columna izquierda, debajo de la ficha). El video propio ya
     # subido (reproducible nativo) tiene prioridad sobre un link externo de
