@@ -41,6 +41,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 import agente_investigador
+import navegador_alibaba
 from orquestador import ejecutar_pipeline
 
 CARPETA_PROYECTO = Path(__file__).parent
@@ -68,12 +69,20 @@ class _Job:
     proposito: permite que la pagina reabra /eventos/{job_id} — por ejemplo
     tras recargar la pestaña — y reciba TODO el progreso ya emitido antes de
     seguir en vivo, en vez de quedarse esperando para siempre un mensaje que
-    ya paso."""
+    ya paso.
+
+    `evento_continuar` (Fase 2b, Alibaba): un solo Event por job. La tool de
+    Alibaba (navegador_alibaba.SesionAlibaba, ver ese modulo) lo espera de
+    forma bloqueante tras la primera navegacion de la corrida; el endpoint
+    POST /continuar/{job_id} de aca abajo es quien lo despierta cuando Angie
+    confirma desde la pagina. Un link no-Alibaba nunca lo toca -- no hay
+    problema en crearlo igual para todo job, aunque no siempre se use."""
 
     def __init__(self) -> None:
         self.mensajes: list[dict] = []
         self.terminado = False
         self.lock = threading.Lock()
+        self.evento_continuar = threading.Event()
 
     def agregar(self, item: dict) -> None:
         with self.lock:
@@ -116,13 +125,24 @@ def _correr_pipeline(job_id: str, entrada: str) -> None:
     job = _JOBS[job_id]
 
     def notificar(mensaje: str) -> None:
-        job.agregar({"tipo": "progreso", "mensaje": mensaje})
+        # La tool de Alibaba (navegador_alibaba.SesionAlibaba) publica un
+        # mensaje con este prefijo la primera vez que abre pagina en la
+        # corrida, y despues se queda esperando bloqueada en
+        # job.evento_continuar -- este evento SSE distinto ("necesita_
+        # confirmacion", no "progreso") es lo que le permite a la pagina
+        # mostrar el estado especial con el boton "Continuar" en vez de
+        # tratarlo como una linea de progreso mas.
+        if mensaje.startswith(navegador_alibaba.PREFIJO_ESPERANDO_CONFIRMACION):
+            job.agregar({"tipo": "necesita_confirmacion", "mensaje": mensaje})
+        else:
+            job.agregar({"tipo": "progreso", "mensaje": mensaje})
 
     try:
         if agente_investigador.es_url(entrada):
             carpeta_destino = CARPETA_INVESTIGACIONES / job_id
             resultado_investigacion = agente_investigador.investigar_producto(
                 entrada, carpeta_destino, notificar,
+                evento_continuar=job.evento_continuar,
             )
             if resultado_investigacion["estado"] != "ficha_lista":
                 # Mismo formato de resultado que ejecutar_pipeline(): la
@@ -192,6 +212,21 @@ def generar(peticion: PeticionGenerar) -> dict:
     )
     hilo.start()
     return {"job_id": job_id}
+
+
+@app.post("/continuar/{job_id}")
+def continuar(job_id: str) -> dict:
+    """Fase 2b (Alibaba): Angie llama esto (boton 'Ya resolvi, continuar' en
+    la pagina) despues de iniciar sesion o resolver lo que haga falta en la
+    ventana de Chrome que abrio navegador_alibaba.SesionAlibaba. Solo
+    despierta el Event -- la propia tool, bloqueada en
+    evento_continuar.wait() (ver _asegurar_pagina en navegador_alibaba.py),
+    es quien retoma la investigacion desde ahi."""
+    job = _JOBS.get(job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail="job_id desconocido")
+    job.evento_continuar.set()
+    return {"ok": True}
 
 
 @app.get("/eventos/{job_id}")

@@ -356,6 +356,56 @@
   .etiqueta-estado.revisar { background: var(--ambar-suave); color: var(--ambar); }
   .etiqueta-estado.error { background: var(--rojo-suave); color: var(--rojo); }
   .etiqueta-estado.en-curso { background: var(--naranja-suave); color: var(--naranja); }
+  .etiqueta-estado.espera { background: var(--turquesa-suave); color: var(--turquesa); }
+
+  /* ---------- Aviso "necesita confirmacion" (Fase 2b, Alibaba) ---------- */
+  #caja-confirmacion {
+    display: none;
+    align-items: flex-start;
+    gap: 14px;
+    background: var(--turquesa-suave);
+    border: 1.5px solid var(--turquesa);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin: 4px 0 20px;
+  }
+  #caja-confirmacion svg {
+    width: 22px;
+    height: 22px;
+    color: var(--turquesa);
+    flex-shrink: 0;
+    margin-top: 2px;
+    animation: pulso 1.4s ease-in-out infinite;
+  }
+  #caja-confirmacion .texto-confirmacion {
+    flex: 1;
+    font-size: .88rem;
+    line-height: 1.55;
+    color: var(--oscuro);
+  }
+  #caja-confirmacion .texto-confirmacion strong { display: block; margin-bottom: 4px; }
+  button#boton-continuar {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--turquesa);
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    font-family: "Montserrat", sans-serif;
+    font-size: .86rem;
+    font-weight: 700;
+    border-radius: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    margin-top: 10px;
+    transition: transform .12s ease, background .12s ease;
+  }
+  button#boton-continuar:hover:not(:disabled) { transform: translateY(-1px); }
+  button#boton-continuar:disabled {
+    background: #B8B0A8;
+    cursor: not-allowed;
+  }
 
   /* Recorrido por etapas (stepper) */
   .recorrido { margin: 0 0 6px; }
@@ -640,6 +690,17 @@
       <span class="etiqueta-estado en-curso" id="etiqueta-estado">Trabajando</span>
     </div>
     <div class="recorrido" id="recorrido"></div>
+
+    <div id="caja-confirmacion">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l2.5 2.5"/></svg>
+      <div class="texto-confirmacion">
+        <strong>Se abrió una ventana de Chrome — necesita que hagas algo ahí.</strong>
+        <span id="mensaje-confirmacion"></span>
+        <br>
+        <button id="boton-continuar">Ya resolví, continuar</button>
+      </div>
+    </div>
+
     <div id="caja-resultado"></div>
   </div>
 </main>
@@ -669,6 +730,16 @@ const panel = document.getElementById('panel-progreso');
 const etiqueta = document.getElementById('etiqueta-estado');
 const recorrido = document.getElementById('recorrido');
 const cajaResultado = document.getElementById('caja-resultado');
+const cajaConfirmacion = document.getElementById('caja-confirmacion');
+const mensajeConfirmacion = document.getElementById('mensaje-confirmacion');
+const botonContinuar = document.getElementById('boton-continuar');
+
+// El mismo prefijo literal que navegador_alibaba.PREFIJO_ESPERANDO_CONFIRMACION
+// en Python -- app.py lo traduce a un evento SSE de tipo
+// "necesita_confirmacion" (ver notificar() en _correr_pipeline), asi que
+// esta constante ya no hace falta compararla aca, pero se deja documentado
+// el mensaje que trae para poder recortar el prefijo al mostrarlo.
+const PREFIJO_ESPERANDO_CONFIRMACION = 'ESPERANDO CONFIRMACION:';
 
 let elementosEtapa = [];
 let indiceEtapaActiva = 0;
@@ -733,6 +804,24 @@ function procesarMensaje(mensaje) {
 function marcarEstado(clase, texto) {
   etiqueta.className = 'etiqueta-estado ' + clase;
   etiqueta.textContent = texto;
+}
+
+function mostrarConfirmacionPendiente(mensaje) {
+  // Recorta el prefijo literal (uso interno para que app.py distinga este
+  // mensaje de uno de progreso normal) -- Angie solo necesita ver el texto
+  // que sigue.
+  const texto = mensaje.startsWith(PREFIJO_ESPERANDO_CONFIRMACION)
+    ? mensaje.slice(PREFIJO_ESPERANDO_CONFIRMACION.length).trim()
+    : mensaje;
+  mensajeConfirmacion.textContent = texto;
+  cajaConfirmacion.style.display = 'flex';
+  botonContinuar.disabled = false;
+  botonContinuar.textContent = 'Ya resolví, continuar';
+  marcarEstado('espera', 'Esperando en Chrome');
+}
+
+function ocultarConfirmacionPendiente() {
+  cajaConfirmacion.style.display = 'none';
 }
 
 function marcarTodoHecho() {
@@ -807,6 +896,7 @@ async function generar() {
   boton.disabled = true;
   panel.style.display = 'block';
   cajaResultado.innerHTML = '';
+  ocultarConfirmacionPendiente();
   construirRecorrido();
   marcarEstado('en-curso', 'Trabajando');
   panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -836,11 +926,34 @@ async function generar() {
   const { job_id: jobId } = await respuesta.json();
   const fuente = new EventSource(`/eventos/${jobId}`);
 
+  // Alibaba (Fase 2b): mientras el boton este visible, un solo clic basta
+  // -- se deshabilita de entrada para que un doble clic no dispare dos
+  // POST /continuar de mas (inofensivo del lado del servidor, set() dos
+  // veces no rompe nada, pero no hace falta permitirlo).
+  botonContinuar.onclick = async () => {
+    botonContinuar.disabled = true;
+    botonContinuar.textContent = 'Avisando...';
+    try {
+      await fetch(`/continuar/${jobId}`, { method: 'POST' });
+    } catch (error) {
+      botonContinuar.disabled = false;
+      botonContinuar.textContent = 'Ya resolví, continuar';
+      return;
+    }
+    mensajeConfirmacion.textContent = 'Listo, avisado — retomando la investigación...';
+    botonContinuar.style.display = 'none';
+    marcarEstado('en-curso', 'Trabajando');
+  };
+
   fuente.onmessage = (evento) => {
     const datos = JSON.parse(evento.data);
     if (datos.tipo === 'progreso') {
       procesarMensaje(datos.mensaje);
+    } else if (datos.tipo === 'necesita_confirmacion') {
+      botonContinuar.style.display = 'inline-flex';
+      mostrarConfirmacionPendiente(datos.mensaje);
     } else if (datos.tipo === 'final') {
+      ocultarConfirmacionPendiente();
       mostrarResultadoFinal(datos.resultado);
       fuente.close();
       boton.disabled = false;

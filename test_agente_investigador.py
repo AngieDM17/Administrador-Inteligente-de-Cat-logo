@@ -13,12 +13,15 @@ instalado y con sesion iniciada). Se prueba SOLO la logica pura:
 - _mensaje_claro_para_error_sdk: traduccion de excepciones crudas del SDK/
   CLI a mensajes en espanol accionables.
 - _slug_codigo: saneamiento del codigo de proveedor para nombre de archivo.
-- investigar_producto: rechazo temprano de Alibaba SIN tocar la red ni
-  importar claude_agent_sdk, y traduccion de errores del SDK/CLI cuando
-  _correr_agente revienta (simulado con mocks, nunca con la API real).
+- investigar_producto: Alibaba/1688/AliExpress (Fase 2b, 10-ago-2026) YA NO
+  se rechaza antes de tocar el SDK -- se verifica que el link SI llega a
+  _correr_agente (simulado con mocks, nunca con la API real) y que el
+  `evento_continuar` recibido viaja intacto hasta ahi; y traduccion de
+  errores del SDK/CLI cuando _correr_agente revienta.
 """
 
 import tempfile
+import threading
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -165,29 +168,61 @@ class PruebasSlugCodigo(unittest.TestCase):
         )
 
 
-class PruebasInvestigarProductoRechazoTemprano(unittest.TestCase):
-    """El unico caso que se decide ANTES de tocar el SDK/la red: link de
-    Alibaba (Fase 2a no lo soporta). Ya NO hace falta clave de API para
-    llegar a correr el agente -- eso se verifica parcheando _correr_agente
-    para que reviente si llega a invocarse en el caso Alibaba."""
+class PruebasInvestigarProductoAlibabaYaNoSeRechaza(unittest.TestCase):
+    """Fase 2b (10-ago-2026): al contrario de la Fase 2a original, un link
+    de Alibaba/1688/AliExpress YA NO se rechaza antes de tocar el SDK --
+    investigar_producto tiene que LLEGAR a invocar _correr_agente para ese
+    link (navegador_alibaba.SesionAlibaba vive puertas adentro de
+    _correr_agente, no se prueba aca con un browser real, ver
+    test_navegador_alibaba.py) y pasarle intacto el `evento_continuar` que
+    hace posible la pausa de login/CAPTCHA."""
 
-    def setUp(self):
-        parche = mock.patch.object(
-            ai, "_correr_agente",
-            side_effect=AssertionError("no deberia llegar a correr el agente"),
-        )
-        parche.start()
-        self.addCleanup(parche.stop)
+    def test_link_alibaba_llega_a_correr_agente_con_el_evento_continuar(self):
+        evento = threading.Event()
+        llamada = {}
 
-    def test_link_alibaba_se_rechaza_sin_tocar_la_red(self):
-        mensajes = []
-        resultado = ai.investigar_producto(
-            "https://www.alibaba.com/product-detail/x.html",
-            Path("carpeta_no_usada"), mensajes.append,
+        async def _correr_agente_falso(link, carpeta_destino,
+                                        publicar_notificacion, evento_continuar):
+            llamada["link"] = link
+            llamada["evento_continuar"] = evento_continuar
+            return None  # simula "el agente no devolvio ficha estructurada"
+
+        with mock.patch.object(ai, "_correr_agente", side_effect=_correr_agente_falso):
+            with tempfile.TemporaryDirectory() as carpeta:
+                mensajes = []
+                resultado = ai.investigar_producto(
+                    "https://www.alibaba.com/product-detail/x.html",
+                    Path(carpeta), mensajes.append, evento_continuar=evento,
+                )
+
+        self.assertEqual(
+            llamada.get("link"), "https://www.alibaba.com/product-detail/x.html",
         )
+        self.assertIs(llamada.get("evento_continuar"), evento)
+        # No es el mensaje viejo de rechazo temprano ("Alibaba..."): la
+        # investigacion SI corrio, y esto es lo que pasa cuando el agente
+        # (falso, en este test) no devuelve una ficha.
         self.assertEqual(resultado["estado"], "error")
-        self.assertIn("Alibaba", resultado["motivo"])
-        self.assertTrue(any("Alibaba" in m for m in mensajes))
+        self.assertIn("no devolvio una ficha estructurada", resultado["motivo"])
+
+    def test_sin_evento_continuar_se_crea_uno_propio_y_no_revienta(self):
+        # Quien llama sin pensar en Alibaba (ej. un test, o un uso futuro
+        # que no lo necesite) no esta obligado a pasar evento_continuar.
+        llamada = {}
+
+        async def _correr_agente_falso(link, carpeta_destino,
+                                        publicar_notificacion, evento_continuar):
+            llamada["evento_continuar"] = evento_continuar
+            return None
+
+        with mock.patch.object(ai, "_correr_agente", side_effect=_correr_agente_falso):
+            with tempfile.TemporaryDirectory() as carpeta:
+                ai.investigar_producto(
+                    "https://www.alibaba.com/product-detail/x.html",
+                    Path(carpeta), lambda m: None,
+                )
+
+        self.assertIsInstance(llamada.get("evento_continuar"), threading.Event)
 
 
 class PruebasInvestigarProductoTraduceErroresDelSdk(unittest.TestCase):

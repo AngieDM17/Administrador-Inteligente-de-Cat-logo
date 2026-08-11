@@ -25,6 +25,11 @@ _productos_nuevos/
 # por producto, regenerable corriendo investigar_producto() de nuevo.
 investigaciones/
 
+# Perfil propio y persistente de Playwright para Alibaba (Fase 2b): trae
+# cookies reales de la cuenta de Angie -- nunca se commitea. Separado de su
+# Chrome real, ver navegador_alibaba.py.
+navegador_perfil_alibaba/
+
 # Estado local
 *.db
 

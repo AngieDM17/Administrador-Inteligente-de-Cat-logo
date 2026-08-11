@@ -7,13 +7,10 @@ producto con tools de navegador propias (`herramientas_navegador.py`) y
 devuelve una ficha v1.4 valida contra `esquema_ficha.FichaEkipon`, lista para
 que `orquestador.ejecutar_pipeline()` la consuma tal cual.
 
-Fase 2a = SOLO links NO-Alibaba (extraccion web directa, "sin trabas": sin
-sesion logueada, sin CAPTCHA). Alibaba es Fase 2b: perfil propio y
-persistente de Playwright + pausa real de CAPTCHA via SSE -- QUEDA DISEÑADA
-en el plan, NO IMPLEMENTADA aca. `investigar_producto()` detecta un link de
-Alibaba y lo rechaza con un motivo claro en vez de intentarlo a ciegas (la
-extraccion automatica de Alibaba esta bloqueada de fabrica, ver
-reglas_negocio.md regla 5).
+Fase 2a = links NO-Alibaba (extraccion web directa, "sin trabas": sin
+sesion logueada, sin CAPTCHA). Fase 2b (10-ago-2026, ver mas abajo) suma
+Alibaba, con una ventana de Chrome VISIBLE y una pausa real para que Angie
+resuelva login/CAPTCHA a mano.
 
 Modelo del agente: ver MODELO_AGENTE mas abajo -- el de mejor razonamiento/
 vision disponible, a proposito NO el economico de redactor_ia.py
@@ -68,6 +65,26 @@ deliberadamente FUERA de alcance (zona gris de terminos de servicio): un
 embed se anota en `multimedia.video_nota` para que Angie lo revise a mano,
 nunca se descarga.
 
+--- Alibaba / Fase 2b (10-ago-2026) ---
+
+Ya NO se rechaza un link de Alibaba/1688/AliExpress. `_correr_agente`
+detecta `es_alibaba(link)` y arma el MISMO set de 5 tools (mismos nombres,
+mismo esquema -- el modelo no necesita saber la diferencia) sobre una
+instancia de `navegador_alibaba.SesionAlibaba` en vez de las funciones
+stateless de `herramientas_navegador.py`. Esa sesion abre una ventana de
+Chromium VISIBLE (perfil propio y persistente en `navegador_perfil_alibaba/`,
+gitignored -- nunca el Chrome real de Angie) y se detiene en la PRIMERA
+pagina que abre en la corrida para que Angie resuelva a mano el login o el
+CAPTCHA -- sin heuristica de deteccion, pausa siempre, una vez por corrida
+(ver navegador_alibaba.py para el detalle completo del mecanismo).
+
+El `threading.Event` que hace posible esa pausa/reanudacion vive en `app.py`
+(uno por job, `_Job.evento_continuar`) y viaja hacia aca por el parametro
+nuevo `evento_continuar` de `investigar_producto()` -- si no se pasa (ej.
+tests, o quien llame sin necesitar Alibaba), se crea uno propio que nunca
+se setea desde afuera; eso no afecta a un link no-Alibaba porque solo la
+tool de Alibaba llega a esperarlo.
+
 --- Verificacion ---
 
 NO se prueba con la API real en unit tests (corrida real que gastaria cupo
@@ -77,7 +94,9 @@ solo la logica pura -- deteccion link-vs-ruta-de-archivo, deteccion de
 dominio Alibaba, armado del system_prompt (incluye el contenido real de
 SKILL.md leido del disco) y la traduccion de errores del SDK/CLI a mensajes
 en espanol. Se verifica a mano/CLI con un link real de una fuente
-no-Alibaba.
+no-Alibaba. La ventana visible de Alibaba (Fase 2b) se prueba a mano, con
+Angie presente frente a su computador -- no hay forma de probarla de punta
+a punta en este entorno (ver navegador_alibaba.py y test_navegador_alibaba.py).
 """
 
 from __future__ import annotations
@@ -85,6 +104,7 @@ from __future__ import annotations
 import asyncio
 import json
 import re
+import threading
 from pathlib import Path
 from typing import Callable
 
@@ -229,6 +249,15 @@ exactas segun lo que devuelva `extraer_video`:
 - `null` (no hay ningun video, el caso mas comun): seguis reportandolo en
   `video_nota` tal como ya haces, sin inventar nada.
 
+Si el link es de Alibaba/1688/AliExpress (novedad Fase 2b): las mismas 5
+herramientas siguen funcionando igual, pero por debajo abren una ventana de
+Chrome VISIBLE con sesion persistente. La PRIMERA llamada a `navegar` en una
+corrida de Alibaba puede demorar varios MINUTOS -- esta esperando que Angie
+resuelva a mano el login o un CAPTCHA desde esa ventana. Esto es NORMAL, no
+es un error ni un timeout ni algo que reintentar o abortar: segui esperando
+esa misma llamada, y cuando Angie confirme vas a recibir el texto de la
+pagina como con cualquier otra fuente y seguis investigando igual.
+
 Tres campos de `producto` tienen un FORMATO LITERAL fijo que el validador
 del contrato v1.4 (esquema_ficha.py) exige exacto -- si no calzan asi, la
 ficha entera se rechaza y no se guarda (verificado 10-ago-2026: una primera
@@ -295,15 +324,34 @@ def _slug_codigo(ficha: dict) -> str:
 
 
 async def _correr_agente(link: str, carpeta_destino: Path,
-                          publicar_notificacion: Notificador) -> dict | None:
+                          publicar_notificacion: Notificador,
+                          evento_continuar: threading.Event) -> dict | None:
     """Corre claude_agent_sdk.query() con las tools de navegador propias y
     el output_format del contrato v1.4. Import diferido de
     claude_agent_sdk/herramientas_navegador: asi quien solo usa el camino
     de Fase 1 (ficha ya investigada, sin agente) no paga el costo de
-    importarlos, y si faltan, el error queda acotado a este agente."""
+    importarlos, y si faltan, el error queda acotado a este agente.
+
+    Si `es_alibaba(link)`, las 5 tools se arman sobre una instancia de
+    `navegador_alibaba.SesionAlibaba` (ventana visible, pausa de
+    login/CAPTCHA) en vez de las funciones stateless de
+    `herramientas_navegador.py` -- mismos nombres de tool, misma firma:
+    `fuente` es indistintamente el modulo o la sesion, el resto del codigo
+    de abajo no necesita saber cual de los dos es."""
     from claude_agent_sdk import ClaudeAgentOptions, create_sdk_mcp_server, query, tool
 
     import herramientas_navegador as nav
+
+    sesion_alibaba = None
+    if es_alibaba(link):
+        import navegador_alibaba
+
+        sesion_alibaba = navegador_alibaba.SesionAlibaba(
+            publicar_notificacion, evento_continuar,
+        )
+        fuente = sesion_alibaba
+    else:
+        fuente = nav
 
     @tool(
         "navegar",
@@ -313,7 +361,7 @@ async def _correr_agente(link: str, carpeta_destino: Path,
     )
     async def _tool_navegar(args: dict) -> dict:
         try:
-            texto = await asyncio.to_thread(nav.navegar, args["url"])
+            texto = await asyncio.to_thread(fuente.navegar, args["url"])
         except nav.ErrorRecurso as error:
             return {
                 "content": [{"type": "text", "text": f"ERROR: {error}"}],
@@ -329,7 +377,7 @@ async def _correr_agente(link: str, carpeta_destino: Path,
     )
     async def _tool_extraer_imagenes(args: dict) -> dict:
         try:
-            urls = await asyncio.to_thread(nav.extraer_imagenes, args["url"])
+            urls = await asyncio.to_thread(fuente.extraer_imagenes, args["url"])
         except nav.ErrorRecurso as error:
             return {
                 "content": [{"type": "text", "text": f"ERROR: {error}"}],
@@ -355,7 +403,7 @@ async def _correr_agente(link: str, carpeta_destino: Path,
             }
         destino = carpeta_destino / nombre
         try:
-            await asyncio.to_thread(nav.descargar_imagen, args["url_imagen"], destino)
+            await asyncio.to_thread(fuente.descargar_imagen, args["url_imagen"], destino)
         except nav.ErrorRecurso as error:
             return {
                 "content": [{"type": "text", "text": f"ERROR: {error}"}],
@@ -373,7 +421,7 @@ async def _correr_agente(link: str, carpeta_destino: Path,
     )
     async def _tool_extraer_video(args: dict) -> dict:
         try:
-            resultado = await asyncio.to_thread(nav.extraer_video, args["url"])
+            resultado = await asyncio.to_thread(fuente.extraer_video, args["url"])
         except nav.ErrorRecurso as error:
             return {
                 "content": [{"type": "text", "text": f"ERROR: {error}"}],
@@ -407,7 +455,7 @@ async def _correr_agente(link: str, carpeta_destino: Path,
             }
         destino = carpeta_destino / nombre
         try:
-            await asyncio.to_thread(nav.descargar_video, args["url_video"], destino)
+            await asyncio.to_thread(fuente.descargar_video, args["url_video"], destino)
         except nav.ErrorRecurso as error:
             return {
                 "content": [{"type": "text", "text": f"ERROR: {error}"}],
@@ -482,43 +530,53 @@ async def _correr_agente(link: str, carpeta_destino: Path,
     ultimo_mensaje_error: str | None = None
     llego_resultado = False
 
-    # Verificado en esta sesion: claude_agent_sdk (0.2.134, todavia en 0.x)
-    # a veces emite, DESPUES de un ResultMessage real y exitoso, un mensaje
-    # de control espurio {"type": "error", "error": "success"} durante el
-    # cierre del stream -- query.py lo traduce a una excepcion generica que,
-    # sin este manejo, tira a la basura una investigacion que en realidad
-    # SI termino bien (y ya gasto el consumo real de la API). Por eso: (1)
-    # se corta el loop apenas llega el ResultMessage real, en vez de seguir
-    # consumiendo el generador de mas; (2) si igual algo revienta DESPUES de
-    # tener ya un resultado, se ignora ese error espurio -- solo se relanza
-    # si la excepcion llego ANTES de ver un ResultMessage real.
     try:
-        async for mensaje in query(
-            prompt=(
-                "Investiga este producto siguiendo el SKILL.md y el apendice de "
-                "arriba, y arma su ficha v1.4 completa. Camino A (con link): "
-                "extrae directo de la fuente. Link del producto:\n\n"
-                f"{link}\n\n"
-                "Guarda este mismo link en entrada_original.link_producto."
-            ),
-            options=opciones,
-        ):
-            tipo = type(mensaje).__name__
-            if tipo == "ResultMessage":
-                llego_resultado = True
-                resultado_estructurado = getattr(mensaje, "structured_output", None)
-                if getattr(mensaje, "is_error", False):
-                    ultimo_mensaje_error = str(
-                        getattr(mensaje, "result", None) or "sin detalle"
-                    )
-                break
-    except Exception as error:
-        if not llego_resultado:
-            raise
-        publicar_notificacion(
-            f"(aviso interno, sin impacto: el SDK cerro con un mensaje "
-            f"espurio despues del resultado real: {error})"
-        )
+        # Verificado en esta sesion: claude_agent_sdk (0.2.134, todavia en
+        # 0.x) a veces emite, DESPUES de un ResultMessage real y exitoso,
+        # un mensaje de control espurio {"type": "error", "error":
+        # "success"} durante el cierre del stream -- query.py lo traduce a
+        # una excepcion generica que, sin este manejo, tira a la basura una
+        # investigacion que en realidad SI termino bien (y ya gasto el
+        # consumo real de la API). Por eso: (1) se corta el loop apenas
+        # llega el ResultMessage real, en vez de seguir consumiendo el
+        # generador de mas; (2) si igual algo revienta DESPUES de tener ya
+        # un resultado, se ignora ese error espurio -- solo se relanza si
+        # la excepcion llego ANTES de ver un ResultMessage real.
+        try:
+            async for mensaje in query(
+                prompt=(
+                    "Investiga este producto siguiendo el SKILL.md y el apendice de "
+                    "arriba, y arma su ficha v1.4 completa. Camino A (con link): "
+                    "extrae directo de la fuente. Link del producto:\n\n"
+                    f"{link}\n\n"
+                    "Guarda este mismo link en entrada_original.link_producto."
+                ),
+                options=opciones,
+            ):
+                tipo = type(mensaje).__name__
+                if tipo == "ResultMessage":
+                    llego_resultado = True
+                    resultado_estructurado = getattr(mensaje, "structured_output", None)
+                    if getattr(mensaje, "is_error", False):
+                        ultimo_mensaje_error = str(
+                            getattr(mensaje, "result", None) or "sin detalle"
+                        )
+                    break
+        except Exception as error:
+            if not llego_resultado:
+                raise
+            publicar_notificacion(
+                f"(aviso interno, sin impacto: el SDK cerro con un mensaje "
+                f"espurio despues del resultado real: {error})"
+            )
+    finally:
+        # La sesion de Alibaba (ventana visible + perfil persistente) se
+        # cierra siempre al terminar esta corrida -- exito, error, o
+        # excepcion -- para no dejar un Chromium huerfano abierto. El
+        # user_data_dir en disco NO se borra: las cookies quedan para la
+        # proxima corrida (ver navegador_alibaba.SesionAlibaba.cerrar).
+        if sesion_alibaba is not None:
+            await asyncio.to_thread(sesion_alibaba.cerrar)
 
     if ultimo_mensaje_error is not None:
         raise ErrorInvestigacion(
@@ -528,7 +586,8 @@ async def _correr_agente(link: str, carpeta_destino: Path,
 
 
 def investigar_producto(link: str, carpeta_destino: Path,
-                         publicar_notificacion: Notificador) -> dict:
+                         publicar_notificacion: Notificador,
+                         evento_continuar: threading.Event | None = None) -> dict:
     """Punto de entrada sincrono (mismo criterio que el resto del pipeline:
     orquestador.py y sus pasos son funciones sincronas, llamadas desde el
     hilo de fondo de app.py -- ver _correr_pipeline). Investiga `link` con
@@ -536,37 +595,38 @@ def investigar_producto(link: str, carpeta_destino: Path,
     valido guarda la ficha (+ las fotos reales que el agente haya
     descargado) en `carpeta_destino`.
 
+    `evento_continuar` es el `threading.Event` que hace posible la pausa de
+    login/CAPTCHA de Alibaba (Fase 2b, ver navegador_alibaba.py): quien
+    llama con Alibaba en mente (app.py, uno por job en `_Job.evento_continuar`)
+    lo pasa para que la tool de Alibaba pueda esperarlo y quien lo controla
+    desde afuera (el endpoint POST /continuar/{job_id}) pueda despertarla.
+    Si no se pasa (ej. tests, o un link no-Alibaba que nunca llega a
+    necesitarlo), se crea uno propio que nunca se setea desde afuera -- no
+    hay problema, porque solo la tool de Alibaba llega a esperarlo.
+
     Devuelve SIEMPRE uno de estos dos dicts, nunca lanza:
 
       {"estado": "ficha_lista", "ruta_ficha": Path}  -> exito
-      {"estado": "error", "motivo": str}               -> fallo (Alibaba,
-                                                           SDK/CLI ausente o
-                                                           sin sesion
-                                                           iniciada, ficha
-                                                           invalida, error
-                                                           real del agente)
+      {"estado": "error", "motivo": str}               -> fallo (SDK/CLI
+                                                           ausente o sin
+                                                           sesion iniciada,
+                                                           ficha invalida,
+                                                           error real del
+                                                           agente)
 
     Quien llama (app.py) decide que hacer con 'ficha_lista': encadenar hacia
     orquestador.ejecutar_pipeline(ruta_ficha, ...)."""
     link = link.strip()
     carpeta_destino = Path(carpeta_destino)
 
-    if es_alibaba(link):
-        motivo = (
-            "Este link es de Alibaba: la Fase 2a de este agente todavia no "
-            "lo soporta (Alibaba exige sesion logueada y resolver un "
-            "CAPTCHA a mano -- eso es la Fase 2b, disenada pero no "
-            "construida todavia). Investiga este producto a mano, como "
-            "hoy."
-        )
-        publicar_notificacion(motivo)
-        return {"estado": "error", "motivo": motivo}
+    if evento_continuar is None:
+        evento_continuar = threading.Event()
 
     carpeta_destino.mkdir(parents=True, exist_ok=True)
 
     try:
         ficha = asyncio.run(
-            _correr_agente(link, carpeta_destino, publicar_notificacion)
+            _correr_agente(link, carpeta_destino, publicar_notificacion, evento_continuar)
         )
     except ErrorInvestigacion as error:
         publicar_notificacion(f"ERROR: {error}")
