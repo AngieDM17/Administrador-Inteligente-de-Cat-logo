@@ -235,7 +235,8 @@ def generar_descripcion_html(datos: dict, banner: dict | None = None) -> str:
 
 
 def construir_payload(datos: dict, codigo: str, slug: str, categoria_id,
-                      imagenes: list, banner: dict | None = None) -> dict:
+                      imagenes: list, banner: dict | None = None,
+                      motivos_revision: list[str] | None = None) -> dict:
     """Arma el payload de creacion del producto WooCommerce.
 
     Es una funcion pura: recibe la ficha (dict crudo), el id de categoria ya
@@ -243,7 +244,14 @@ def construir_payload(datos: dict, codigo: str, slug: str, categoria_id,
     un simulacro) y el banner opcional ({"id", "url", "alt"}). No define sku:
     lo asigna WooCommerce (regla fija). Los metadatos van con prefijo ekipon_
     para alimentar las plantillas dinamicas de Elementor.
-    """
+
+    `motivos_revision` (opcional, aditivo): los motivos que el colador de
+    calidad (revisor_publicacion.py) hubiera dado para REVISAR esta ficha.
+    Desde el 11-ago-2026 el colador ya NO frena la publicacion (decision de
+    Angie: prefiere revisar el borrador ya armado en la tienda antes que una
+    lista de texto previa) -- pero esos motivos NO se descartan: quedan en
+    `ekipon_pendiente_revision` (meta_data, no en `description`: es una nota
+    INTERNA, nunca algo que vea un cliente)."""
     producto = datos["producto"]
     meta_data = [
         {"key": "ekipon_codigo_proveedor", "value": codigo},
@@ -262,6 +270,11 @@ def construir_payload(datos: dict, codigo: str, slug: str, categoria_id,
     if banner and banner.get("url"):
         meta_data.append({"key": "ekipon_banner_id", "value": banner.get("id") or ""})
         meta_data.append({"key": "ekipon_banner_url", "value": banner["url"]})
+    if motivos_revision:
+        meta_data.append({
+            "key": "ekipon_pendiente_revision",
+            "value": json.dumps(motivos_revision, ensure_ascii=False),
+        })
 
     return {
         "name": producto["nombre_propuesto"],
@@ -690,7 +703,8 @@ def publicar(datos: dict, codigo: str, slug: str, carpeta_ficha: Path,
              cliente, ruta_db=None, actualizar: bool = False,
              refrescar_galeria: bool = False,
              ruta_video: Path | None = None,
-             resultado: dict | None = None) -> int:
+             resultado: dict | None = None,
+             motivos_revision: list[str] | None = None) -> int:
     """Ejecuta la publicacion real (siempre como borrador).
 
     `ruta_video` (opcional): si se pasa, DESPUES de crear/actualizar el
@@ -702,7 +716,10 @@ def publicar(datos: dict, codigo: str, slug: str, carpeta_ficha: Path,
     el producto_id creado/actualizado y, si el checkpoint de categoria
     dispara, sus sugerencias — ver resolver_categoria_en_vivo(). Tambien
     aditivo: nada cambia para quien no lo pasa (todos los tests existentes).
-    """
+
+    `motivos_revision` (opcional, aditivo): ver construir_payload(). Solo se
+    usa en el camino de creacion (producto nuevo) -- un producto que ya
+    existe no vuelve a mandar sus meta_data completos aca."""
     print("Verificando que el producto no exista ya...")
     existente = buscar_existente(cliente, codigo, slug, ruta_db)
     if existente:
@@ -728,7 +745,10 @@ def publicar(datos: dict, codigo: str, slug: str, carpeta_ficha: Path,
     subidas = subir_galeria(preparar_imagenes(datos, carpeta_ficha), cliente)
 
     banner = generar_y_subir_banner(datos, codigo, slug, carpeta_ficha, cliente)
-    payload = construir_payload(datos, codigo, slug, categoria["id"], subidas, banner)
+    payload = construir_payload(
+        datos, codigo, slug, categoria["id"], subidas, banner,
+        motivos_revision=motivos_revision,
+    )
     print("Creando el producto como BORRADOR...")
     producto = cliente.crear_producto(payload)
 
@@ -756,13 +776,14 @@ def ejecutar(ruta_ficha: Path, simular: bool,
              fabrica_cliente=ClienteTienda.desde_env, ruta_db=None,
              actualizar: bool = False, refrescar_galeria: bool = False,
              ruta_video: Path | None = None,
-             resultado: dict | None = None) -> int:
+             resultado: dict | None = None,
+             motivos_revision: list[str] | None = None) -> int:
     """Punto de entrada del pipeline; separa el simulacro de la ejecucion real.
 
-    `ruta_video`/`resultado`: parametros aditivos (ambos None por defecto,
-    igual que antes de que existieran) pensados para orquestador.py — ver
-    publicar(). El CLI (main(), abajo) no los usa y su comportamiento no
-    cambia.
+    `ruta_video`/`resultado`/`motivos_revision`: parametros aditivos (todos
+    None por defecto, igual que antes de que existieran) pensados para
+    orquestador.py — ver publicar(). El CLI (main(), abajo) no los usa y su
+    comportamiento no cambia.
     """
     # La consola de Windows no siempre esta en UTF-8; sin esto, imprimir la
     # ficha tecnica (simbolos como ≤) rompe con UnicodeEncodeError.
@@ -797,6 +818,7 @@ def ejecutar(ruta_ficha: Path, simular: bool,
         datos, codigo, slug, ruta_ficha.parent, cliente, ruta_db,
         actualizar=actualizar, refrescar_galeria=refrescar_galeria,
         ruta_video=ruta_video, resultado=resultado,
+        motivos_revision=motivos_revision,
     )
 
 

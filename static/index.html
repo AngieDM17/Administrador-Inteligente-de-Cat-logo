@@ -849,10 +849,18 @@ function mostrarResultadoFinal(resultado) {
 
   if (resultado.estado === 'publicado') {
     marcarTodoHecho();
-    marcarEstado('listo', '✓ Publicado');
-    caja.className = 'caja-resultado listo';
+    const tieneMotivos = Array.isArray(resultado.motivos_revision) && resultado.motivos_revision.length > 0;
+    marcarEstado(tieneMotivos ? 'revisar' : 'listo', tieneMotivos ? '✓ Publicado — con avisos' : '✓ Publicado');
+    caja.className = 'caja-resultado ' + (tieneMotivos ? 'revisar' : 'listo');
     let html = '<strong>Listo — el borrador quedó creado con el video adjunto.</strong>';
     caja.innerHTML = html;
+    if (tieneMotivos) {
+      const aviso = document.createElement('div');
+      aviso.style.marginTop = '10px';
+      aviso.innerHTML = '<strong>Antes de venderlo, confirmá esto con el proveedor:</strong>';
+      caja.appendChild(aviso);
+      caja.appendChild(armarListaMotivos(resultado.motivos_revision));
+    }
     if (resultado.url_revisar) {
       const link = document.createElement('a');
       link.href = resultado.url_revisar;

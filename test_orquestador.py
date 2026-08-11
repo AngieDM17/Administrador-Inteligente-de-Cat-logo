@@ -86,10 +86,17 @@ class PruebasCheckpointColador(unittest.TestCase):
             self.assertEqual(resultado["estado"], "error")
             self.assertIn("codigo_proveedor", resultado["motivo"])
 
-    def test_ficha_con_advertencias_dispara_checkpoint_revisar(self):
-        # identificacion_del_producto.advertencias no vacio -> motivo real
-        # segun revisor_publicacion._revisar_identificacion. No hace falta
-        # una ficha completa: el colador trabaja sobre el dict crudo.
+    def test_ficha_con_advertencias_ya_no_frena_solo_se_notifica(self):
+        # Decision de Angie (11-ago-2026): el colador ya NO detiene el
+        # pipeline -- revisar_listo_para_publicar() sigue corriendo y sus
+        # motivos se notifican (para que la pagina los muestre en vivo y
+        # publicador.py los guarde en el borrador via motivos_revision),
+        # pero el pipeline CONTINUA. Con esta ficha minima (sin
+        # multimedia.plan_galeria.imagen_base) el resultado final es el
+        # MISMO error real que ya prueba test_ficha_lista_pero_sin_plan_
+        # galeria_es_error_real (no un checkpoint "revisar"): asi se
+        # confirma que de verdad se siguio de largo tras el colador, en vez
+        # de pararse ahi.
         ficha = {
             "entrada_original": {"codigo_proveedor": "TEST-1"},
             "identificacion_del_producto": {
@@ -106,12 +113,11 @@ class PruebasCheckpointColador(unittest.TestCase):
             ruta = self._escribir_ficha(carpeta, ficha)
             mensajes = []
             resultado = orquestador.ejecutar_pipeline(ruta, mensajes.append)
-            self.assertEqual(resultado["estado"], "revisar")
-            self.assertEqual(resultado["etapa"], "colador")
-            self.assertTrue(resultado["motivos"])
-            self.assertTrue(any("advertencia" in m.lower() for m in resultado["motivos"]))
-            # Se notifico el motivo por publicar_notificacion, no solo se
-            # devolvio en el dict (asi la pagina lo muestra en vivo).
+            self.assertNotEqual(resultado["estado"], "revisar")
+            self.assertEqual(resultado["estado"], "error")
+            self.assertIn("plan_galeria", resultado["motivo"])
+            # El motivo del colador SI se notifico (la pagina lo muestra en
+            # vivo), aunque no haya frenado el pipeline.
             self.assertTrue(any("advertencia" in m.lower() or "REVISAR" in m for m in mensajes))
 
     def test_ficha_lista_pero_sin_plan_galeria_es_error_real(self):

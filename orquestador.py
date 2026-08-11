@@ -216,16 +216,24 @@ def ejecutar_pipeline(ruta_ficha: Path, publicar_notificacion: Notificador) -> d
         publicar_notificacion(motivo)
         return {"estado": "error", "motivo": motivo}
 
-    if not revision.listo:
-        motivos = [m.mensaje for m in revision.motivos]
+    # Decision de Angie (11-ago-2026): el colador YA NO frena el pipeline.
+    # Motivo dado: quiere el producto montado en la tienda (fotos, ficha
+    # tecnica, descripcion, video) con los campos dudosos vacios/marcados,
+    # y revisar el borrador armado en la tienda en vez de una lista de
+    # texto antes de que exista. Los motivos NO se pierden: se notifican
+    # igual (abajo) y viajan en el resultado final para que la pagina los
+    # muestre junto al link del borrador -- ver "motivos_revision" en el
+    # "estado": "publicado" al final de esta funcion.
+    motivos_colador = [m.mensaje for m in revision.motivos]
+    if motivos_colador:
         publicar_notificacion(
-            f"REVISAR — {len(motivos)} motivo(s) antes de seguir:"
+            f"REVISAR — {len(motivos_colador)} motivo(s), se sigue igual "
+            "(vas a poder revisarlos en el borrador):"
         )
-        for motivo in motivos:
+        for motivo in motivos_colador:
             publicar_notificacion(f"  • {motivo}")
-        return {"estado": "revisar", "motivos": motivos, "etapa": "colador"}
 
-    publicar_notificacion("Ficha lista — arrancando el armado automatico.")
+    publicar_notificacion("Arrancando el armado automatico.")
 
     try:
         # --- Recorte del producto ---------------------------------------
@@ -382,6 +390,7 @@ def ejecutar_pipeline(ruta_ficha: Path, publicar_notificacion: Notificador) -> d
         codigo_salida = publicador.ejecutar(
             ruta_ficha, simular=False, ruta_video=ruta_video_final,
             resultado=resultado_publicacion,
+            motivos_revision=motivos_colador,
         )
     except SystemExit as salida:
         # publicador.cargar_ficha_validada() y cliente_tienda (cargar_env,
@@ -429,4 +438,8 @@ def ejecutar_pipeline(ruta_ficha: Path, publicar_notificacion: Notificador) -> d
         "estado": "publicado",
         "producto_id": producto_id,
         "url_revisar": url_revisar,
+        # No vacio solo si el colador dejo motivos (ver arriba): la pagina
+        # los muestra junto al link para que la revision pase adentro del
+        # borrador ya armado, no antes de que exista.
+        "motivos_revision": motivos_colador,
     }
