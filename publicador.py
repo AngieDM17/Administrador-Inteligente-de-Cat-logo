@@ -185,30 +185,30 @@ def generar_descripcion_html(datos: dict, banner: dict | None = None,
                        if isinstance(c, str) and c.strip()]
     video_youtube = (datos.get("multimedia") or {}).get("video_youtube") or ""
 
-    # Ficha tecnica (columna izquierda, arriba). Cada fila lleva la clase
-    # ekipon-fila-dato: la regla CSS de mas abajo (tr:has(td:empty)) hace
-    # que, si Angie entra a editar el HTML y borra el VALOR de una celda
-    # (dejando el <td> vacio), la fila entera se oculte sola en vez de
-    # quedar con el titulo pegado y nada al lado -- pedido explicito de
-    # Angie (11-ago-2026) tras ver un dato dudoso en un borrador real.
+    # Ficha tecnica (columna izquierda, arriba). NO es una <table>: se
+    # probo con <style>+class (11-ago-2026) para que una fila se oculte
+    # sola si Angie borra su valor, pero WordPress limpia por seguridad
+    # cualquier <style> y los atributos class[] al guardar la descripcion
+    # (verificado leyendo la descripcion ya guardada: ninguno de los dos
+    # sobrevive) -- no tiene sentido pelear contra ese filtro. Y borrar
+    # una fila SUELTA de una <table> en el editor de WordPress deja un
+    # hueco vacio (el <tr> no siempre se borra limpio). Por eso cada dato
+    # es un <div> independiente: borrar el bloque completo en el editor
+    # (seleccionarlo entero y suprimir) no deja ningun resto de estructura
+    # atras, a diferencia de una fila de tabla.
     tabla = ""
     if filas:
         cuerpo = ""
         for clave, valor in filas.items():
             cuerpo += (
-                '<tr class="ekipon-fila-dato"><th style="text-align:left;'
-                'padding:8px 12px;border-bottom:1px solid rgba(0,0,0,.08);'
-                'width:40%;white-space:nowrap;vertical-align:top">'
-                + html.escape(str(clave)) + '</th>'
-                '<td style="padding:8px 12px;border-bottom:1px solid '
-                'rgba(0,0,0,.08);vertical-align:top">'
-                + html.escape(str(valor)) + '</td></tr>'
+                '<div style="padding:8px 0;border-bottom:1px solid '
+                'rgba(0,0,0,.08)">'
+                '<strong style="display:block;font-size:.92em;'
+                'margin-bottom:2px">' + html.escape(str(clave)) + '</strong>'
+                '<span>' + html.escape(str(valor)) + '</span>'
+                '</div>'
             )
-        tabla = (
-            '<style>tr.ekipon-fila-dato:has(td:empty){display:none}</style>'
-            '<table style="width:100%;border-collapse:collapse">'
-            '<tbody>' + cuerpo + '</tbody></table>'
-        )
+        tabla = '<div>' + cuerpo + '</div>'
 
     # Video (columna izquierda, debajo de la ficha). El video propio ya
     # subido (reproducible nativo) tiene prioridad sobre un link externo de

@@ -177,7 +177,7 @@ class PruebasPayloadFichaReal(unittest.TestCase):
         # tema la renderiza en la pestaña Descripcion sin depender de Elementor.
         desc = self.payload["description"]
         self.assertIn("600 L", desc)          # una fila real de la ficha tecnica
-        self.assertIn("<table", desc)
+        self.assertIn("<strong", desc)
         self.assertIn("#ff4e03", desc)        # titulo de caracteristicas en naranja
         self.assertIn("<ul", desc)
         self.assertIn("<li", desc)
@@ -247,7 +247,7 @@ class PruebasPayloadActualizacion(unittest.TestCase):
 
     def test_actualizar_refresca_la_descripcion_html(self):
         # Actualizar tambien refresca la descripcion nativa (ficha tecnica).
-        self.assertIn("<table", self.payload["description"])
+        self.assertIn("<strong", self.payload["description"])
 
     def test_contenido_textual_coincide_con_la_ficha(self):
         self.assertEqual(
@@ -255,7 +255,7 @@ class PruebasPayloadActualizacion(unittest.TestCase):
         )
         self.assertEqual(self.payload["regular_price"], "16434999")
         self.assertEqual(self.payload["categories"], [{"id": 428}])
-        self.assertIn("<table", self.payload["description"])
+        self.assertIn("<strong", self.payload["description"])
 
     def test_con_imagenes_explicitas_si_lleva_images(self):
         # Unica forma de que una actualizacion toque la galeria: pedirlo.
@@ -402,7 +402,7 @@ class PruebasIdempotencia(unittest.TestCase):
         # que el tema renderiza en la pestaña Descripcion sin Elementor.
         metas = {m["key"]: m["value"] for m in payload["meta_data"]}
         self.assertIn("ekipon_banner_url", metas)
-        self.assertIn("<table", payload["description"])
+        self.assertIn("<strong", payload["description"])
         self.assertIn("<img", payload["description"])
         self.assertEqual(len(payload["images"]), 8)  # el banner NO va en la galeria
         fila = registro.obtener_publicacion("4212", self.ruta_db)
@@ -420,7 +420,7 @@ class PruebasIdempotencia(unittest.TestCase):
         metas = {m["key"]: m["value"] for m in cliente.creaciones[0]["meta_data"]}
         self.assertNotIn("ekipon_banner_url", metas)
         desc = cliente.creaciones[0]["description"]
-        self.assertIn("<table", desc)   # la ficha tecnica sigue en la descripcion
+        self.assertIn("<strong", desc)   # la ficha tecnica sigue en la descripcion
         self.assertNotIn("<img", desc)  # pero sin banner (no hay recorte)
 
     def test_banner_corrupto_se_publica_sin_banner(self):
