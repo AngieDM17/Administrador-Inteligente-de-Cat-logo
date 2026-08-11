@@ -180,13 +180,16 @@ def generar_musica(prompt: str, duracion_ms: int) -> bytes:
     clave = _clave_api()
     try:
         from elevenlabs.client import ElevenLabs
+
+        from resolucion_dns import forzar_ipv4
         cliente = ElevenLabs(api_key=clave)
-        trozos = cliente.music.compose(
-            prompt=prompt,
-            music_length_ms=duracion_ms,
-            output_format=OUTPUT_FORMAT,
-        )
-        return b"".join(trozos)
+        with forzar_ipv4():
+            trozos = cliente.music.compose(
+                prompt=prompt,
+                music_length_ms=duracion_ms,
+                output_format=OUTPUT_FORMAT,
+            )
+            return b"".join(trozos)
     except ErrorRecurso:
         raise
     except Exception as error:  # el SDK de ElevenLabs lanza distintos tipos

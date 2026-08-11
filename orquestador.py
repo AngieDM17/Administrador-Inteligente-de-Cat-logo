@@ -343,6 +343,14 @@ def ejecutar_pipeline(ruta_ficha: Path, publicar_notificacion: Notificador) -> d
             "Mezclando la voz con el video...",
             voz_en_off.preparar_clip_con_voz,
             ruta_clip_normalizado, ruta_voz, ruta_clip_con_voz,
+            # Sin esto, un clip fuente mas corto que la voz (comun: el clip
+            # de Alibaba no se elige a medida) tumba TODO el pipeline en vez
+            # de resolverse solo -- permitir_estirar ya existia en voz_en_
+            # off.py (6-ago-2026, "estirar clip corto") pero el orquestador
+            # nunca lo prendia. Verificado en vivo 11-ago-2026: un clip de
+            # 39.6s contra una voz de 41.3s (diferencia de 1.7s) fallaba
+            # aca antes de este cambio.
+            permitir_estirar=True,
         )
 
         ruta_clip_con_musica = carpeta_trabajo / "clip_con_musica.mp4"

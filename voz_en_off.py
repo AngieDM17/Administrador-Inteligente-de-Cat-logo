@@ -236,13 +236,16 @@ def _sintetizar_voz(guion: str, voz: str) -> bytes:
     try:
         from elevenlabs.client import ElevenLabs
         from elevenlabs.types import VoiceSettings
+
+        from resolucion_dns import forzar_ipv4
         cliente = ElevenLabs(api_key=clave)
-        trozos = cliente.text_to_speech.convert(
-            voice_id=voice_id, text=guion, model_id=MODEL_ID,
-            output_format=OUTPUT_FORMAT,
-            voice_settings=VoiceSettings(speed=VELOCIDAD_VOZ),
-        )
-        return b"".join(trozos)
+        with forzar_ipv4():
+            trozos = cliente.text_to_speech.convert(
+                voice_id=voice_id, text=guion, model_id=MODEL_ID,
+                output_format=OUTPUT_FORMAT,
+                voice_settings=VoiceSettings(speed=VELOCIDAD_VOZ),
+            )
+            return b"".join(trozos)
     except ErrorRecurso:
         raise
     except Exception as error:  # el SDK de ElevenLabs lanza distintos tipos

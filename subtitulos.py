@@ -147,8 +147,10 @@ def alinear_audio(ruta_audio: Path, texto: str) -> list[dict]:
     clave = _clave_api()
     try:
         from elevenlabs.client import ElevenLabs
+
+        from resolucion_dns import forzar_ipv4
         cliente = ElevenLabs(api_key=clave)
-        with open(ruta_audio, "rb") as archivo_audio:
+        with forzar_ipv4(), open(ruta_audio, "rb") as archivo_audio:
             respuesta = cliente.forced_alignment.create(
                 file=archivo_audio, text=texto
             )
