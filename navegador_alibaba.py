@@ -251,16 +251,27 @@ class SesionAlibaba:
         self._carpeta_perfil.mkdir(parents=True, exist_ok=True)
         self._playwright = sync_playwright().start()
         try:
+            # channel="msedge": el Chromium propio que baja Playwright
+            # (`playwright install chromium`) no logra abrir ventana VISIBLE
+            # en Windows -- verificado en vivo el 11-ago-2026, falla con
+            # "spawn UNKNOWN" en TODO lanzamiento headed (persistente o no),
+            # desde cualquier terminal (Bash, PowerShell nueva, standalone),
+            # siempre con el MISMO error -- descarta que sea un problema de
+            # sesion/consola y apunta a ese binario puntual. El Edge YA
+            # instalado en la maquina (msedge, motor Chromium igual,
+            # compatible con la misma API de Playwright) SI abre ventana sin
+            # problema -- confirmado con Angie mirando la pantalla en vivo.
             self._context = self._playwright.chromium.launch_persistent_context(
                 user_data_dir=str(self._carpeta_perfil),
                 headless=False,
+                channel="msedge",
             )
         except Exception as error:
             self._playwright.stop()
             self._playwright = None
             raise nav.ErrorRecurso(
-                f"no se pudo abrir Chromium visible para Alibaba "
-                f"(¿'playwright install chromium' corrio bien?): {error}"
+                f"no se pudo abrir una ventana visible de Edge para Alibaba "
+                f"(¿esta instalado Microsoft Edge en esta maquina?): {error}"
             ) from error
         self._page = (
             self._context.pages[0] if self._context.pages
