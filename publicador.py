@@ -34,6 +34,7 @@ import argparse
 import difflib
 import html
 import json
+import re
 import sys
 import tempfile
 import unicodedata
@@ -113,6 +114,26 @@ def extraer_codigo_proveedor(datos: dict) -> str | None:
     return None
 
 
+_PATRON_ID_YOUTUBE = re.compile(
+    r"(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|youtu\.be/)"
+    r"(?P<id>[A-Za-z0-9_-]{11})"
+)
+
+
+def url_embed_youtube(url: str) -> str | None:
+    """Convierte una URL de YouTube (watch?v=, youtu.be/, shorts/ o ya
+    embed/) a su forma embed (https://www.youtube.com/embed/<id>), para
+    incrustarla en un <iframe>. Devuelve None si url no matchea ningun
+    formato conocido de YouTube -- generar_descripcion_html() degrada a un
+    link de texto en ese caso, en vez de armar un iframe roto."""
+    if not isinstance(url, str) or not url.strip():
+        return None
+    coincidencia = _PATRON_ID_YOUTUBE.search(url.strip())
+    if not coincidencia:
+        return None
+    return f"https://www.youtube.com/embed/{coincidencia.group('id')}"
+
+
 def texto_alt_imagen(alt_base: str | None, nota: str | None) -> str:
     """Texto alt de una imagen: base SEO + nota propia de la toma."""
     partes = [p.strip() for p in (alt_base, nota) if p and p.strip()]
@@ -162,8 +183,21 @@ def ficha_tecnica_publica(datos: dict) -> dict:
 
 def generar_descripcion_html(datos: dict, banner: dict | None = None,
                              video_url_subido: str | None = None) -> str:
-    """Arma el HTML de la descripcion: ficha tecnica + banner (2 columnas) +
-    caracteristicas, con estilos EN LINEA.
+    """Arma el HTML de la descripcion, con estilos EN LINEA.
+
+    Layout (afinado con Angie, 13-ago-2026): el banner FLOTA a la derecha
+    arriba de todo, y la ficha tecnica fluye alrededor de el -- igual que el
+    texto de un periodico rodea una foto. Mientras el banner tiene altura,
+    las filas de la ficha quedan angostas a su izquierda; en cuanto el
+    banner se termina, las filas siguientes usan el ancho completo, sin
+    dejar espacio vacio debajo del banner. Es automatico para cualquier
+    cantidad de filas (float de CSS puro, sin medir nada en pixeles). Recien
+    cuando termina TODA la ficha empieza la fila de video + caracteristicas,
+    lado a lado, del ancho completo. Limitacion real: las filas que caen
+    despues del banner ocupan el ancho COMPLETO (no un carril angosto que
+    imite el ancho del banner) -- CSS no puede medir en pixeles donde
+    termina un float sin JavaScript, y WordPress bloquea <script> en la
+    descripcion del producto por seguridad.
 
     Va en el campo 'description' de WooCommerce, que el tema renderiza en la
     pestana Descripcion SIN depender de Elementor, ningun shortcode ni snippet.
@@ -178,6 +212,19 @@ def generar_descripcion_html(datos: dict, banner: dict | None = None,
     encontrado 11-ago-2026: el video se subia y quedaba en meta_data
     (ekipon_video_url), pero la descripcion nunca lo mostraba -- el video
     quedaba "adjunto" sin estar visible en ningun lado de la pagina."""
+    # Ancho del banner (float) y, mas abajo, del video: los dos comparten
+    # este numero para que la fila banner+ficha y la fila video+
+    # caracteristicas queden con la misma distribucion de columnas.
+    # 50% menos la mitad del gap (24px) para que banner+margen y ficha
+    # queden a mitades reales, con esos 24px de aire en el medio -- pedido
+    # de Angie 13-ago-2026: banner grande, mitad y mitad, no una columna
+    # angosta. Este ancho es RELATIVO al contenedor que arma el tema de
+    # WordPress alrededor de la descripcion -- generar_descripcion_html no
+    # define ningun max-width propio (verificado: no hay ningun max-width
+    # en todo publicador.py), asi que si en la tienda real la seccion sigue
+    # viendose angosta, la causa es el ancho del contenedor del TEMA, no
+    # este HTML.
+    ANCHO_LATERAL = "calc(50% - 12px)"
     producto = datos.get("producto") or {}
     titulo = str(producto.get("nombre_propuesto") or "").strip()
     filas = ficha_tecnica_publica(datos)
@@ -185,34 +232,63 @@ def generar_descripcion_html(datos: dict, banner: dict | None = None,
                        if isinstance(c, str) and c.strip()]
     video_youtube = (datos.get("multimedia") or {}).get("video_youtube") or ""
 
-    # Ficha tecnica (columna izquierda, arriba). NO es una <table>: se
-    # probo con <style>+class (11-ago-2026) para que una fila se oculte
-    # sola si Angie borra su valor, pero WordPress limpia por seguridad
-    # cualquier <style> y los atributos class[] al guardar la descripcion
-    # (verificado leyendo la descripcion ya guardada: ninguno de los dos
-    # sobrevive) -- no tiene sentido pelear contra ese filtro. Y borrar
-    # una fila SUELTA de una <table> en el editor de WordPress deja un
-    # hueco vacio (el <tr> no siempre se borra limpio). Por eso cada dato
-    # es un <div> independiente: borrar el bloque completo en el editor
-    # (seleccionarlo entero y suprimir) no deja ningun resto de estructura
-    # atras, a diferencia de una fila de tabla.
+    # Ficha tecnica (columna izquierda, una sola columna con todas las
+    # filas -- asi la confirmo Angie 13-ago-2026 contra la referencia real
+    # https://ekipon.co/producto/benlg-a8-electric-tricycle/, cuyo bloque
+    # ficha+video+caracteristicas queda oculto en viewports angostos por
+    # 'elementor-hidden-mobile': se ve tal cual solo en escritorio). NO es
+    # una <table>: se probo con <style>+class (11-ago-2026) para que una
+    # fila se oculte sola si Angie borra su valor, pero WordPress limpia
+    # por seguridad cualquier <style> y los atributos class[] al guardar la
+    # descripcion (verificado leyendo la descripcion ya guardada: ninguno
+    # de los dos sobrevive) -- no tiene sentido pelear contra ese filtro. Y
+    # borrar una fila SUELTA de una <table> en el editor de WordPress deja
+    # un hueco vacio (el <tr> no siempre se borra limpio). Por eso cada
+    # dato es un <div> independiente: borrar el bloque completo en el
+    # editor (seleccionarlo entero y suprimir) no deja ningun resto de
+    # estructura atras, a diferencia de una fila de tabla -- y Angie puede
+    # escribir texto nuevo abajo o al lado sin romper el resto del layout.
+    # Etiqueta y valor van en la MISMA linea, uno al lado del otro (pedido
+    # de Angie 13-ago-2026 contra la referencia real: "TIPO: Bicicleta...",
+    # no "TIPO" arriba y el valor abajo). Estilo (colores, espaciado,
+    # encabezado) tambien calcado de esa referencia -- segunda vuelta:
+    # el primer intento con etiqueta en negro+negrita quedo "sin gracia".
+    # max-width:650px en la FILA (no solo en el valor, 13-ago-2026, segunda
+    # vuelta): las filas que caen debajo del banner y pasan a ancho completo
+    # (ver docstring) quedaban con el valor topado en 440px pero la fila
+    # entera en 1245px -- un espacio en blanco enorme colgando a la derecha
+    # que se veia "suelto", distinto a las filas de al lado del banner.
+    # Con el tope en la fila completa, la ficha se ve como UNA columna
+    # pareja de principio a fin, tenga o no el banner al lado. El costo
+    # (avisado y aceptado por Angie): puede quedar espacio en blanco a la
+    # derecha de estas filas, debajo del banner -- llenarlo exactamente
+    # necesitaria saber en pixeles donde termina el banner, y eso es
+    # JavaScript, que WordPress bloquea en la descripcion.
     tabla = ""
     if filas:
         cuerpo = ""
         for clave, valor in filas.items():
             cuerpo += (
-                '<div style="padding:8px 0;border-bottom:1px solid '
+                '<div style="display:flex;flex-wrap:wrap;gap:4px 16px;'
+                'max-width:650px;padding:14px 0;border-bottom:1px solid '
                 'rgba(0,0,0,.08)">'
-                '<strong style="display:block;font-size:.92em;'
-                'margin-bottom:2px">' + html.escape(str(clave)) + '</strong>'
-                '<span>' + html.escape(str(valor)) + '</span>'
+                '<strong style="flex:0 0 190px;color:#111;'
+                'font-weight:700">' + html.escape(str(clave)) + ':</strong>'
+                '<span style="flex:1 1 160px;color:#6b6b6b">'
+                + html.escape(str(valor)) + '</span>'
                 '</div>'
             )
-        tabla = '<div>' + cuerpo + '</div>'
+        encabezado_ficha = (
+            '<h3 style="margin:0 0 8px;padding-bottom:12px;font-size:1.15em;'
+            'font-weight:700;color:#1a1a1a;border-bottom:2px solid '
+            'rgba(0,0,0,.12)">FICHA TÉCNICA DEL PRODUCTO</h3>'
+        )
+        tabla = '<div>' + encabezado_ficha + cuerpo + '</div>'
 
-    # Video (columna izquierda, debajo de la ficha). El video propio ya
-    # subido (reproducible nativo) tiene prioridad sobre un link externo de
-    # YouTube que pudiera traer la ficha -- no tiene sentido mostrar los dos.
+    # Video (columna derecha, debajo del banner, al lado de caracteristicas).
+    # El video propio ya subido (reproducible nativo) tiene prioridad sobre
+    # un link externo de YouTube que pudiera traer la ficha -- no tiene
+    # sentido mostrar los dos.
     video = ""
     if video_url_subido:
         video = ('<video controls preload="metadata" style="width:100%;'
@@ -220,19 +296,45 @@ def generar_descripcion_html(datos: dict, banner: dict | None = None,
                  'src="' + html.escape(video_url_subido, quote=True)
                  + '"></video>')
     elif isinstance(video_youtube, str) and video_youtube.strip():
-        video = ('<p style="margin-top:16px"><a href="'
-                 + html.escape(video_youtube.strip(), quote=True)
-                 + '" target="_blank" rel="noopener noreferrer">'
-                 'Ver video del producto</a></p>')
+        url_embed = url_embed_youtube(video_youtube.strip())
+        if url_embed:
+            # NO se usa el truco responsive de position:absolute+inset:0 en
+            # el <iframe> -- probado en vivo 12-ago-2026 (producto real
+            # TOP250414656): WordPress borra el atributo style ESPECIFICO de
+            # <iframe> al guardar la descripcion (aunque lo respeta en <div>,
+            # por eso el marco de alrededor si sobrevive), asi que el iframe
+            # quedaba con el tamano minimo de fabrica del navegador, flotando
+            # en un contenedor vacio. width/height como atributos HTML
+            # comunes (no CSS) SI sobreviven -- es el mismo mecanismo que usa
+            # el propio oEmbed de WordPress para videos de YouTube.
+            video = (
+                '<div style="margin-top:16px;border-radius:8px;'
+                'overflow:hidden">'
+                '<iframe src="' + html.escape(url_embed, quote=True) + '" '
+                'width="100%" height="400" frameborder="0" allow='
+                '"accelerometer;autoplay;clipboard-write;encrypted-media;'
+                'gyroscope;picture-in-picture;web-share" '
+                'allowfullscreen></iframe></div>'
+            )
+        else:
+            # No matchea el formato esperado de YouTube (link raro, u otro
+            # sitio): se degrada al link de texto de siempre en vez de
+            # armar un iframe que capaz no carga nada.
+            video = ('<p style="margin-top:16px"><a href="'
+                     + html.escape(video_youtube.strip(), quote=True)
+                     + '" target="_blank" rel="noopener noreferrer">'
+                     'Ver video del producto</a></p>')
 
-    # Banner (columna derecha, arriba).
+    # Banner: flota a la derecha para que la ficha tecnica fluya a su
+    # alrededor (ver docstring).
     img = ""
     if banner and banner.get("url"):
         img = ('<img src="' + html.escape(str(banner["url"]), quote=True)
                + '" alt="' + html.escape(titulo, quote=True)
-               + '" style="max-width:100%;height:auto;display:block" />')
+               + '" style="float:right;width:' + ANCHO_LATERAL + ';'
+               'height:auto;margin:0 0 20px 24px;border-radius:8px" />')
 
-    # Caracteristicas (columna derecha, debajo del banner).
+    # Caracteristicas (columna derecha, debajo del banner, al lado del video).
     lista = ""
     if caracteristicas:
         items = "".join('<li style="margin:.25em 0">' + html.escape(c) + '</li>'
@@ -246,17 +348,38 @@ def generar_descripcion_html(datos: dict, banner: dict | None = None,
                  + '<ul style="margin:0;padding-left:1.2em">' + items
                  + '</ul></div>')
 
-    # Layout 2x2: izquierda = ficha + video; derecha = banner + caracteristicas.
-    izquierda = tabla + video
-    derecha = img + lista
-    if not (izquierda or derecha):
+    # Video y caracteristicas van lado a lado, con la MISMA distribucion de
+    # columnas que la fila de arriba (video tan ancho como el banner). El
+    # video NO lleva flex-grow (flex:0 0 ANCHO_LATERAL, ancho fijo) --
+    # dárselo junto con flex-grow:1 en caracteristicas (bug real, 13-ago-2026)
+    # hacia que los dos se repartieran el espacio SOBRANTE en partes
+    # iguales ADEMAS de su ancho base, y el video terminaba ocupando ~75%
+    # en vez de 50%. Si falta uno de los dos, el que queda pasa a flex:1
+    # para usar la fila entera en vez de dejar la mitad en blanco.
+    video_y_caracteristicas = ""
+    if video or lista:
+        ancho_video = ('flex:0 0 ' + ANCHO_LATERAL) if (video and lista) else 'flex:1'
+        video_y_caracteristicas = (
+            '<div style="display:flex;flex-wrap:wrap;gap:24px;margin-top:16px">'
+            + ('<div style="' + ancho_video + ';min-width:200px">'
+               + video + '</div>' if video else '')
+            + ('<div style="flex:1 1 0;min-width:200px">' + lista + '</div>'
+               if lista else '')
+            + '</div>'
+        )
+
+    # Ficha + banner: el banner flota (float:right) y las filas de la ficha
+    # fluyen a su alrededor. overflow:hidden en este contenedor es lo que
+    # hace que el banner quede "contenido" -- sin esto, el contenedor no
+    # sabria que tiene que estirarse hasta el final del banner, y la fila
+    # de video+caracteristicas de abajo podria arrancar montada encima.
+    ficha_y_banner = ""
+    if tabla or img:
+        ficha_y_banner = '<div style="overflow:hidden">' + img + tabla + '</div>'
+
+    if not (ficha_y_banner or video_y_caracteristicas):
         return ""
-    return (
-        '<div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start">'
-        '<div style="flex:1 1 320px;min-width:280px">' + izquierda + '</div>'
-        '<div style="flex:1 1 320px;min-width:280px">' + derecha + '</div>'
-        '</div>'
-    )
+    return ficha_y_banner + video_y_caracteristicas
 
 
 def construir_payload(datos: dict, codigo: str, slug: str, categoria_id,

@@ -23,6 +23,7 @@ from publicador import (
     construir_payload_actualizacion,
     ejecutar,
     extraer_codigo_proveedor,
+    generar_descripcion_html,
     generar_slug,
     precio_a_texto,
     preparar_imagenes,
@@ -30,6 +31,7 @@ from publicador import (
     resolver_categoria,
     ruta_relativa_segura,
     texto_alt_imagen,
+    url_embed_youtube,
 )
 
 RAIZ = Path(__file__).parent
@@ -224,6 +226,99 @@ class PruebasPayloadFichaReal(unittest.TestCase):
         claves = {m["key"] for m in self.payload["meta_data"]}
         self.assertNotIn("_elementor_data", claves)
         self.assertNotIn("_elementor_edit_mode", claves)
+
+
+class PruebasUrlEmbedYoutube(unittest.TestCase):
+    """url_embed_youtube: logica pura, sin red."""
+
+    def test_watch_url(self):
+        self.assertEqual(
+            url_embed_youtube("https://www.youtube.com/watch?v=dQw4w9WgXcQ"),
+            "https://www.youtube.com/embed/dQw4w9WgXcQ",
+        )
+
+    def test_youtu_be_corto(self):
+        self.assertEqual(
+            url_embed_youtube("https://youtu.be/dQw4w9WgXcQ"),
+            "https://www.youtube.com/embed/dQw4w9WgXcQ",
+        )
+
+    def test_ya_embed(self):
+        self.assertEqual(
+            url_embed_youtube("https://www.youtube.com/embed/dQw4w9WgXcQ"),
+            "https://www.youtube.com/embed/dQw4w9WgXcQ",
+        )
+
+    def test_con_parametros_extra(self):
+        self.assertEqual(
+            url_embed_youtube(
+                "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PL123&t=30s"
+            ),
+            "https://www.youtube.com/embed/dQw4w9WgXcQ",
+        )
+
+    def test_url_no_youtube_devuelve_none(self):
+        self.assertIsNone(url_embed_youtube("https://vimeo.com/12345678"))
+
+    def test_vacio_o_none_devuelve_none(self):
+        self.assertIsNone(url_embed_youtube(""))
+        self.assertIsNone(url_embed_youtube(None))
+
+
+class PruebasDescripcionVideoYoutube(unittest.TestCase):
+    """generar_descripcion_html(): el iframe de YouTube se arma bien a partir
+    de multimedia.video_youtube (camino PRINCIPAL desde 11-ago-2026 --
+    ver youtube_uploader.py). video_url_subido sigue mandando si por algun
+    motivo las dos cosas llegaran a estar presentes (jerarquia ya existente,
+    no deberia darse con el diseno actual del orquestador)."""
+
+    def _datos(self, video_youtube):
+        return {
+            "producto": {"nombre_propuesto": "PRODUCTO DE PRUEBA"},
+            "ficha_tecnica": {},
+            "caracteristicas": [],
+            "multimedia": {"video_youtube": video_youtube},
+        }
+
+    def test_arma_iframe_con_ancho_alto_como_atributos(self):
+        # No position:absolute/padding-top: probado en vivo 12-ago-2026 que
+        # WordPress borra el atributo style DEL IFRAME (aunque lo respeta en
+        # el <div> de alrededor) -- width/height como atributos HTML comunes
+        # SI sobreviven (mismo mecanismo que el oEmbed nativo de WordPress).
+        html_desc = generar_descripcion_html(
+            self._datos("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+        )
+        self.assertIn(
+            '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"', html_desc
+        )
+        self.assertIn('width="100%"', html_desc)
+        self.assertIn('height="400"', html_desc)
+        self.assertIn("allowfullscreen", html_desc)
+        # El iframe no debe llevar atributo style: se borra al guardar (12-ago-2026).
+        indice_iframe = html_desc.index("<iframe")
+        indice_cierre = html_desc.index(">", indice_iframe)
+        self.assertNotIn("style=", html_desc[indice_iframe:indice_cierre])
+        # Nunca <style> ni class[]: WordPress los borra al guardar (11-ago-2026).
+        self.assertNotIn("<style", html_desc)
+        self.assertNotIn('class="', html_desc)
+
+    def test_url_no_youtube_degrada_a_link_de_texto(self):
+        html_desc = generar_descripcion_html(self._datos("https://vimeo.com/12345678"))
+        self.assertNotIn("<iframe", html_desc)
+        self.assertIn("Ver video del producto", html_desc)
+
+    def test_video_subido_gana_al_de_youtube(self):
+        datos = self._datos("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+        html_desc = generar_descripcion_html(
+            datos, video_url_subido="https://tienda.example.com/video.mp4"
+        )
+        self.assertIn("<video", html_desc)
+        self.assertNotIn("<iframe", html_desc)
+
+    def test_sin_video_no_arma_nada(self):
+        html_desc = generar_descripcion_html(self._datos(None))
+        self.assertNotIn("<iframe", html_desc)
+        self.assertNotIn("Ver video del producto", html_desc)
 
 
 class PruebasPayloadActualizacion(unittest.TestCase):
