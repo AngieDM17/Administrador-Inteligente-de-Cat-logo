@@ -264,17 +264,36 @@ def generar_descripcion_html(datos: dict, banner: dict | None = None,
     # derecha de estas filas, debajo del banner -- llenarlo exactamente
     # necesitaria saber en pixeles donde termina el banner, y eso es
     # JavaScript, que WordPress bloquea en la descripcion.
+    #
+    # Celular (13-ago-2026, tercera vuelta -- Angie mando capturas reales:
+    # en celular el float apretaba la ficha en una columna angosta al lado
+    # de un banner tambien chico, todo amontonado). Sin @media (WordPress
+    # tambien bloquea <style>, verificado igual que con class[]), la unica
+    # forma de que la fila "se rinda" y baje entera debajo del banner en
+    # vez de apretarse es darle un min-width mayor al espacio que puede
+    # quedar libre en un celular tipico -- por reglas de CSS, un elemento
+    # que no entra al lado de un float baja completo debajo de el.
+    #
+    # Celular, CUARTA vuelta: el intento anterior hacia que etiqueta y valor
+    # se apilaran ADENTRO de la fila en celular (como la referencia que
+    # Angie habia mandado). Pero Angie penso distinto en su propio producto:
+    # quiere el valor SIEMPRE al lado de la etiqueta, igual que en escritorio,
+    # nunca abajo -- asi que la fila NO lleva flex-wrap (nowrap, el valor
+    # por defecto de flex-wrap): etiqueta y valor quedan siempre en la misma
+    # linea, y si el valor no entra, es el TEXTO el que se corta a la
+    # siguiente linea (como cualquier parrafo), no el bloque entero el que
+    # salta de renglon.
     tabla = ""
     if filas:
         cuerpo = ""
         for clave, valor in filas.items():
             cuerpo += (
-                '<div style="display:flex;flex-wrap:wrap;gap:4px 16px;'
-                'max-width:650px;padding:14px 0;border-bottom:1px solid '
-                'rgba(0,0,0,.08)">'
-                '<strong style="flex:0 0 190px;color:#111;'
+                '<div style="display:flex;gap:4px 16px;'
+                'max-width:650px;min-width:280px;padding:14px 0;'
+                'border-bottom:1px solid rgba(0,0,0,.08)">'
+                '<strong style="flex:0 0 140px;color:#111;'
                 'font-weight:700">' + html.escape(str(clave)) + ':</strong>'
-                '<span style="flex:1 1 160px;color:#6b6b6b">'
+                '<span style="flex:1 1 auto;color:#6b6b6b">'
                 + html.escape(str(valor)) + '</span>'
                 '</div>'
             )
@@ -298,20 +317,24 @@ def generar_descripcion_html(datos: dict, banner: dict | None = None,
     elif isinstance(video_youtube, str) and video_youtube.strip():
         url_embed = url_embed_youtube(video_youtube.strip())
         if url_embed:
-            # NO se usa el truco responsive de position:absolute+inset:0 en
-            # el <iframe> -- probado en vivo 12-ago-2026 (producto real
-            # TOP250414656): WordPress borra el atributo style ESPECIFICO de
-            # <iframe> al guardar la descripcion (aunque lo respeta en <div>,
-            # por eso el marco de alrededor si sobrevive), asi que el iframe
-            # quedaba con el tamano minimo de fabrica del navegador, flotando
-            # en un contenedor vacio. width/height como atributos HTML
-            # comunes (no CSS) SI sobreviven -- es el mismo mecanismo que usa
-            # el propio oEmbed de WordPress para videos de YouTube.
+            # NO se usa el truco responsive CLASICO de position:absolute+
+            # inset:0 en el <iframe> -- probado en vivo 12-ago-2026 (producto
+            # real TOP250414656): WordPress borra el atributo style
+            # ESPECIFICO de <iframe> al guardar la descripcion (aunque lo
+            # respeta en <div>, por eso el marco de alrededor si sobrevive).
+            # En su lugar (13-ago-2026): aspect-ratio:16/9 en el <div> (SI
+            # sobrevive, es un div) le da una altura DEFINIDA basada en su
+            # propio ancho, y el <iframe> toma width="100%" height="100%"
+            # como ATRIBUTOS HTML comunes (no CSS -- estos SI sobreviven,
+            # igual que antes) -- probado contra la tienda real: la relacion
+            # de aspecto queda exacta (1.78 = 16:9) en cualquier ancho. Antes
+            # el iframe llevaba height="400" fijo, que en celular (fila de
+            # ~335px de ancho) quedaba casi cuadrado en vez de panoramico.
             video = (
-                '<div style="margin-top:16px;border-radius:8px;'
-                'overflow:hidden">'
+                '<div style="aspect-ratio:16/9;margin-top:16px;'
+                'border-radius:8px;overflow:hidden;background:#000">'
                 '<iframe src="' + html.escape(url_embed, quote=True) + '" '
-                'width="100%" height="400" frameborder="0" allow='
+                'width="100%" height="100%" frameborder="0" allow='
                 '"accelerometer;autoplay;clipboard-write;encrypted-media;'
                 'gyroscope;picture-in-picture;web-share" '
                 'allowfullscreen></iframe></div>'
@@ -326,13 +349,18 @@ def generar_descripcion_html(datos: dict, banner: dict | None = None,
                      'Ver video del producto</a></p>')
 
     # Banner: flota a la derecha para que la ficha tecnica fluya a su
-    # alrededor (ver docstring).
+    # alrededor (ver docstring). min-width:280px (13-ago-2026, celular): sin
+    # esto, en una pantalla angosta el banner tambien se achicaba al 50%
+    # (un banner minusculo) en vez de ocupar casi todo el ancho como en la
+    # referencia real en celular. max-width:100% evita que se desborde en
+    # un celular MAS angosto que 280px.
     img = ""
     if banner and banner.get("url"):
         img = ('<img src="' + html.escape(str(banner["url"]), quote=True)
                + '" alt="' + html.escape(titulo, quote=True)
                + '" style="float:right;width:' + ANCHO_LATERAL + ';'
-               'height:auto;margin:0 0 20px 24px;border-radius:8px" />')
+               'min-width:280px;max-width:100%;height:auto;margin:0 0 20px '
+               '24px;border-radius:8px" />')
 
     # Caracteristicas (columna derecha, debajo del banner, al lado del video).
     lista = ""
@@ -356,14 +384,20 @@ def generar_descripcion_html(datos: dict, banner: dict | None = None,
     # iguales ADEMAS de su ancho base, y el video terminaba ocupando ~75%
     # en vez de 50%. Si falta uno de los dos, el que queda pasa a flex:1
     # para usar la fila entera en vez de dejar la mitad en blanco.
+    # min-width:320px (13-ago-2026, celular -- Angie: "el video sigue siendo
+    # muy pequeño"): con 200px el video todavia entraba al 50% en telefonos
+    # anchos, quedando chico. Con 320px por lado (640px + 24px de gap
+    # necesarios) se garantiza que se apilen en CUALQUIER celular real y
+    # el video quede a todo el ancho -- solo quedan lado a lado en
+    # contenedores mas anchos que eso (escritorio real).
     video_y_caracteristicas = ""
     if video or lista:
         ancho_video = ('flex:0 0 ' + ANCHO_LATERAL) if (video and lista) else 'flex:1'
         video_y_caracteristicas = (
             '<div style="display:flex;flex-wrap:wrap;gap:24px;margin-top:16px">'
-            + ('<div style="' + ancho_video + ';min-width:200px">'
+            + ('<div style="' + ancho_video + ';min-width:320px">'
                + video + '</div>' if video else '')
-            + ('<div style="flex:1 1 0;min-width:200px">' + lista + '</div>'
+            + ('<div style="flex:1 1 0;min-width:320px">' + lista + '</div>'
                if lista else '')
             + '</div>'
         )

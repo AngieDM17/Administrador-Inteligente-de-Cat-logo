@@ -285,6 +285,10 @@ class PruebasDescripcionVideoYoutube(unittest.TestCase):
         # WordPress borra el atributo style DEL IFRAME (aunque lo respeta en
         # el <div> de alrededor) -- width/height como atributos HTML comunes
         # SI sobreviven (mismo mecanismo que el oEmbed nativo de WordPress).
+        # aspect-ratio:16/9 en el <div> (13-ago-2026, celular): probado
+        # contra la tienda real que sobrevive y le da al iframe una relacion
+        # de aspecto correcta en cualquier ancho, en vez del height="400"
+        # fijo de antes (que en celular quedaba casi cuadrado).
         html_desc = generar_descripcion_html(
             self._datos("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
         )
@@ -292,7 +296,8 @@ class PruebasDescripcionVideoYoutube(unittest.TestCase):
             '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"', html_desc
         )
         self.assertIn('width="100%"', html_desc)
-        self.assertIn('height="400"', html_desc)
+        self.assertIn('height="100%"', html_desc)
+        self.assertIn("aspect-ratio:16/9", html_desc)
         self.assertIn("allowfullscreen", html_desc)
         # El iframe no debe llevar atributo style: se borra al guardar (12-ago-2026).
         indice_iframe = html_desc.index("<iframe")
