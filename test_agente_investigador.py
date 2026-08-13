@@ -182,7 +182,8 @@ class PruebasInvestigarProductoAlibabaYaNoSeRechaza(unittest.TestCase):
         llamada = {}
 
         async def _correr_agente_falso(link, carpeta_destino,
-                                        publicar_notificacion, evento_continuar):
+                                        publicar_notificacion, evento_continuar,
+                                        sesion_alibaba=None):
             llamada["link"] = link
             llamada["evento_continuar"] = evento_continuar
             return None  # simula "el agente no devolvio ficha estructurada"
@@ -211,7 +212,8 @@ class PruebasInvestigarProductoAlibabaYaNoSeRechaza(unittest.TestCase):
         llamada = {}
 
         async def _correr_agente_falso(link, carpeta_destino,
-                                        publicar_notificacion, evento_continuar):
+                                        publicar_notificacion, evento_continuar,
+                                        sesion_alibaba=None):
             llamada["evento_continuar"] = evento_continuar
             return None
 
@@ -258,6 +260,120 @@ class PruebasInvestigarProductoTraduceErroresDelSdk(unittest.TestCase):
                 )
         self.assertEqual(resultado["estado"], "error")
         self.assertIn("claude-agent-sdk", resultado["motivo"])
+
+
+class PruebasInvestigarProductoPasaLaSesionAlibaba(unittest.TestCase):
+    """Lote nocturno (lote_masivo.py): investigar_producto tiene que dejar
+    pasar un `sesion_alibaba` ya abierto, intacto, hasta _correr_agente --
+    esa es la pieza que permite reusar UNA sola ventana de Chrome para
+    varios productos de Alibaba seguidos en vez de abrir una por link."""
+
+    def test_sesion_alibaba_viaja_intacta_hasta_correr_agente(self):
+        sesion_falsa = object()
+        llamada = {}
+
+        async def _correr_agente_falso(link, carpeta_destino,
+                                        publicar_notificacion, evento_continuar,
+                                        sesion_alibaba=None):
+            llamada["sesion_alibaba"] = sesion_alibaba
+            return None
+
+        with mock.patch.object(ai, "_correr_agente", side_effect=_correr_agente_falso):
+            with tempfile.TemporaryDirectory() as carpeta:
+                ai.investigar_producto(
+                    "https://www.alibaba.com/product-detail/x.html",
+                    Path(carpeta), lambda m: None,
+                    sesion_alibaba=sesion_falsa,
+                )
+
+        self.assertIs(llamada.get("sesion_alibaba"), sesion_falsa)
+
+    def test_sin_sesion_alibaba_se_pasa_none(self):
+        llamada = {}
+
+        async def _correr_agente_falso(link, carpeta_destino,
+                                        publicar_notificacion, evento_continuar,
+                                        sesion_alibaba=None):
+            llamada["sesion_alibaba"] = sesion_alibaba
+            return None
+
+        with mock.patch.object(ai, "_correr_agente", side_effect=_correr_agente_falso):
+            with tempfile.TemporaryDirectory() as carpeta:
+                ai.investigar_producto(
+                    "https://www.fitnessmarket.com.co/producto/x",
+                    Path(carpeta), lambda m: None,
+                )
+
+        self.assertIsNone(llamada.get("sesion_alibaba"))
+
+
+class PruebasSlugLegible(unittest.TestCase):
+    def test_codigo_y_nombre(self):
+        ficha = {
+            "entrada_original": {"codigo_proveedor": "9060C"},
+            "producto": {"nombre_propuesto": "Compresor de Aire 3 HP"},
+        }
+        self.assertEqual(ai._slug_legible(ficha), "9060C_compresor-de-aire-3-hp")
+
+    def test_sin_nombre_propuesto_solo_codigo(self):
+        ficha = {"entrada_original": {"codigo_proveedor": "9060C"}}
+        self.assertEqual(ai._slug_legible(ficha), "9060C")
+
+    def test_sin_nada_cae_a_producto(self):
+        self.assertEqual(ai._slug_legible({}), "producto")
+
+
+class PruebasRenombrarCarpetaInvestigacion(unittest.TestCase):
+    """Lote nocturno y camino de un solo link comparten esta funcion: la
+    carpeta temporal (uuid) pasa a llamarse '<codigo>_<nombre-en-slug>' en
+    cuanto la ficha existe, sin pisar nunca una carpeta previa con el mismo
+    nombre."""
+
+    def test_renombra_a_codigo_y_nombre_slug(self):
+        with tempfile.TemporaryDirectory() as carpeta:
+            vieja = Path(carpeta) / "98e81bdc9cda45089c5dcd88131218e3"
+            vieja.mkdir()
+            (vieja / "ficha_investigada_9060C.json").write_text("{}", encoding="utf-8")
+            ficha = {
+                "entrada_original": {"codigo_proveedor": "9060C"},
+                "producto": {"nombre_propuesto": "Compresor de Aire 3 HP"},
+            }
+
+            nueva = ai.renombrar_carpeta_investigacion(vieja, ficha, lambda m: None)
+
+            self.assertEqual(nueva.name, "9060C_compresor-de-aire-3-hp")
+            self.assertTrue(nueva.is_dir())
+            self.assertFalse(vieja.exists())
+            # El contenido viajo con la carpeta (rename, no copia+borrado).
+            self.assertTrue((nueva / "ficha_investigada_9060C.json").is_file())
+
+    def test_colision_agrega_sufijo_numerico_sin_pisar_la_existente(self):
+        with tempfile.TemporaryDirectory() as carpeta:
+            existente = Path(carpeta) / "9060C_compresor-de-aire-3-hp"
+            existente.mkdir()
+            (existente / "marca.txt").write_text("producto viejo", encoding="utf-8")
+
+            vieja = Path(carpeta) / "otro-job-id"
+            vieja.mkdir()
+            ficha = {
+                "entrada_original": {"codigo_proveedor": "9060C"},
+                "producto": {"nombre_propuesto": "Compresor de Aire 3 HP"},
+            }
+
+            nueva = ai.renombrar_carpeta_investigacion(vieja, ficha, lambda m: None)
+
+            self.assertEqual(nueva.name, "9060C_compresor-de-aire-3-hp-2")
+            self.assertTrue(nueva.is_dir())
+            # La carpeta existente NO se toco.
+            self.assertTrue(existente.is_dir())
+            self.assertEqual(
+                (existente / "marca.txt").read_text(encoding="utf-8"), "producto viejo",
+            )
+
+    def test_carpeta_inexistente_devuelve_la_misma_ruta_sin_lanzar(self):
+        ruta_falsa = Path("no_existe_esta_carpeta_1234")
+        resultado = ai.renombrar_carpeta_investigacion(ruta_falsa, {}, lambda m: None)
+        self.assertEqual(resultado, ruta_falsa)
 
 
 if __name__ == "__main__":

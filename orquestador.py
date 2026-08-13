@@ -44,6 +44,7 @@ import musica
 import redactor_ia
 import subtitulos
 import voz_en_off
+import youtube_uploader
 from cliente_tienda import ErrorTienda, cargar_env
 from ensamblar_video_producto import generar_a_archivo as ensamblar_video
 from marca_agua import generar_a_archivo as aplicar_marca_agua
@@ -107,6 +108,58 @@ def _guardar_ficha(ruta_ficha: Path, ficha: dict) -> None:
         json.dumps(ficha, ensure_ascii=False, indent=2), encoding="utf-8"
     )
     os.replace(temporal, ruta_ficha)
+
+
+def _descripcion_youtube(ficha: dict) -> str:
+    """Arma la descripcion del video para YouTube: caracteristicas del
+    producto (si la ficha las trae) + la misma frase de marca que ya usa la
+    voz en off (ver voz_en_off.FRASE_FIJA), para que el texto sea consistente
+    entre el video y su descripcion en YouTube."""
+    caracteristicas = [
+        c.strip() for c in (ficha.get("caracteristicas") or [])
+        if isinstance(c, str) and c.strip()
+    ]
+    partes = list(caracteristicas) + [voz_en_off.FRASE_FIJA]
+    return "\n".join(partes)
+
+
+def _resolver_video_a_publicar(ficha: dict, ruta_ficha: Path, ruta_video_final: Path,
+                               publicar_notificacion: Notificador) -> Path | None:
+    """Decide COMO llega el video a publicador.ejecutar(): a YouTube (la
+    ficha guarda la URL resultante en multimedia.video_youtube y esta funcion
+    devuelve None, para NO subir tambien el mp4 crudo a WordPress -- es "en
+    vez de", no "ademas de", pedido explicito de Angie) o directo a WordPress
+    como siempre (devuelve ruta_video_final sin tocar la ficha), si YouTube
+    todavia no esta autorizado o la subida falla.
+
+    NUNCA lanza: un error real de YouTube (cuota agotada -- ver el limite
+    documentado en youtube_uploader.py --, red caida, etc.) cae al camino de
+    WordPress de siempre en vez de tumbar el pipeline. YouTube es una mejora
+    opcional, no puede poner en riesgo la publicacion del borrador."""
+    if not youtube_uploader.disponible():
+        return ruta_video_final
+    publicar_notificacion("Subiendo el video a YouTube...")
+    titulo = (
+        (ficha.get("producto") or {}).get("nombre_propuesto")
+        or _codigo_proveedor(ficha) or "Producto Ekipon"
+    )
+    try:
+        subido = youtube_uploader.subir_video(
+            ruta_video_final, titulo=titulo,
+            descripcion=_descripcion_youtube(ficha),
+        )
+    except Exception as error:
+        publicar_notificacion(
+            f"No se pudo subir el video a YouTube ({error}); se sube el "
+            "video directo a la tienda, como antes."
+        )
+        return ruta_video_final
+    if not isinstance(ficha.get("multimedia"), dict):
+        ficha["multimedia"] = {}
+    ficha["multimedia"]["video_youtube"] = subido["url"]
+    _guardar_ficha(ruta_ficha, ficha)
+    publicar_notificacion(f"Video en YouTube: {subido['url']}")
+    return None
 
 
 def _interpretar_fallo_publicacion(resultado_publicacion: dict) -> dict:
@@ -388,6 +441,13 @@ def ejecutar_pipeline(ruta_ficha: Path, publicar_notificacion: Notificador) -> d
         publicar_notificacion(f"ERROR: {error}")
         return {"estado": "error", "motivo": str(error)}
 
+    # --- Video: a YouTube si esta autorizado, si no directo a WordPress ----
+    # (como siempre). Ver _resolver_video_a_publicar: nunca lanza, cualquier
+    # error real de YouTube cae sola al camino de WordPress de siempre.
+    ruta_video_a_publicar = _resolver_video_a_publicar(
+        ficha, ruta_ficha, ruta_video_final, publicar_notificacion,
+    )
+
     # --- Publicacion (CHECKPOINT 2 vive adentro de este paso) -----------
     publicar_notificacion("Publicando el borrador en la tienda de pruebas...")
     import publicador  # import diferido: evita el costo de importarlo si el
@@ -396,7 +456,7 @@ def ejecutar_pipeline(ruta_ficha: Path, publicar_notificacion: Notificador) -> d
     resultado_publicacion: dict = {}
     try:
         codigo_salida = publicador.ejecutar(
-            ruta_ficha, simular=False, ruta_video=ruta_video_final,
+            ruta_ficha, simular=False, ruta_video=ruta_video_a_publicar,
             resultado=resultado_publicacion,
             motivos_revision=motivos_colador,
         )

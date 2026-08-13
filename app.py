@@ -35,12 +35,13 @@ import time
 import uuid
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 import agente_investigador
+import lote_masivo
 import navegador_alibaba
 from orquestador import ejecutar_pipeline
 
@@ -48,10 +49,14 @@ CARPETA_PROYECTO = Path(__file__).parent
 RUTA_INDEX = CARPETA_PROYECTO / "static" / "index.html"
 RUTA_ASSETS = CARPETA_PROYECTO / "static" / "assets"
 # Carpeta donde el agente investigador (Fase 2a) guarda la ficha + fotos
-# reales de cada link investigado. Una subcarpeta por job_id: evita
-# colisiones entre corridas y no depende de conocer el codigo de proveedor
-# ANTES de investigar (se sabe recien cuando el agente termina).
+# reales de cada link investigado. Una subcarpeta por job_id (mientras
+# corre; se renombra a un nombre legible apenas la ficha existe, ver
+# agente_investigador.renombrar_carpeta_investigacion): evita colisiones
+# entre corridas y no depende de conocer el codigo de proveedor ANTES de
+# investigar (se sabe recien cuando el agente termina).
 CARPETA_INVESTIGACIONES = CARPETA_PROYECTO / "investigaciones"
+# Carpeta donde se guardan los Excel subidos del lote nocturno (Fase 3).
+CARPETA_LOTES = CARPETA_PROYECTO / "lotes"
 
 # Cuanto espera cada vuelta del generador SSE cuando no hay mensajes nuevos
 # (poll corto, no busy-loop agresivo; el trabajo real vive en el hilo del
@@ -157,6 +162,19 @@ def _correr_pipeline(job_id: str, entrada: str) -> None:
                 job.marcar_terminado()
                 return
             ruta_ficha = Path(resultado_investigacion["ruta_ficha"])
+            # Carpeta legible (10-ago-2026): investigar_producto trabajo en
+            # una carpeta temporal por uuid (job_id) porque el nombre real
+            # del producto no se conoce hasta que la ficha existe. Ahora que
+            # ya existe, se renombra a '<codigo>_<nombre-en-slug>' -- misma
+            # funcion compartida que usa lote_masivo.py, para no duplicar la
+            # logica de slug/colision entre los dos caminos. El resto del
+            # pipeline (ejecutar_pipeline mas abajo) sigue con la ruta
+            # NUEVA, nunca con la carpeta vieja.
+            ficha = json.loads(ruta_ficha.read_text(encoding="utf-8-sig"))
+            carpeta_nueva = agente_investigador.renombrar_carpeta_investigacion(
+                ruta_ficha.parent, ficha, notificar,
+            )
+            ruta_ficha = carpeta_nueva / ruta_ficha.name
         else:
             ruta_ficha = Path(entrada)
 
@@ -208,6 +226,72 @@ def generar(peticion: PeticionGenerar) -> dict:
 
     hilo = threading.Thread(
         target=_correr_pipeline, args=(job_id, entrada_normalizada),
+        daemon=True,
+    )
+    hilo.start()
+    return {"job_id": job_id}
+
+
+def _correr_lote(job_id: str, ruta_excel: Path) -> None:
+    """Corre lote_masivo.procesar_lote en el hilo de fondo del job -- mismo
+    patron que _correr_pipeline (arriba), notificar() traduce el prefijo de
+    Alibaba al mismo evento SSE "necesita_confirmacion" (una unica sesion
+    compartida para todo el lote, ver lote_masivo.py, asi que esto puede
+    pasar como mucho una vez por lote, no una vez por producto)."""
+    job = _JOBS[job_id]
+
+    def notificar(mensaje: str) -> None:
+        if mensaje.startswith(navegador_alibaba.PREFIJO_ESPERANDO_CONFIRMACION):
+            job.agregar({"tipo": "necesita_confirmacion", "mensaje": mensaje})
+        else:
+            job.agregar({"tipo": "progreso", "mensaje": mensaje})
+
+    try:
+        resultado_lote = lote_masivo.procesar_lote(
+            ruta_excel, CARPETA_INVESTIGACIONES, notificar,
+            evento_continuar=job.evento_continuar,
+        )
+        resultado = {"estado": "lote_terminado", **resultado_lote}
+    except Exception as error:
+        # Ultima red de seguridad, mismo criterio que _correr_pipeline:
+        # procesar_lote() no deberia lanzar nunca (cada producto se atrapa
+        # solo, ver _procesar_producto), pero si algo se escapa igual la
+        # pagina no se queda esperando un final que nunca llega.
+        resultado = {
+            "estado": "error",
+            "motivo": f"Error inesperado del servidor procesando el lote: {error}",
+        }
+    job.agregar({"tipo": "final", "resultado": resultado})
+    job.marcar_terminado()
+
+
+@app.post("/generar-lote")
+async def generar_lote(archivo: UploadFile = File(...)) -> dict:
+    """Recibe el .xlsx del lote nocturno (columnas Link / Nota opcional /
+    Estado), lo guarda en lotes/ (gitignored, igual que investigaciones/) y
+    arranca lote_masivo.procesar_lote en un hilo aparte -- mismo patron de
+    hilo + _Job + SSE que /generar, reusando el mismo job_id para
+    /eventos/{job_id} y /continuar/{job_id}."""
+    nombre = Path(archivo.filename or "lote.xlsx").name
+    if not nombre.lower().endswith(".xlsx"):
+        raise HTTPException(
+            status_code=400,
+            detail="El archivo tiene que ser un Excel .xlsx.",
+        )
+
+    CARPETA_LOTES.mkdir(parents=True, exist_ok=True)
+    job_id = uuid.uuid4().hex
+    ruta_excel = CARPETA_LOTES / f"{job_id}_{nombre}"
+    contenido = await archivo.read()
+    if not contenido:
+        raise HTTPException(status_code=400, detail="El archivo esta vacio.")
+    ruta_excel.write_bytes(contenido)
+
+    with _JOBS_LOCK:
+        _JOBS[job_id] = _Job()
+
+    hilo = threading.Thread(
+        target=_correr_lote, args=(job_id, ruta_excel),
         daemon=True,
     )
     hilo.start()

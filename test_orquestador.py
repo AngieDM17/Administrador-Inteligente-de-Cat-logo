@@ -18,6 +18,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import orquestador
 
@@ -56,6 +57,99 @@ class PruebasCodigoProveedor(unittest.TestCase):
         self.assertIsNone(
             orquestador._codigo_proveedor({"entrada_original": {"codigo_proveedor": "   "}})
         )
+
+
+class PruebasDescripcionYoutube(unittest.TestCase):
+    def test_incluye_caracteristicas_y_frase_de_marca(self):
+        ficha = {"caracteristicas": ["Motor 2HP", "Tanque 50L", "  ", 123]}
+        descripcion = orquestador._descripcion_youtube(ficha)
+        self.assertIn("Motor 2HP", descripcion)
+        self.assertIn("Tanque 50L", descripcion)
+        self.assertIn("Ekipon.co", descripcion)
+        # Entradas no-string o vacias no ensucian la descripcion.
+        self.assertNotIn("123", descripcion)
+
+    def test_sin_caracteristicas_solo_trae_la_frase_de_marca(self):
+        descripcion = orquestador._descripcion_youtube({})
+        self.assertIn("Ekipon.co", descripcion)
+
+
+class PruebasResolverVideoAPublicar(unittest.TestCase):
+    """_resolver_video_a_publicar(): decide YouTube vs. WordPress. Se mockea
+    orquestador.youtube_uploader entero (disponible/subir_video) -- ninguna
+    de estas pruebas toca la red ni sube nada real."""
+
+    def _ficha(self):
+        return {
+            "entrada_original": {"codigo_proveedor": "TEST-YT"},
+            "producto": {"nombre_propuesto": "PRODUCTO DE PRUEBA"},
+            "multimedia": {},
+        }
+
+    def test_no_disponible_devuelve_ruta_video_final_sin_tocar_la_ficha(self):
+        with tempfile.TemporaryDirectory() as carpeta_str:
+            ruta_ficha = Path(carpeta_str) / "ficha.json"
+            ficha = self._ficha()
+            ruta_ficha.write_text(json.dumps(ficha), encoding="utf-8")
+            ruta_video_final = Path(carpeta_str) / "video_final.mp4"
+            mensajes = []
+            with mock.patch.object(orquestador, "youtube_uploader") as falso:
+                falso.disponible.return_value = False
+                resultado = orquestador._resolver_video_a_publicar(
+                    ficha, ruta_ficha, ruta_video_final, mensajes.append,
+                )
+            self.assertEqual(resultado, ruta_video_final)
+            falso.subir_video.assert_not_called()
+            self.assertEqual(ficha["multimedia"], {})
+
+    def test_exito_guarda_url_en_la_ficha_y_devuelve_none(self):
+        with tempfile.TemporaryDirectory() as carpeta_str:
+            ruta_ficha = Path(carpeta_str) / "ficha.json"
+            ficha = self._ficha()
+            ruta_ficha.write_text(json.dumps(ficha), encoding="utf-8")
+            ruta_video_final = Path(carpeta_str) / "video_final.mp4"
+            mensajes = []
+            with mock.patch.object(orquestador, "youtube_uploader") as falso:
+                falso.disponible.return_value = True
+                falso.subir_video.return_value = {
+                    "video_id": "XYZ", "url": "https://www.youtube.com/watch?v=XYZ",
+                }
+                resultado = orquestador._resolver_video_a_publicar(
+                    ficha, ruta_ficha, ruta_video_final, mensajes.append,
+                )
+            self.assertIsNone(resultado)
+            self.assertEqual(
+                ficha["multimedia"]["video_youtube"],
+                "https://www.youtube.com/watch?v=XYZ",
+            )
+            # Se guardo en disco: publicador.ejecutar() vuelve a leer la
+            # ficha del archivo, no del dict en memoria (ver _guardar_ficha).
+            en_disco = json.loads(ruta_ficha.read_text(encoding="utf-8"))
+            self.assertEqual(
+                en_disco["multimedia"]["video_youtube"],
+                "https://www.youtube.com/watch?v=XYZ",
+            )
+            self.assertTrue(any("YouTube" in m for m in mensajes))
+
+    def test_falla_la_subida_cae_a_wordpress_sin_tumbar_nada(self):
+        with tempfile.TemporaryDirectory() as carpeta_str:
+            ruta_ficha = Path(carpeta_str) / "ficha.json"
+            ficha = self._ficha()
+            ruta_ficha.write_text(json.dumps(ficha), encoding="utf-8")
+            ruta_video_final = Path(carpeta_str) / "video_final.mp4"
+            mensajes = []
+            with mock.patch.object(orquestador, "youtube_uploader") as falso:
+                falso.disponible.return_value = True
+                falso.subir_video.side_effect = RuntimeError("cuota agotada")
+                resultado = orquestador._resolver_video_a_publicar(
+                    ficha, ruta_ficha, ruta_video_final, mensajes.append,
+                )
+            self.assertEqual(resultado, ruta_video_final)
+            self.assertEqual(ficha["multimedia"], {})
+            self.assertTrue(any("cuota agotada" in m for m in mensajes))
+            # La ficha en disco NO cambio: no se guardo nada tras el fallo.
+            en_disco = json.loads(ruta_ficha.read_text(encoding="utf-8"))
+            self.assertEqual(en_disco["multimedia"], {})
 
 
 class PruebasCheckpointColador(unittest.TestCase):

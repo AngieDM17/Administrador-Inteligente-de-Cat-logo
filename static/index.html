@@ -243,6 +243,29 @@
     background: #fff;
     box-shadow: 0 0 0 4px var(--naranja-suave);
   }
+  /* ---------- Campo de archivo (lote nocturno) ---------- */
+  input[type="file"] {
+    width: 100%;
+    padding: 13px 16px 13px 46px;
+    font-family: "Montserrat", sans-serif;
+    font-size: .9rem;
+    color: var(--oscuro);
+    border: 1.5px solid var(--gris-borde);
+    border-radius: 16px;
+    background: var(--crema);
+  }
+  input[type="file"]::file-selector-button {
+    margin-right: 12px;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 10px;
+    background: var(--naranja-suave);
+    color: var(--naranja);
+    font-family: "Montserrat", sans-serif;
+    font-weight: 700;
+    font-size: .82rem;
+    cursor: pointer;
+  }
   p.ayuda {
     font-size: .84rem;
     color: var(--gris-texto);
@@ -327,6 +350,7 @@
     margin-bottom: 22px;
   }
   #panel-progreso { display: none; }
+  #panel-progreso-lote { display: none; }
   .cabecera-progreso {
     display: flex;
     align-items: center;
@@ -358,7 +382,28 @@
   .etiqueta-estado.en-curso { background: var(--naranja-suave); color: var(--naranja); }
   .etiqueta-estado.espera { background: var(--turquesa-suave); color: var(--turquesa); }
 
-  /* ---------- Aviso "necesita confirmacion" (Fase 2b, Alibaba) ---------- */
+  /* ---------- Registro simple del lote (una linea por mensaje) ---------- */
+  ul.lista-log {
+    list-style: none;
+    margin: 0 0 4px;
+    padding: 0;
+    max-height: 320px;
+    overflow-y: auto;
+  }
+  ul.lista-log li.linea-detalle {
+    font-size: .86rem;
+    color: var(--gris-texto);
+    line-height: 1.7;
+    border-bottom: 1px dashed var(--gris-borde);
+    padding: 5px 2px;
+  }
+  ul.lista-log li.linea-detalle:last-child { border-bottom: none; }
+
+  /* ---------- Aviso "necesita confirmacion" (Fase 2b, Alibaba) ----------
+     Elemento COMPARTIDO entre el camino de un solo link y el lote (un solo
+     job corre a la vez en el servidor, ver app.py): vive FUERA de las dos
+     tarjetas de progreso a proposito, para que mostrarlo no dependa de que
+     su tarjeta padre este visible. */
   #caja-confirmacion {
     display: none;
     align-items: flex-start;
@@ -646,6 +691,27 @@
     </p>
   </div>
 
+  <div class="barra-entrada" id="barra-lote">
+    <div class="etiqueta-campo"><span class="numero">2</span> Lote de jornada — subí un Excel con varios links</div>
+    <div class="fila-entrada">
+      <div class="campo-con-icono">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>
+        <input type="file" id="archivo-lote" accept=".xlsx">
+      </div>
+      <button id="boton-lote">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v13"/></svg>
+        Procesar lote
+      </button>
+    </div>
+    <p class="ayuda">
+      El Excel necesita una columna <code>Link</code> con un link de producto por fila
+      (columna <code>Nota</code> opcional, para tus comentarios). El sistema los procesa
+      uno detrás del otro, sin que tengas que estar presente, y va marcando la columna
+      <code>Estado</code> de cada fila a medida que termina — pensado para dejarlo
+      corriendo mientras hacés otra cosa durante tu jornada.
+    </p>
+  </div>
+
   <div class="fila-features">
     <div class="feature">
       <div class="insignia bg-naranja">
@@ -684,24 +750,32 @@
     </div>
   </div>
 
+  <div id="caja-confirmacion">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l2.5 2.5"/></svg>
+    <div class="texto-confirmacion">
+      <strong>Se abrió una ventana de Chrome — necesita que hagas algo ahí.</strong>
+      <span id="mensaje-confirmacion"></span>
+      <br>
+      <button id="boton-continuar">Ya resolví, continuar</button>
+    </div>
+  </div>
+
   <div class="tarjeta" id="panel-progreso">
     <div class="cabecera-progreso">
       <h2>Armando el producto</h2>
       <span class="etiqueta-estado en-curso" id="etiqueta-estado">Trabajando</span>
     </div>
     <div class="recorrido" id="recorrido"></div>
-
-    <div id="caja-confirmacion">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l2.5 2.5"/></svg>
-      <div class="texto-confirmacion">
-        <strong>Se abrió una ventana de Chrome — necesita que hagas algo ahí.</strong>
-        <span id="mensaje-confirmacion"></span>
-        <br>
-        <button id="boton-continuar">Ya resolví, continuar</button>
-      </div>
-    </div>
-
     <div id="caja-resultado"></div>
+  </div>
+
+  <div class="tarjeta" id="panel-progreso-lote">
+    <div class="cabecera-progreso">
+      <h2>Procesando el lote</h2>
+      <span class="etiqueta-estado en-curso" id="etiqueta-estado-lote">Trabajando</span>
+    </div>
+    <ul class="lista-log" id="lista-progreso-lote"></ul>
+    <div id="caja-resultado-lote"></div>
   </div>
 </main>
 
@@ -982,6 +1056,147 @@ boton.addEventListener('click', generar);
 inputRuta.addEventListener('keydown', (evento) => {
   if (evento.key === 'Enter') generar();
 });
+
+// ---------- Lote nocturno (varios links de una vez, vía Excel) ----------
+
+const inputLote = document.getElementById('archivo-lote');
+const botonLote = document.getElementById('boton-lote');
+const panelLote = document.getElementById('panel-progreso-lote');
+const etiquetaLote = document.getElementById('etiqueta-estado-lote');
+const listaLote = document.getElementById('lista-progreso-lote');
+const cajaResultadoLote = document.getElementById('caja-resultado-lote');
+
+function agregarLineaLote(texto, clase) {
+  const li = document.createElement('li');
+  li.className = 'linea-detalle' + (clase ? ' ' + clase : '');
+  li.textContent = texto;
+  listaLote.appendChild(li);
+  li.scrollIntoView({ block: 'nearest' });
+}
+
+function marcarEstadoLote(clase, texto) {
+  etiquetaLote.className = 'etiqueta-estado ' + clase;
+  etiquetaLote.textContent = texto;
+}
+
+function mostrarResultadoLote(resultado) {
+  cajaResultadoLote.innerHTML = '';
+  const procesados = resultado.procesados || [];
+  const listos = procesados.filter((p) => p.estado.startsWith('✅')).length;
+  const conAviso = procesados.filter((p) => p.estado.startsWith('⚠️')).length;
+  const fallidos = procesados.filter((p) => p.estado.startsWith('❌')).length;
+  const huboProblemas = conAviso > 0 || fallidos > 0;
+
+  marcarEstadoLote(
+    huboProblemas ? 'revisar' : 'listo',
+    huboProblemas ? '✓ Lote terminado — con avisos' : '✓ Lote terminado',
+  );
+
+  const caja = document.createElement('div');
+  caja.className = 'caja-resultado ' + (huboProblemas ? 'revisar' : 'listo');
+  caja.innerHTML =
+    `<strong>Terminó el lote de ${resultado.total ?? procesados.length} producto(s): ` +
+    `${listos} listo(s), ${conAviso} con aviso, ${fallidos} con error.</strong>`;
+  const ul = document.createElement('ul');
+  procesados.forEach((p) => {
+    const li = document.createElement('li');
+    li.textContent = `${p.link} — ${p.estado}`;
+    ul.appendChild(li);
+  });
+  caja.appendChild(ul);
+  cajaResultadoLote.appendChild(caja);
+}
+
+async function generarLote() {
+  const archivo = inputLote.files[0];
+  if (!archivo) {
+    alert('Elegí primero el archivo .xlsx con los links.');
+    return;
+  }
+
+  botonLote.disabled = true;
+  panelLote.style.display = 'block';
+  listaLote.innerHTML = '';
+  cajaResultadoLote.innerHTML = '';
+  ocultarConfirmacionPendiente();
+  marcarEstadoLote('en-curso', 'Trabajando');
+  panelLote.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  const datosFormulario = new FormData();
+  datosFormulario.append('archivo', archivo);
+
+  let respuesta;
+  try {
+    respuesta = await fetch('/generar-lote', { method: 'POST', body: datosFormulario });
+  } catch (error) {
+    marcarEstadoLote('error', '✕ Error');
+    agregarLineaLote('No se pudo conectar con el servidor local: ' + error, 'error-texto');
+    botonLote.disabled = false;
+    return;
+  }
+
+  if (!respuesta.ok) {
+    const detalle = await respuesta.json().catch(() => ({}));
+    marcarEstadoLote('error', '✕ Error');
+    agregarLineaLote(detalle.detail || 'No se pudo iniciar el lote.', 'error-texto');
+    botonLote.disabled = false;
+    return;
+  }
+
+  const { job_id: jobId } = await respuesta.json();
+  const fuente = new EventSource(`/eventos/${jobId}`);
+
+  // Mismo elemento compartido de confirmacion que el camino de un solo
+  // link (un solo job corre a la vez en el servidor) -- se redefine el
+  // handler para que apunte al job_id de ESTE lote.
+  botonContinuar.onclick = async () => {
+    botonContinuar.disabled = true;
+    botonContinuar.textContent = 'Avisando...';
+    try {
+      await fetch(`/continuar/${jobId}`, { method: 'POST' });
+    } catch (error) {
+      botonContinuar.disabled = false;
+      botonContinuar.textContent = 'Ya resolví, continuar';
+      return;
+    }
+    mensajeConfirmacion.textContent = 'Listo, avisado — retomando el lote...';
+    botonContinuar.style.display = 'none';
+    marcarEstadoLote('en-curso', 'Trabajando');
+  };
+
+  fuente.onmessage = (evento) => {
+    const datosEvento = JSON.parse(evento.data);
+    if (datosEvento.tipo === 'progreso') {
+      const esError = datosEvento.mensaje.startsWith('ERROR')
+        || datosEvento.mensaje.includes('Error inesperado');
+      agregarLineaLote(datosEvento.mensaje, esError ? 'error-texto' : null);
+    } else if (datosEvento.tipo === 'necesita_confirmacion') {
+      botonContinuar.style.display = 'inline-flex';
+      mostrarConfirmacionPendiente(datosEvento.mensaje);
+    } else if (datosEvento.tipo === 'final') {
+      ocultarConfirmacionPendiente();
+      if (datosEvento.resultado.estado === 'error') {
+        marcarEstadoLote('error', '✕ Error');
+        agregarLineaLote(datosEvento.resultado.motivo || 'Error sin detalle.', 'error-texto');
+      } else {
+        mostrarResultadoLote(datosEvento.resultado);
+      }
+      fuente.close();
+      botonLote.disabled = false;
+    }
+  };
+
+  fuente.onerror = () => {
+    if (cajaResultadoLote.innerHTML === '') {
+      marcarEstadoLote('error', '✕ Error');
+      agregarLineaLote('Se perdió la conexión con el servidor antes de terminar.', 'error-texto');
+      botonLote.disabled = false;
+    }
+    fuente.close();
+  };
+}
+
+botonLote.addEventListener('click', generarLote);
 </script>
 </body>
 </html>

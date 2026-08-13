@@ -27,6 +27,11 @@ _productos_nuevos/
 # por producto, regenerable corriendo investigar_producto() de nuevo.
 investigaciones/
 
+# Excel del lote nocturno (Fase 3): los sube Angie con links reales, y el
+# sistema los reescribe con el Estado de cada producto -- estado local, no
+# codigo.
+lotes/
+
 # Perfil propio y persistente de Playwright para Alibaba (Fase 2b): trae
 # cookies reales de la cuenta de Angie -- nunca se commitea. Separado de su
 # Chrome real, ver navegador_alibaba.py.

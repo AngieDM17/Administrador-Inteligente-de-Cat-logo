@@ -325,7 +325,8 @@ def _slug_codigo(ficha: dict) -> str:
 
 async def _correr_agente(link: str, carpeta_destino: Path,
                           publicar_notificacion: Notificador,
-                          evento_continuar: threading.Event) -> dict | None:
+                          evento_continuar: threading.Event,
+                          sesion_alibaba=None) -> dict | None:
     """Corre claude_agent_sdk.query() con las tools de navegador propias y
     el output_format del contrato v1.4. Import diferido de
     claude_agent_sdk/herramientas_navegador: asi quien solo usa el camino
@@ -337,19 +338,33 @@ async def _correr_agente(link: str, carpeta_destino: Path,
     login/CAPTCHA) en vez de las funciones stateless de
     `herramientas_navegador.py` -- mismos nombres de tool, misma firma:
     `fuente` es indistintamente el modulo o la sesion, el resto del codigo
-    de abajo no necesita saber cual de los dos es."""
+    de abajo no necesita saber cual de los dos es.
+
+    `sesion_alibaba`, si se pasa, es una instancia YA ABIERTA de
+    `navegador_alibaba.SesionAlibaba` para REUSAR entre varias llamadas
+    (lote_masivo.py: una sola sesion para todo el lote nocturno, asi el
+    CAPTCHA/login de Alibaba se resuelve UNA vez, no una vez por producto
+    -- ver SesionAlibaba._primera_navegacion, que solo pausa en la primera
+    navegacion real de la instancia). En ese caso esta funcion NO la cierra
+    al terminar -- la cierra quien la creo, al final del lote. Si no se
+    pasa (comportamiento de siempre para un solo link), y el link es de
+    Alibaba, se crea una sesion PROPIA que esta funcion SI cierra en su
+    `finally`, igual que antes de este parametro."""
     from claude_agent_sdk import ClaudeAgentOptions, create_sdk_mcp_server, query, tool
 
     import herramientas_navegador as nav
 
-    sesion_alibaba = None
+    _sesion_propia = None
     if es_alibaba(link):
-        import navegador_alibaba
+        if sesion_alibaba is not None:
+            fuente = sesion_alibaba
+        else:
+            import navegador_alibaba
 
-        sesion_alibaba = navegador_alibaba.SesionAlibaba(
-            publicar_notificacion, evento_continuar,
-        )
-        fuente = sesion_alibaba
+            _sesion_propia = navegador_alibaba.SesionAlibaba(
+                publicar_notificacion, evento_continuar,
+            )
+            fuente = _sesion_propia
     else:
         fuente = nav
 
@@ -570,13 +585,15 @@ async def _correr_agente(link: str, carpeta_destino: Path,
                 f"espurio despues del resultado real: {error})"
             )
     finally:
-        # La sesion de Alibaba (ventana visible + perfil persistente) se
-        # cierra siempre al terminar esta corrida -- exito, error, o
+        # La sesion de Alibaba PROPIA (ventana visible + perfil persistente)
+        # se cierra siempre al terminar esta corrida -- exito, error, o
         # excepcion -- para no dejar un Chromium huerfano abierto. El
         # user_data_dir en disco NO se borra: las cookies quedan para la
-        # proxima corrida (ver navegador_alibaba.SesionAlibaba.cerrar).
-        if sesion_alibaba is not None:
-            await asyncio.to_thread(sesion_alibaba.cerrar)
+        # proxima corrida (ver navegador_alibaba.SesionAlibaba.cerrar). Si
+        # la sesion vino REUSADA desde afuera (lote_masivo.py), NO se cierra
+        # aca -- la cierra quien la creo, al final del lote completo.
+        if _sesion_propia is not None:
+            await asyncio.to_thread(_sesion_propia.cerrar)
 
     if ultimo_mensaje_error is not None:
         raise ErrorInvestigacion(
@@ -587,7 +604,8 @@ async def _correr_agente(link: str, carpeta_destino: Path,
 
 def investigar_producto(link: str, carpeta_destino: Path,
                          publicar_notificacion: Notificador,
-                         evento_continuar: threading.Event | None = None) -> dict:
+                         evento_continuar: threading.Event | None = None,
+                         sesion_alibaba=None) -> dict:
     """Punto de entrada sincrono (mismo criterio que el resto del pipeline:
     orquestador.py y sus pasos son funciones sincronas, llamadas desde el
     hilo de fondo de app.py -- ver _correr_pipeline). Investiga `link` con
@@ -603,6 +621,13 @@ def investigar_producto(link: str, carpeta_destino: Path,
     Si no se pasa (ej. tests, o un link no-Alibaba que nunca llega a
     necesitarlo), se crea uno propio que nunca se setea desde afuera -- no
     hay problema, porque solo la tool de Alibaba llega a esperarlo.
+
+    `sesion_alibaba`, si se pasa, es una `navegador_alibaba.SesionAlibaba`
+    YA ABIERTA para reusar en vez de abrir una ventana nueva (lote_masivo.py:
+    una sola sesion para todo el lote nocturno). Viaja intacta hacia
+    `_correr_agente`, que decide si la usa (link de Alibaba) o la ignora
+    (cualquier otro link). Ver el docstring de `_correr_agente` para el
+    detalle de quien la cierra en cada caso.
 
     Devuelve SIEMPRE uno de estos dos dicts, nunca lanza:
 
@@ -626,7 +651,10 @@ def investigar_producto(link: str, carpeta_destino: Path,
 
     try:
         ficha = asyncio.run(
-            _correr_agente(link, carpeta_destino, publicar_notificacion, evento_continuar)
+            _correr_agente(
+                link, carpeta_destino, publicar_notificacion, evento_continuar,
+                sesion_alibaba=sesion_alibaba,
+            )
         )
     except ErrorInvestigacion as error:
         publicar_notificacion(f"ERROR: {error}")
@@ -672,3 +700,87 @@ def investigar_producto(link: str, carpeta_destino: Path,
     publicar_notificacion(f"Ficha investigada guardada: {ruta_ficha.name}")
 
     return {"estado": "ficha_lista", "ruta_ficha": ruta_ficha}
+
+
+# ----------------------------------------------------------------------
+# Carpeta legible (10-ago-2026, lote nocturno)
+# ----------------------------------------------------------------------
+#
+# investigar_producto() SIGUE trabajando en una carpeta temporal (uuid):
+# el nombre legible recien se puede armar cuando la ficha YA tiene
+# producto.nombre_propuesto / entrada_original.codigo_proveedor, y eso solo
+# se sabe cuando esta funcion ya termino. Por eso el renombre es un paso
+# APARTE que corre quien llama (app.py para el camino de un solo link,
+# lote_masivo.py para el lote) justo despues de recibir 'ficha_lista' --
+# una sola funcion compartida, para no duplicar la logica de slug/colision
+# entre los dos caminos.
+
+def _slug_legible(ficha: dict) -> str:
+    """'<codigo>_<nombre-en-slug>' para nombrar la carpeta de un producto de
+    forma que Angie pueda leerla a simple vista (en vez del uuid opaco de
+    la carpeta temporal). Reusa `publicador.generar_slug` (ya limpia
+    acentos/simbolos y pasa a minusculas) para la parte del nombre, y
+    `_slug_codigo` (ya usado para el nombre del archivo de la ficha) para
+    la parte del codigo -- no se duplica ninguna de las dos logicas.
+
+    Import de publicador diferido (mismo criterio que orquestador.py: evita
+    el costo de importarlo para quien no llega a necesitar el renombre)."""
+    slug_codigo = _slug_codigo(ficha)
+    producto = ficha.get("producto") or {}
+    nombre = str(producto.get("nombre_propuesto") or "").strip()
+    if not nombre:
+        return slug_codigo
+
+    import publicador
+
+    try:
+        slug_nombre = publicador.generar_slug("", nombre)
+    except ValueError:
+        return slug_codigo
+    if not slug_nombre:
+        return slug_codigo
+    return f"{slug_codigo}_{slug_nombre}"
+
+
+def renombrar_carpeta_investigacion(carpeta_actual: Path, ficha: dict,
+                                     publicar_notificacion: Notificador) -> Path:
+    """Renombra `carpeta_actual` (la carpeta temporal por uuid donde
+    investigar_producto trabajo) a un nombre legible '<codigo>_<nombre-en-
+    slug>' -- se llama DESPUES de que la ficha ya existe, con la ficha en
+    memoria. Si ya existe una carpeta con ese nombre (otro producto previo
+    con el mismo codigo/nombre), agrega un sufijo numerico -2, -3... para
+    no pisarla nunca.
+
+    Devuelve la carpeta FINAL: la renombrada si todo salio bien, o
+    `carpeta_actual` sin tocar si no se pudo (sin nombre/codigo utilizable,
+    la carpeta no existe, o el renombre en disco fallo). Quien llama tiene
+    que seguir trabajando SIEMPRE con la ruta devuelta, nunca con la
+    original -- si el renombre paso, la vieja ya no existe."""
+    carpeta_actual = Path(carpeta_actual)
+    if not carpeta_actual.is_dir():
+        return carpeta_actual
+
+    base = _slug_legible(ficha)
+    if not base:
+        return carpeta_actual
+
+    carpeta_padre = carpeta_actual.parent
+    destino = carpeta_padre / base
+    sufijo = 2
+    while destino.exists() and destino.resolve() != carpeta_actual.resolve():
+        destino = carpeta_padre / f"{base}-{sufijo}"
+        sufijo += 1
+
+    if destino.resolve() == carpeta_actual.resolve():
+        return carpeta_actual
+
+    try:
+        carpeta_actual.rename(destino)
+    except OSError as error:
+        publicar_notificacion(
+            f"No se pudo renombrar la carpeta de trabajo a '{destino.name}' "
+            f"({error}); se sigue con el nombre temporal."
+        )
+        return carpeta_actual
+
+    return destino

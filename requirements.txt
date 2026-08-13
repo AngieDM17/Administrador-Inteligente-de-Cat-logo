@@ -8,3 +8,8 @@ uvicorn[standard]
 claude-agent-sdk
 playwright
 httpx
+google-auth-oauthlib
+google-api-python-client
+google-auth-httplib2
+openpyxl
+python-multipart
