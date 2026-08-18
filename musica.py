@@ -17,7 +17,7 @@ texto ya armado y una duracion, y mezclarla -- no tiene logica de "que genero
 segun la categoria".
 
 Uso:  python musica.py <video_con_voz.mp4> "<prompt de musica>"
-      [--salida salida.mp4] [--volumen 0.12]
+      [--salida salida.mp4] [--sonoridad -17]
 
 Codigos de salida: 0 = video con musica de fondo generado; 2 = problema de
 recurso (clave de ElevenLabs faltante, video de entrada faltante/ilegible, o
@@ -55,16 +55,20 @@ DURACION_MAXIMA_MS = 600_000
 # en vez de confiar en el largo devuelto por la API.
 MARGEN_EXTRA_MS = 2000
 
-# Volumen de la musica de fondo durante la mezcla (amix), como factor sobre
-# el audio ya generado por ElevenLabs. El audio YA EXISTENTE del video (voz
-# normalizada con loudnorm + ambiente en silencio, ver
-# voz_en_off.preparar_clip_con_voz) NO se toca. Bajado de 0.12 a 0.06
-# (6-ago-2026): Angie escucho la primera mezcla completa y la musica todavia
-# le competia protagonismo a la voz -- "la voz es la que debe llevarse el
-# protagonismo". Subido de 0.06 a 0.08 (8-ago-2026): con la voz ya reforzada
-# (ver LOUDNORM_VOZ_I en voz_en_off.py), Angie pidio "un poco mas de volumen
-# a la musica para que se sienta mas energico".
-VOLUMEN_MUSICA_DEFECTO = 0.08
+# Sonoridad objetivo de la MUSICA en la mezcla final, normalizada con
+# loudnorm (mismo mecanismo que la voz, ver LOUDNORM_VOZ_I en voz_en_off.py)
+# en vez de un porcentaje fijo sobre el audio crudo de ElevenLabs. Reemplaza
+# a VOLUMEN_MUSICA_DEFECTO (bajado 0.12->0.06->0.08 entre el 6 y 8-ago-2026):
+# un porcentaje fijo se nota distinto segun que tan fuerte o floja haya
+# salido ESA generacion puntual de musica -- bug real reportado por Angie el
+# 18-ago-2026 ("a veces casi no se escucha"), mismo problema que ya se habia
+# resuelto para la voz (Carlos a -33dB crudo, Gonzalo a -17dB, mismo factor
+# fijo sonaba parejo en uno y saturaba en el otro).
+# Angie pidio un balance de "musica al 4%, voz al 7%" (~5dB de diferencia,
+# 20*log10(0.07/0.04)): LOUDNORM_VOZ_I ya esta en -12 LUFS, asi que la
+# musica se deja 5 LU mas floja para guardar esa misma relacion.
+LOUDNORM_MUSICA_I = -17
+LOUDNORM_MUSICA_TP = -1.5
 
 
 class ErrorRecurso(Exception):
@@ -153,16 +157,6 @@ def calcular_duracion_generacion_ms(duracion_video_segundos: float) -> int:
     return max(DURACION_MINIMA_MS, min(DURACION_MAXIMA_MS, solicitados))
 
 
-def clamp_volumen(volumen: float) -> float:
-    """Acota volumen al rango razonable [0.0, 1.0]: 0.0 = musica muda (no
-    tiene sentido pedirla, pero no debe romper el filtro de ffmpeg con un
-    valor negativo), 1.0 = musica al mismo volumen que el audio original del
-    video (ya no seria "de fondo", pero tampoco es un error de por si -- la
-    decision de que tan alto suena queda en manos de quien llama). Logica
-    pura: es la parte testeable por unit test."""
-    return max(0.0, min(1.0, volumen))
-
-
 def generar_musica(prompt: str, duracion_ms: int) -> bytes:
     """Llama a cliente.music.compose() de ElevenLabs y devuelve el audio
     (mp3) generado como bytes.
@@ -200,14 +194,15 @@ def generar_musica(prompt: str, duracion_ms: int) -> bytes:
 
 def mezclar_musica_de_fondo(ruta_video_con_voz: Path, prompt_musica: str,
                             ruta_salida: Path,
-                            volumen_musica: float = VOLUMEN_MUSICA_DEFECTO) -> Path:
+                            loudnorm_musica_i: float = LOUDNORM_MUSICA_I) -> Path:
     """Genera musica real a partir de prompt_musica (duracion = la del video
     de entrada + margen) y la mezcla como capa de FONDO sobre el audio YA
     EXISTENTE de ruta_video_con_voz (voz + ambiente ya mezclados por
     voz_en_off.preparar_clip_con_voz): ese audio no se toca, la musica nueva
-    se baja a volumen_musica antes de mezclar. Guarda el resultado (mismo
-    video, audio de 3 capas) en ruta_salida y devuelve ruta_salida. Guardado
-    atomico (temporal + os.replace).
+    se normaliza a loudnorm_musica_i (LUFS) antes de mezclar -- pareja sin
+    importar que tan fuerte o floja haya salido de la sintesis de ElevenLabs.
+    Guarda el resultado (mismo video, audio de 3 capas) en ruta_salida y
+    devuelve ruta_salida. Guardado atomico (temporal + os.replace).
 
     El video NO se recodifica (`-c:v copy`): el filtro solo toca audio.
 
@@ -221,7 +216,6 @@ def mezclar_musica_de_fondo(ruta_video_con_voz: Path, prompt_musica: str,
     ruta_video_con_voz = Path(ruta_video_con_voz)
     if not ruta_video_con_voz.is_file():
         raise ErrorRecurso(f"no existe el video '{ruta_video_con_voz}'.")
-    volumen_musica = clamp_volumen(volumen_musica)
 
     duracion_video = _duracion_segundos(ruta_video_con_voz)
     duracion_generacion_ms = calcular_duracion_generacion_ms(duracion_video)
@@ -236,18 +230,22 @@ def mezclar_musica_de_fondo(ruta_video_con_voz: Path, prompt_musica: str,
         ruta_musica_temporal.write_bytes(audio_musica)
 
         # [0:a] = audio YA mezclado del video (voz+ambiente), INTACTO;
-        # [1:a] = musica nueva, bajada a volumen_musica. amix con
-        # duration=first deja el resultado con la duracion del PRIMER input
-        # (el audio del video, que es el que manda): si la musica vino un
-        # poco mas corta o mas larga que el video (el margen la deja mas
-        # larga a proposito), amix la recorta/rellena con silencio para
-        # calzar, no hace falta un -t explicito.
+        # [1:a] = musica nueva, normalizada a loudnorm_musica_i LUFS (mismo
+        # mecanismo que la voz, ver LOUDNORM_VOZ_I en voz_en_off.py) en vez
+        # de un volume= fijo -- asi la musica queda pareja sin importar el
+        # nivel crudo con que salio de la sintesis. amix con duration=first
+        # deja el resultado con la duracion del PRIMER input (el audio del
+        # video, que es el que manda): si la musica vino un poco mas corta o
+        # mas larga que el video (el margen la deja mas larga a proposito),
+        # amix la recorta/rellena con silencio para calzar, no hace falta un
+        # -t explicito.
         # normalize=0: sin esto amix baja el audio YA mezclado del video
         # (la voz) para que la suma con la musica no sature, tapando la voz
-        # de nuevo aunque volumen_musica ya venga bajo (mismo problema que
-        # en voz_en_off.preparar_clip_con_voz).
+        # de nuevo aunque la musica ya venga bajo (mismo problema que en
+        # voz_en_off.preparar_clip_con_voz).
         filtro_complejo = (
-            f"[1:a]volume={volumen_musica}[musica];"
+            f"[1:a]loudnorm=I={loudnorm_musica_i}:TP={LOUDNORM_MUSICA_TP}:"
+            "LRA=11[musica];"
             "[0:a][musica]amix=inputs=2:duration=first:dropout_transition=0"
             ":normalize=0[audio_final]"
         )
@@ -280,8 +278,9 @@ def main() -> None:
 
     parser = argparse.ArgumentParser(
         description="Genera musica de fondo con IA (ElevenLabs) a partir de "
-        "un prompt de texto y la mezcla, bajada de volumen, sobre el audio "
-        "ya existente (voz+ambiente) de un video de producto."
+        "un prompt de texto y la mezcla, normalizada a una sonoridad pareja "
+        "(loudnorm), sobre el audio ya existente (voz+ambiente) de un video "
+        "de producto."
     )
     parser.add_argument("video", help="clip de video con voz ya mezclada (mp4)")
     parser.add_argument("prompt", help="prompt de texto para la musica "
@@ -289,9 +288,9 @@ def main() -> None:
                         "motivational, no vocals')")
     parser.add_argument("--salida", default=None,
                         help="ruta de salida (default: <video>_musica.mp4)")
-    parser.add_argument("--volumen", type=float, default=VOLUMEN_MUSICA_DEFECTO,
-                        help=f"volumen de la musica de fondo, 0.0-1.0 "
-                        f"(default {VOLUMEN_MUSICA_DEFECTO})")
+    parser.add_argument("--sonoridad", type=float, default=LOUDNORM_MUSICA_I,
+                        help="sonoridad objetivo de la musica en LUFS, "
+                        f"un numero negativo (default {LOUDNORM_MUSICA_I})")
     args = parser.parse_args()
 
     ruta_video = Path(args.video).resolve()
@@ -304,7 +303,7 @@ def main() -> None:
 
     try:
         mezclar_musica_de_fondo(
-            ruta_video, args.prompt, ruta_salida, volumen_musica=args.volumen
+            ruta_video, args.prompt, ruta_salida, loudnorm_musica_i=args.sonoridad
         )
     except ErrorRecurso as error:
         print(f"ERROR DE ARCHIVO: {error}")

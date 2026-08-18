@@ -1,12 +1,13 @@
 """Pruebas de musica. Offline: no llaman a ElevenLabs ni corren ffmpeg/ffprobe
 reales (servicio de red pago / herramienta externa pesada). Solo se prueba la
 logica pura: calcular_duracion_generacion_ms (cuanto pedirle a music.compose
-para que alcance y sobre para recortar exacto despues) y clamp_volumen (que
-el volumen de la musica de fondo quede en un rango razonable). generar_musica
-(llama a ElevenLabs) y mezclar_musica_de_fondo (llama a ElevenLabs y a
-ffmpeg/ffprobe) se verifican a mano/CLI contra una voz y un clip reales,
-mismo criterio que el resto de los modulos de video de este proyecto
-(voz_en_off.py, marca_agua.py, subtitulos.py, preparar_video_producto.py).
+para que alcance y sobre para recortar exacto despues) y las constantes de
+sonoridad (LOUDNORM_MUSICA_I/TP, mismo mecanismo que la voz en voz_en_off.py).
+generar_musica (llama a ElevenLabs) y mezclar_musica_de_fondo (llama a
+ElevenLabs y a ffmpeg/ffprobe) se verifican a mano/CLI contra una voz y un
+clip reales, mismo criterio que el resto de los modulos de video de este
+proyecto (voz_en_off.py, marca_agua.py, subtitulos.py,
+preparar_video_producto.py).
 """
 
 import unittest
@@ -41,26 +42,18 @@ class PruebasCalcularDuracionGeneracionMs(unittest.TestCase):
             mu.calcular_duracion_generacion_ms(-5.0)
 
 
-class PruebasClampVolumen(unittest.TestCase):
-    def test_valor_dentro_del_rango_no_cambia(self):
-        self.assertEqual(mu.clamp_volumen(0.12), 0.12)
-        self.assertEqual(mu.clamp_volumen(0.5), 0.5)
-
-    def test_valor_negativo_se_acota_a_cero(self):
-        self.assertEqual(mu.clamp_volumen(-0.3), 0.0)
-
-    def test_valor_mayor_a_uno_se_acota_a_uno(self):
-        self.assertEqual(mu.clamp_volumen(1.7), 1.0)
-
-    def test_limites_exactos_se_respetan(self):
-        self.assertEqual(mu.clamp_volumen(0.0), 0.0)
-        self.assertEqual(mu.clamp_volumen(1.0), 1.0)
-
-
 class PruebasConstantes(unittest.TestCase):
-    def test_volumen_musica_defecto_es_bajo_pero_audible(self):
-        self.assertGreater(mu.VOLUMEN_MUSICA_DEFECTO, 0.0)
-        self.assertLess(mu.VOLUMEN_MUSICA_DEFECTO, 0.5)
+    def test_sonoridad_musica_es_mas_floja_que_la_voz(self):
+        # LOUDNORM_VOZ_I (voz_en_off.py) esta en -12 LUFS; la musica tiene
+        # que quedar mas floja (numero mas negativo) para que la voz siga
+        # llevando el protagonismo, pero sin depender de un porcentaje fijo
+        # sobre un volumen crudo que varia de una generacion a otra (bug
+        # real, 18-ago-2026: "a veces casi no se escucha").
+        import voz_en_off
+        self.assertLess(mu.LOUDNORM_MUSICA_I, voz_en_off.LOUDNORM_VOZ_I)
+
+    def test_techo_de_pico_deja_margen_bajo_cero(self):
+        self.assertLess(mu.LOUDNORM_MUSICA_TP, 0.0)
 
     def test_margen_extra_es_positivo(self):
         self.assertGreater(mu.MARGEN_EXTRA_MS, 0)
