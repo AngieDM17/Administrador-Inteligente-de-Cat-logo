@@ -21,6 +21,7 @@
    - **Todo lo que no sea `foto_real` debe anclarse a una imagen real** (`imagen_base` del plan o `deriva_de` del slot). Generar el producto desde texto no se puede expresar en el contrato: no existe.
    - **`fuente` y `origen` son ejes distintos y no se contradicen.** `fuente` dice cómo se hizo la imagen; `origen` dice quién responde por ella. Una imagen de IA nunca puede declarar `verificado` ni `encontrado_web`, y una foto real nunca puede declarar `generado_ia`. Las de IA llevan sufijo `_IA` en el archivo.
    - `imagen_base` es la foto canónica del producto: garantiza que todas las piezas se vean como la MISMA máquina.
+9d. **Descartar imágenes de "credibilidad de proveedor", nunca del producto.** Las páginas de Alibaba y de fabricantes mezclan fotos reales del producto con material promocional de la EMPRESA: certificados de calidad (CE, ISO, informes de prueba tipo "PARTIAL CERTIFICATION"), capturas de entrevistas o apariciones en TV ("TV STATION INTERVIEW"), fotos de la fábrica o bodega, banners genéricos ("Fast Delivery", "Modern Factory"). Ninguna de estas muestra el producto — se descartan siempre al reunir el material real (Fase 4.1 del SKILL), sin necesidad de pasar por el criterio de verificación visual: se reconocen de un vistazo, no hace falta compararlas contra la foto de referencia. (Regla agregada 13-ago-2026, pedido de Angie.)
 
 ## Lecciones del piloto NBC 250 (cada una viene de un error real)
 

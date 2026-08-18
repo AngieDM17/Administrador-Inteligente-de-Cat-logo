@@ -20,6 +20,8 @@ Hay **dos maneras de entrar**, y una es preferida:
 
 Registra en `entrada_original` el nombre exacto que dio Angie, el código de proveedor tal cual (con sufijos), el link si lo hay, y una descripción escrita de los rasgos visibles en la foto (esa descripción servirá de criterio cuando la foto no esté a mano).
 
+**Si Angie no dio código de antemano (entrada solo con link — el caso normal del lote de varios links), el código lo asignás vos.** Nunca dejes `entrada_original.codigo_proveedor` vacío ni en `null`: el resto del sistema lo usa como identificador único para nombrar archivos (video, banner, carpeta del producto) y para armar el link final en la tienda — sin él, la ficha no se puede publicar y toda la corrida se corta ahí. En la Fase 1, en cuanto identifiques la página del producto, sacá el número de modelo o SKU que declare el fabricante/importador y escribilo en `entrada_original.codigo_proveedor` (13-ago-2026: un caso real mostró que el modelo SÍ se encontraba y se usaba para nombrar las fotos, pero nunca se copiaba a este campo — quedaba `null` y la publicación fallaba igual). Si la fuente genuinamente no publica ningún código reconocible, armá uno corto y estable a partir de la página (por ejemplo, el identificador numérico que trae la URL del listing) — la regla dura es que este campo **nunca** quede vacío al terminar.
+
 ## Fase 1 — Identificación (dos caminos)
 
 Objetivo: encontrar la **página del producto exacto** en el importador o fabricante. Termina SIEMPRE marcando **cómo** lo lograste en `identificacion_del_producto.origen_identificacion` (`link` | `busqueda_imagen` | `inferencia`): esa etiqueta le dice a Angie cuánto confiar en la revisión.
@@ -89,6 +91,12 @@ y queda inservible: nunca llega a la galería. Regla práctica:
 
 Normalmente llega **una sola foto**. El primer trabajo es buscar en internet la mayor cantidad de
 fotos reales del producto exacto, y verificar cada una contra el criterio de la Fase 2.
+
+**Antes de eso, descarta las imágenes que no son del producto.** Las páginas de proveedor mezclan
+fotos reales con material de "credibilidad de la empresa": certificados de calidad, capturas de
+entrevistas o TV, fotos de fábrica/bodega, banners de marketing genéricos. Ninguna de estas es
+candidata a la galería — se reconocen de un vistazo, sin necesidad del criterio visual (regla fija,
+ver `reglas_negocio.md`).
 
 **No hay meta de 8 imágenes. La cuota fija está muerta.** Se llenan los slots que el material real
 permita llenar con honestidad, y nada más. Rellenar hasta un número con recortes redundantes del
