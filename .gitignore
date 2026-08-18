@@ -48,6 +48,7 @@ galeria_motor/
 
 # === Tooling caches ===
 .atl/.skill-registry.cache.json
+.codegraph/
 
 # Previews/scratch de verificación (regenerables desde las piezas commiteadas)
 Imagenes/**/_*.png
