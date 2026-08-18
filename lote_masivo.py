@@ -142,13 +142,17 @@ def _guardar_libro(libro, ruta_excel: Path) -> None:
 def _procesar_producto(link: str, carpeta_investigaciones: Path,
                         publicar_notificacion: Notificador,
                         evento_continuar: threading.Event,
-                        sesion_alibaba) -> dict:
+                        sesion_alibaba, produccion: bool = False) -> dict:
     """Corre investigar_producto() -> ejecutar_pipeline() para UN link,
     exactamente el mismo orden que _correr_pipeline de app.py para el
     camino de un solo link. Si la investigacion no produce una ficha, no se
     llega a ejecutar_pipeline. Nunca lanza: cualquier excepcion que se
     escape (ultima red de seguridad, mismo criterio que app.py) se traduce
-    a {'estado': 'error', 'motivo': ...} en vez de tumbar el lote entero."""
+    a {'estado': 'error', 'motivo': ...} en vez de tumbar el lote entero.
+
+    `produccion`: ver orquestador.ejecutar_pipeline -- se pasa tal cual,
+    mismo valor para TODO el lote (no se elige tienda producto por
+    producto)."""
     carpeta_temporal = carpeta_investigaciones / uuid.uuid4().hex
     try:
         resultado_investigacion = agente_investigador.investigar_producto(
@@ -170,7 +174,9 @@ def _procesar_producto(link: str, carpeta_investigaciones: Path,
         )
         ruta_ficha = carpeta_nueva / ruta_ficha.name
 
-        return orquestador.ejecutar_pipeline(ruta_ficha, publicar_notificacion)
+        return orquestador.ejecutar_pipeline(
+            ruta_ficha, publicar_notificacion, produccion=produccion,
+        )
     except Exception as error:
         motivo = f"Error inesperado procesando '{link}': {error}"
         publicar_notificacion(motivo)
@@ -179,13 +185,18 @@ def _procesar_producto(link: str, carpeta_investigaciones: Path,
 
 def procesar_lote(ruta_excel: Path, carpeta_investigaciones: Path,
                    publicar_notificacion: Notificador,
-                   evento_continuar: threading.Event | None = None) -> dict:
+                   evento_continuar: threading.Event | None = None,
+                   produccion: bool = False) -> dict:
     """Punto de entrada del lote nocturno. Lee `ruta_excel` (columnas Link /
     Nota opcional / Estado) y procesa cada fila con un link, encadenando
     investigar_producto() -> ejecutar_pipeline() (ver _procesar_producto),
     uno detras de otro y sin pausas entre productos (salvo la pausa real de
     Alibaba, que solo ocurre una vez por lote). Reescribe el Excel en disco
     despues de CADA producto.
+
+    `produccion` (default False): igual para todas las filas del lote --
+    ver orquestador.ejecutar_pipeline. Decision explicita de quien dispara
+    el lote, nunca implicita.
 
     `evento_continuar` es el mismo `threading.Event` que ya usa el camino
     de un solo link (app.py, `_Job.evento_continuar`) para la pausa de
@@ -231,7 +242,7 @@ def procesar_lote(ruta_excel: Path, carpeta_investigaciones: Path,
 
             resultado = _procesar_producto(
                 link, carpeta_investigaciones, publicar_notificacion,
-                evento_continuar, sesion_alibaba,
+                evento_continuar, sesion_alibaba, produccion=produccion,
             )
             texto_estado = _texto_estado(resultado)
 

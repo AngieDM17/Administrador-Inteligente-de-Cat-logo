@@ -92,7 +92,8 @@ class PruebasResiliencia(unittest.TestCase):
 
             llamadas_pipeline = []
 
-            def _ejecutar_pipeline_falso(ruta_ficha, publicar_notificacion):
+            def _ejecutar_pipeline_falso(ruta_ficha, publicar_notificacion,
+                                         produccion=False):
                 llamadas_pipeline.append(Path(ruta_ficha))
                 return {"estado": "publicado", "producto_id": 111, "motivos_revision": []}
 
@@ -131,7 +132,8 @@ class PruebasResiliencia(unittest.TestCase):
             carpeta_investigaciones = carpeta / "investigaciones"
             _armar_excel(ruta_excel, ["https://tienda.com/producto/DDD"])
 
-            def _ejecutar_pipeline_falso(ruta_ficha, publicar_notificacion):
+            def _ejecutar_pipeline_falso(ruta_ficha, publicar_notificacion,
+                                         produccion=False):
                 return {
                     "estado": "publicado", "producto_id": 5,
                     "motivos_revision": ["Falta confirmar la potencia del motor"],

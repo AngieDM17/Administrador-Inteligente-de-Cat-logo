@@ -30,9 +30,20 @@ import urllib.request
 from pathlib import Path
 from urllib.parse import quote, urlparse
 
-# Candado de seguridad: unica tienda contra la que este cliente acepta correr.
-# La tienda real (ekipon.co) NO esta en la lista a proposito.
-TIENDAS_PERMITIDAS = {"pruebas.ekipon.co"}
+# Candado de seguridad: unicas tiendas contra las que este cliente acepta
+# correr. "ekipon.co" (la tienda real) se sumo el 18-ago-2026, decision
+# explicita de Angie, junto con la creacion de las credenciales reales -- ver
+# RUTA_ENV_PRODUCCION abajo: las dos cosas van juntas a proposito, nunca una
+# sin la otra.
+TIENDAS_PERMITIDAS = {"pruebas.ekipon.co", "ekipon.co"}
+
+# .env de siempre = tienda de pruebas (comportamiento por defecto, sin
+# cambios). .env.produccion = tienda real: archivo APARTE (nunca se
+# sobreescribe el de pruebas) para poder seguir probando en pruebas.ekipon.co
+# sin perder las credenciales reales. Gitignored igual que .env (patron
+# ".env.*" ya cubierto). Quien dispara una corrida elige cual usar --
+# ver ejecutar_pipeline(produccion=...) en orquestador.py.
+RUTA_ENV_PRODUCCION = Path(__file__).parent / ".env.produccion"
 
 TIMEOUT_SEGUNDOS = 30
 

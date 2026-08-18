@@ -35,7 +35,7 @@ import time
 import uuid
 from pathlib import Path
 
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -108,6 +108,10 @@ _JOBS_LOCK = threading.Lock()
 
 class PeticionGenerar(BaseModel):
     ruta_ficha: str
+    # Decision explicita de quien dispara la corrida (checkbox en la pagina,
+    # sin marcar por defecto): False = tienda de pruebas (.env, de siempre),
+    # True = tienda real (.env.produccion). Ver orquestador.ejecutar_pipeline.
+    produccion: bool = False
 
 
 app = FastAPI(
@@ -121,12 +125,15 @@ app = FastAPI(
 app.mount("/assets", StaticFiles(directory=RUTA_ASSETS), name="assets")
 
 
-def _correr_pipeline(job_id: str, entrada: str) -> None:
+def _correr_pipeline(job_id: str, entrada: str, produccion: bool = False) -> None:
     """Corre el flujo completo para `entrada`: si es un link, primero
     investiga (Fase 2a) y SOLO si produce una ficha valida encadena hacia
     el pipeline de Fase 1; si es una ruta de archivo, va directo al
     pipeline como siempre. `entrada` es un str (no Path) porque puede ser
-    una URL, que Path() no representa bien."""
+    una URL, que Path() no representa bien.
+
+    `produccion`: ver orquestador.ejecutar_pipeline -- viene del checkbox
+    de la pagina, tal cual, sin transformar."""
     job = _JOBS[job_id]
 
     def notificar(mensaje: str) -> None:
@@ -178,7 +185,7 @@ def _correr_pipeline(job_id: str, entrada: str) -> None:
         else:
             ruta_ficha = Path(entrada)
 
-        resultado = ejecutar_pipeline(ruta_ficha, notificar)
+        resultado = ejecutar_pipeline(ruta_ficha, notificar, produccion=produccion)
     except Exception as error:
         # Ultima red de seguridad: ni ejecutar_pipeline() ni
         # investigar_producto() deberian lanzar nunca (todo se traduce a
@@ -225,19 +232,23 @@ def generar(peticion: PeticionGenerar) -> dict:
         _JOBS[job_id] = _Job()
 
     hilo = threading.Thread(
-        target=_correr_pipeline, args=(job_id, entrada_normalizada),
+        target=_correr_pipeline,
+        args=(job_id, entrada_normalizada, peticion.produccion),
         daemon=True,
     )
     hilo.start()
     return {"job_id": job_id}
 
 
-def _correr_lote(job_id: str, ruta_excel: Path) -> None:
+def _correr_lote(job_id: str, ruta_excel: Path, produccion: bool = False) -> None:
     """Corre lote_masivo.procesar_lote en el hilo de fondo del job -- mismo
     patron que _correr_pipeline (arriba), notificar() traduce el prefijo de
     Alibaba al mismo evento SSE "necesita_confirmacion" (una unica sesion
     compartida para todo el lote, ver lote_masivo.py, asi que esto puede
-    pasar como mucho una vez por lote, no una vez por producto)."""
+    pasar como mucho una vez por lote, no una vez por producto).
+
+    `produccion`: ver orquestador.ejecutar_pipeline -- mismo valor para
+    TODO el lote, viene del checkbox de la pagina."""
     job = _JOBS[job_id]
 
     def notificar(mensaje: str) -> None:
@@ -249,7 +260,7 @@ def _correr_lote(job_id: str, ruta_excel: Path) -> None:
     try:
         resultado_lote = lote_masivo.procesar_lote(
             ruta_excel, CARPETA_INVESTIGACIONES, notificar,
-            evento_continuar=job.evento_continuar,
+            evento_continuar=job.evento_continuar, produccion=produccion,
         )
         resultado = {"estado": "lote_terminado", **resultado_lote}
     except Exception as error:
@@ -266,12 +277,17 @@ def _correr_lote(job_id: str, ruta_excel: Path) -> None:
 
 
 @app.post("/generar-lote")
-async def generar_lote(archivo: UploadFile = File(...)) -> dict:
+async def generar_lote(
+    archivo: UploadFile = File(...), produccion: bool = Form(False),
+) -> dict:
     """Recibe el .xlsx del lote nocturno (columnas Link / Nota opcional /
     Estado), lo guarda en lotes/ (gitignored, igual que investigaciones/) y
     arranca lote_masivo.procesar_lote en un hilo aparte -- mismo patron de
     hilo + _Job + SSE que /generar, reusando el mismo job_id para
-    /eventos/{job_id} y /continuar/{job_id}."""
+    /eventos/{job_id} y /continuar/{job_id}.
+
+    `produccion`: campo de formulario (checkbox de la pagina), False por
+    defecto -- ver orquestador.ejecutar_pipeline."""
     nombre = Path(archivo.filename or "lote.xlsx").name
     if not nombre.lower().endswith(".xlsx"):
         raise HTTPException(
@@ -291,7 +307,7 @@ async def generar_lote(archivo: UploadFile = File(...)) -> dict:
         _JOBS[job_id] = _Job()
 
     hilo = threading.Thread(
-        target=_correr_lote, args=(job_id, ruta_excel),
+        target=_correr_lote, args=(job_id, ruta_excel, produccion),
         daemon=True,
     )
     hilo.start()

@@ -1027,7 +1027,7 @@ def ejecutar(ruta_ficha: Path, simular: bool,
                                    refrescar_galeria=refrescar_galeria)
 
     cliente = fabrica_cliente()
-    print(f"Tienda: {cliente.base}  [candado OK: es la tienda de pruebas]")
+    print(f"Tienda: {cliente.base}  [candado OK: dominio permitido]")
     return publicar(
         datos, codigo, slug, ruta_ficha.parent, cliente, ruta_db,
         actualizar=actualizar, refrescar_galeria=refrescar_galeria,

@@ -211,7 +211,8 @@ def _paso(publicar_notificacion: Notificador, mensaje: str,
         raise ErrorPipeline(f"{mensaje} — fallo: {error}") from error
 
 
-def ejecutar_pipeline(ruta_ficha: Path, publicar_notificacion: Notificador) -> dict:
+def ejecutar_pipeline(ruta_ficha: Path, publicar_notificacion: Notificador,
+                       produccion: bool = False) -> dict:
     """Corre el pipeline completo para una ficha ya investigada. Devuelve un
     dict con 'estado':
 
@@ -220,6 +221,12 @@ def ejecutar_pipeline(ruta_ficha: Path, publicar_notificacion: Notificador) -> d
       'error'   -> un paso real fallo; 'motivo' trae el mensaje.
       'publicado' -> borrador creado/actualizado con el video adjunto;
                      'producto_id' y 'url_revisar' traen donde revisarlo.
+
+    `produccion` (default False, decision explicita de quien dispara la
+    corrida -- nunca implicita): False usa las credenciales de siempre
+    (.env, tienda de pruebas); True usa cliente_tienda.RUTA_ENV_PRODUCCION
+    (tienda real, ekipon.co). El candado de seguridad (TIENDAS_PERMITIDAS)
+    sigue validando el dominio en cualquiera de los dos casos.
 
     NUNCA lanza: toda excepcion se traduce a uno de los tres estados de
     arriba, siempre notificando por publicar_notificacion antes de volver.
@@ -470,9 +477,19 @@ def ejecutar_pipeline(ruta_ficha: Path, publicar_notificacion: Notificador) -> d
         )
 
     # --- Publicacion (CHECKPOINT 2 vive adentro de este paso) -----------
-    publicar_notificacion("Publicando el borrador en la tienda de pruebas...")
     import publicador  # import diferido: evita el costo de importarlo si el
     # pipeline se corta antes (colador, o cualquier ErrorPipeline de arriba).
+    import functools
+    from cliente_tienda import ClienteTienda, RUTA_ENV_PRODUCCION
+
+    if produccion:
+        publicar_notificacion("Publicando el borrador en la tienda REAL (ekipon.co)...")
+        fabrica_cliente = functools.partial(
+            ClienteTienda.desde_env, ruta_env=RUTA_ENV_PRODUCCION,
+        )
+    else:
+        publicar_notificacion("Publicando el borrador en la tienda de pruebas...")
+        fabrica_cliente = ClienteTienda.desde_env
 
     resultado_publicacion: dict = {}
     try:
@@ -480,6 +497,7 @@ def ejecutar_pipeline(ruta_ficha: Path, publicar_notificacion: Notificador) -> d
             ruta_ficha, simular=False, ruta_video=ruta_video_a_publicar,
             resultado=resultado_publicacion,
             motivos_revision=motivos_colador,
+            fabrica_cliente=fabrica_cliente,
         )
     except SystemExit as salida:
         # publicador.cargar_ficha_validada() y cliente_tienda (cargar_env,
@@ -515,7 +533,9 @@ def ejecutar_pipeline(ruta_ficha: Path, publicar_notificacion: Notificador) -> d
         # (sin reconstruir un ClienteTienda, que ya se construyo adentro de
         # publicador.ejecutar()): alcanza con WC_STORE_URL del .env.
         try:
-            env = cargar_env(Path(__file__).parent / ".env")
+            ruta_env_url = RUTA_ENV_PRODUCCION if produccion else \
+                Path(__file__).parent / ".env"
+            env = cargar_env(ruta_env_url)
             base = (env.get("WC_STORE_URL") or "").rstrip("/")
             if base:
                 url_revisar = f"{base}/wp-admin/post.php?post={producto_id}&action=edit"

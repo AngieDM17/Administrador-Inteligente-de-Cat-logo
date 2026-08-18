@@ -382,6 +382,31 @@
     margin: 12px 0 0;
     line-height: 1.5;
   }
+  /* Interruptor de tienda real: apagado por defecto en el HTML (checkbox
+     sin "checked") y en cada carga de la pagina -- no se recuerda entre
+     sesiones a proposito, para que nunca quede prendido "sin querer". */
+  label.interruptor-produccion {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 12px 0 0;
+    padding: 10px 14px;
+    background: var(--rojo-suave);
+    border: 1.5px solid var(--rojo);
+    border-radius: 10px;
+    font-size: .84rem;
+    font-weight: 600;
+    color: var(--rojo);
+    cursor: pointer;
+    width: fit-content;
+  }
+  label.interruptor-produccion input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--rojo);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
   button#boton-generar {
     display: inline-flex;
     align-items: center;
@@ -916,6 +941,10 @@
       Investigador: la "ficha técnica" digital del equipo, con sus fotos y
       datos.
     </p>
+    <label class="interruptor-produccion">
+      <input type="checkbox" id="chk-produccion">
+      ⚠️ Publicar en la tienda REAL (ekipon.co), no en la de pruebas
+    </label>
     </div>
   </div>
 
@@ -943,6 +972,10 @@
       <code>Estado</code> de cada fila a medida que termina — pensado para dejarlo
       corriendo mientras hacés otra cosa durante tu jornada.
     </p>
+    <label class="interruptor-produccion">
+      <input type="checkbox" id="chk-produccion-lote">
+      ⚠️ Publicar TODO el lote en la tienda REAL (ekipon.co), no en la de pruebas
+    </label>
     </div>
   </div>
 
@@ -1228,10 +1261,11 @@ async function generar() {
 
   let respuesta;
   try {
+    const produccion = document.getElementById('chk-produccion').checked;
     respuesta = await fetch('/generar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ruta_ficha: rutaFicha }),
+      body: JSON.stringify({ ruta_ficha: rutaFicha, produccion }),
     });
   } catch (error) {
     marcarEstado('error', '✕ Error');
@@ -1367,6 +1401,8 @@ async function generarLote() {
 
   const datosFormulario = new FormData();
   datosFormulario.append('archivo', archivo);
+  const produccionLote = document.getElementById('chk-produccion-lote').checked;
+  datosFormulario.append('produccion', produccionLote);
 
   let respuesta;
   try {
