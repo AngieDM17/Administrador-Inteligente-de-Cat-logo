@@ -327,115 +327,132 @@ def ejecutar_pipeline(ruta_ficha: Path, publicar_notificacion: Notificador) -> d
             f"{len(incluidas)} van a la tienda."
         )
 
-        # --- Portada del video (miniatura) -------------------------------
-        # El banner de FOTOS no se genera aca a proposito: publicador.py ya
-        # lo genera y sube solo al publicar, siempre que encuentre
-        # '<codigo>_recorte.png' en la carpeta de la ficha (que ya dejamos
-        # arriba) -- volver a generarlo aca seria trabajo duplicado. La
-        # PORTADA de video si hace falta generarla aca: nada mas la produce.
-        carpeta_trabajo = _carpeta_trabajo(carpeta_ficha, codigo)
-        carpeta_trabajo.mkdir(parents=True, exist_ok=True)
-        ruta_portada = carpeta_trabajo / "portada.png"
-        _paso(
-            publicar_notificacion,
-            "Generando la portada del video...",
-            generador_portada.generar_a_archivo, ficha, ruta_recorte, ruta_portada,
-        )
-
-        # --- Guion (IA) y prompt de musica (IA, con respaldo fijo) -------
-        publicar_notificacion("Redactando el guion de la voz con IA...")
-        cuerpo_guion = redactor_ia.redactar_guion_voz(ficha)
-        if cuerpo_guion is None:
-            publicar_notificacion(
-                "No se pudo redactar el guion con IA (sin clave o fallo de "
-                "red); se usa el recorte automatico de la descripcion."
-            )
-        texto_guion = voz_en_off.armar_guion(
-            ficha, voz_en_off.PRESUPUESTO_CARACTERES_DEFECTO,
-            cuerpo_manual=cuerpo_guion,
-        )
-
-        publicar_notificacion("Redactando el estilo de musica con IA...")
-        prompt_musica = redactor_ia.redactar_prompt_musica(ficha)
-        if prompt_musica is None:
-            prompt_musica = redactor_ia.PROMPT_MUSICA_GENERICO
-            publicar_notificacion(
-                "No se pudo redactar el estilo de musica con IA; se usa un "
-                "estilo generico de respaldo."
-            )
-
-        # --- Video: normalizar -> voz -> musica -> subtitulos -> marca ---
+        # --- Video: opcional (pedido de Angie, 14-ago-2026) --------------
+        # Antes, si la fuente no traia el clip crudo del producto, esto
+        # cortaba TODO el pipeline con un error -- ningun producto se
+        # publicaba solo porque le faltaba el video. Ahora el video es una
+        # seccion mas que puede faltar, igual que una dimension o una
+        # caracteristica: si no hay clip, se salta ENTERA (portada, guion y
+        # musica por IA, normalizado, voz, musica, subtitulos, marca de
+        # agua, ensamblado -- nada de eso tiene sentido sin un clip base) y
+        # se sigue derecho a publicar, dejando el video marcado como
+        # pendiente en vez de bloquear el producto completo. El chequeo va
+        # ANTES de redactar el guion a proposito: ese paso usa IA (cuesta
+        # una llamada real) y no tiene destino si no hay video para pegarle
+        # la voz.
         ruta_clip_original = _ruta_clip_original(carpeta_ficha, codigo)
+        ruta_video_final: Path | None = None
         if not ruta_clip_original.is_file():
-            raise ErrorPipeline(
-                f"No encuentro el clip de video original en "
-                f"'{ruta_clip_original.name}' (carpeta de la ficha). Este "
-                "orquestador espera el clip crudo del producto ya puesto ahi "
-                "a mano, con ese nombre exacto (ver ETAPA_IMAGENES.md / "
-                "reporte de esta sesion: la ficha todavia no declara de "
-                "donde sale este archivo)."
+            publicar_notificacion(
+                f"No encontre '{ruta_clip_original.name}': la fuente no "
+                "trajo video de este producto. Se publica igual, sin "
+                "video -- queda pendiente para subirlo despues."
             )
-        ruta_clip_normalizado = carpeta_trabajo / "clip_normalizado.mp4"
-        _paso(
-            publicar_notificacion,
-            "Normalizando el clip de video a 1920x1080...",
-            normalizar_video, ruta_clip_original, ruta_clip_normalizado,
-        )
+            motivos_colador.append(
+                "Video pendiente: la fuente no traia material de video "
+                "para este producto."
+            )
+        else:
+            # El banner de FOTOS no se genera aca a proposito: publicador.py
+            # ya lo genera y sube solo al publicar, siempre que encuentre
+            # '<codigo>_recorte.png' en la carpeta de la ficha (que ya
+            # dejamos arriba) -- volver a generarlo aca seria trabajo
+            # duplicado. La PORTADA de video si hace falta generarla aca:
+            # nada mas la produce.
+            carpeta_trabajo = _carpeta_trabajo(carpeta_ficha, codigo)
+            carpeta_trabajo.mkdir(parents=True, exist_ok=True)
+            ruta_portada = carpeta_trabajo / "portada.png"
+            _paso(
+                publicar_notificacion,
+                "Generando la portada del video...",
+                generador_portada.generar_a_archivo, ficha, ruta_recorte, ruta_portada,
+            )
 
-        ruta_voz = carpeta_trabajo / "voz.mp3"
-        _paso(
-            publicar_notificacion,
-            "Generando la voz en off...",
-            voz_en_off.generar_a_archivo, ficha, ruta_voz,
-            indice_producto=0, cuerpo_manual=cuerpo_guion,
-        )
+            # --- Guion (IA) y prompt de musica (IA, con respaldo fijo) ---
+            publicar_notificacion("Redactando el guion de la voz con IA...")
+            cuerpo_guion = redactor_ia.redactar_guion_voz(ficha)
+            if cuerpo_guion is None:
+                publicar_notificacion(
+                    "No se pudo redactar el guion con IA (sin clave o fallo "
+                    "de red); se usa el recorte automatico de la descripcion."
+                )
+            texto_guion = voz_en_off.armar_guion(
+                ficha, voz_en_off.PRESUPUESTO_CARACTERES_DEFECTO,
+                cuerpo_manual=cuerpo_guion,
+            )
 
-        ruta_clip_con_voz = carpeta_trabajo / "clip_con_voz.mp4"
-        _paso(
-            publicar_notificacion,
-            "Mezclando la voz con el video...",
-            voz_en_off.preparar_clip_con_voz,
-            ruta_clip_normalizado, ruta_voz, ruta_clip_con_voz,
-            # Sin esto, un clip fuente mas corto que la voz (comun: el clip
-            # de Alibaba no se elige a medida) tumba TODO el pipeline en vez
-            # de resolverse solo -- permitir_estirar ya existia en voz_en_
-            # off.py (6-ago-2026, "estirar clip corto") pero el orquestador
-            # nunca lo prendia. Verificado en vivo 11-ago-2026: un clip de
-            # 39.6s contra una voz de 41.3s (diferencia de 1.7s) fallaba
-            # aca antes de este cambio.
-            permitir_estirar=True,
-        )
+            publicar_notificacion("Redactando el estilo de musica con IA...")
+            prompt_musica = redactor_ia.redactar_prompt_musica(ficha)
+            if prompt_musica is None:
+                prompt_musica = redactor_ia.PROMPT_MUSICA_GENERICO
+                publicar_notificacion(
+                    "No se pudo redactar el estilo de musica con IA; se usa "
+                    "un estilo generico de respaldo."
+                )
 
-        ruta_clip_con_musica = carpeta_trabajo / "clip_con_musica.mp4"
-        _paso(
-            publicar_notificacion,
-            "Agregando musica de fondo...",
-            musica.mezclar_musica_de_fondo,
-            ruta_clip_con_voz, prompt_musica, ruta_clip_con_musica,
-        )
+            # --- normalizar -> voz -> musica -> subtitulos -> marca ------
+            ruta_clip_normalizado = carpeta_trabajo / "clip_normalizado.mp4"
+            _paso(
+                publicar_notificacion,
+                "Normalizando el clip de video a 1920x1080...",
+                normalizar_video, ruta_clip_original, ruta_clip_normalizado,
+            )
 
-        ruta_clip_con_subtitulos = carpeta_trabajo / "clip_con_subtitulos.mp4"
-        _paso(
-            publicar_notificacion,
-            "Quemando los subtitulos...",
-            subtitulos.generar_a_archivo,
-            ruta_clip_con_musica, ruta_voz, texto_guion, ruta_clip_con_subtitulos,
-        )
+            ruta_voz = carpeta_trabajo / "voz.mp3"
+            _paso(
+                publicar_notificacion,
+                "Generando la voz en off...",
+                voz_en_off.generar_a_archivo, ficha, ruta_voz,
+                indice_producto=0, cuerpo_manual=cuerpo_guion,
+            )
 
-        ruta_clip_con_marca = carpeta_trabajo / "clip_con_marca_agua.mp4"
-        _paso(
-            publicar_notificacion,
-            "Agregando la marca de agua...",
-            aplicar_marca_agua, ruta_clip_con_subtitulos, ruta_clip_con_marca,
-        )
+            ruta_clip_con_voz = carpeta_trabajo / "clip_con_voz.mp4"
+            _paso(
+                publicar_notificacion,
+                "Mezclando la voz con el video...",
+                voz_en_off.preparar_clip_con_voz,
+                ruta_clip_normalizado, ruta_voz, ruta_clip_con_voz,
+                # Sin esto, un clip fuente mas corto que la voz (comun: el
+                # clip de Alibaba no se elige a medida) tumba TODO el
+                # pipeline en vez de resolverse solo -- permitir_estirar ya
+                # existia en voz_en_off.py (6-ago-2026, "estirar clip
+                # corto") pero el orquestador nunca lo prendia. Verificado
+                # en vivo 11-ago-2026: un clip de 39.6s contra una voz de
+                # 41.3s (diferencia de 1.7s) fallaba aca antes de este
+                # cambio.
+                permitir_estirar=True,
+            )
 
-        ruta_video_final = carpeta_ficha / f"{codigo}_video_final.mp4"
-        _paso(
-            publicar_notificacion,
-            "Armando el video final (portada + clip + outros)...",
-            ensamblar_video, ruta_portada, ruta_clip_con_marca, ruta_video_final,
-        )
-        publicar_notificacion(f"Video final listo: {ruta_video_final.name}")
+            ruta_clip_con_musica = carpeta_trabajo / "clip_con_musica.mp4"
+            _paso(
+                publicar_notificacion,
+                "Agregando musica de fondo...",
+                musica.mezclar_musica_de_fondo,
+                ruta_clip_con_voz, prompt_musica, ruta_clip_con_musica,
+            )
+
+            ruta_clip_con_subtitulos = carpeta_trabajo / "clip_con_subtitulos.mp4"
+            _paso(
+                publicar_notificacion,
+                "Quemando los subtitulos...",
+                subtitulos.generar_a_archivo,
+                ruta_clip_con_musica, ruta_voz, texto_guion, ruta_clip_con_subtitulos,
+            )
+
+            ruta_clip_con_marca = carpeta_trabajo / "clip_con_marca_agua.mp4"
+            _paso(
+                publicar_notificacion,
+                "Agregando la marca de agua...",
+                aplicar_marca_agua, ruta_clip_con_subtitulos, ruta_clip_con_marca,
+            )
+
+            ruta_video_final = carpeta_ficha / f"{codigo}_video_final.mp4"
+            _paso(
+                publicar_notificacion,
+                "Armando el video final (portada + clip + outros)...",
+                ensamblar_video, ruta_portada, ruta_clip_con_marca, ruta_video_final,
+            )
+            publicar_notificacion(f"Video final listo: {ruta_video_final.name}")
 
     except ErrorPipeline as error:
         publicar_notificacion(f"ERROR: {error}")
@@ -443,10 +460,14 @@ def ejecutar_pipeline(ruta_ficha: Path, publicar_notificacion: Notificador) -> d
 
     # --- Video: a YouTube si esta autorizado, si no directo a WordPress ----
     # (como siempre). Ver _resolver_video_a_publicar: nunca lanza, cualquier
-    # error real de YouTube cae sola al camino de WordPress de siempre.
-    ruta_video_a_publicar = _resolver_video_a_publicar(
-        ficha, ruta_ficha, ruta_video_final, publicar_notificacion,
-    )
+    # error real de YouTube cae sola al camino de WordPress de siempre. Si
+    # no hubo clip (ruta_video_final es None), no hay nada que resolver --
+    # se publica derecho sin video.
+    ruta_video_a_publicar = None
+    if ruta_video_final is not None:
+        ruta_video_a_publicar = _resolver_video_a_publicar(
+            ficha, ruta_ficha, ruta_video_final, publicar_notificacion,
+        )
 
     # --- Publicacion (CHECKPOINT 2 vive adentro de este paso) -----------
     publicar_notificacion("Publicando el borrador en la tienda de pruebas...")
@@ -501,7 +522,17 @@ def ejecutar_pipeline(ruta_ficha: Path, publicar_notificacion: Notificador) -> d
         except SystemExit:
             url_revisar = None
 
-    publicar_notificacion("Listo: borrador publicado con el video adjunto.")
+    # ruta_video_final (no ruta_video_a_publicar) es la senal correcta de
+    # "hubo video": _resolver_video_a_publicar devuelve None tanto cuando NO
+    # hubo clip como cuando el video SI se proceso pero se subio a YouTube
+    # (va embebido en la ficha, no como archivo aparte) -- confundir los dos
+    # casos diria "sin video" en un producto que si lo tiene.
+    mensaje_final = (
+        "Listo: borrador publicado con el video adjunto."
+        if ruta_video_final is not None
+        else "Listo: borrador publicado sin video (queda pendiente)."
+    )
+    publicar_notificacion(mensaje_final)
     return {
         "estado": "publicado",
         "producto_id": producto_id,
