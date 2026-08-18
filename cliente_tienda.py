@@ -47,6 +47,15 @@ RUTA_ENV_PRODUCCION = Path(__file__).parent / ".env.produccion"
 
 TIMEOUT_SEGUNDOS = 30
 
+# Los videos de producto pesan decenas de MB (hasta ~45MB medido en la
+# practica) -- 30s se quedo corto varias veces subiendo el binario crudo
+# (visto en vivo el 18-ago-2026, dos productos distintos, dos tiendas
+# distintas: no era la tienda, era el margen). Solo se usa para ESE POST
+# especifico (ver subir_video) -- el resto de las llamadas (JSON chico,
+# imagenes, lecturas) se quedan con TIMEOUT_SEGUNDOS: subirlo para todas
+# taparia una tienda de verdad caida detras de una espera mucho mas larga.
+TIMEOUT_VIDEO_SEGUNDOS = 180
+
 # El DNS de la tienda de pruebas resuelve de forma intermitente (getaddrinfo
 # falla y resuelve a ratos). Se reintenta la conexion con espera creciente para
 # que un lote no se caiga por un hipo de DNS. Ver test_cliente_tienda.py.
@@ -217,20 +226,24 @@ class ClienteTienda:
 
     def _solicitar(self, ruta: str, datos: bytes | None = None,
                    cabeceras_extra: dict | None = None,
-                   metodo: str | None = None):
+                   metodo: str | None = None,
+                   timeout_segundos: int | None = None):
         # metodo=None deja el comportamiento clasico de urllib:
         # GET sin datos, POST con datos. Solo actualizar_borrador pasa "PUT".
+        # timeout_segundos: override puntual (ver subir_video) -- default None
+        # usa TIMEOUT_SEGUNDOS, sin cambiar el comportamiento de nadie mas.
         url_final, cabeceras = self._preparar(ruta)
         cabeceras.update(cabeceras_extra or {})
         peticion = urllib.request.Request(
             url_final, data=datos, headers=cabeceras, method=metodo
         )
+        espera = timeout_segundos if timeout_segundos is not None else TIMEOUT_SEGUNDOS
         # Un GET no tiene efectos; un POST/PUT si. Importa para decidir que es
         # seguro reintentar cuando la conexion falla a mitad de camino.
         es_lectura = datos is None and metodo is None
         for intento in range(1, INTENTOS_CONEXION + 1):
             try:
-                with _ABRIDOR.open(peticion, timeout=TIMEOUT_SEGUNDOS) as respuesta:
+                with _ABRIDOR.open(peticion, timeout=espera) as respuesta:
                     return json.loads(respuesta.read().decode("utf-8"))
             except urllib.error.HTTPError as error:
                 # Una respuesta HTTP real (auth, 404, etc.) NUNCA se reintenta:
@@ -409,6 +422,7 @@ class ClienteTienda:
                 "Content-Type": tipo,
                 "Content-Disposition": f'attachment; filename="{nombre}"',
             },
+            timeout_segundos=TIMEOUT_VIDEO_SEGUNDOS,
         )
         detalle = json.dumps({"title": titulo}, ensure_ascii=False).encode("utf-8")
         return self._solicitar(

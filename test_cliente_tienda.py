@@ -141,9 +141,11 @@ class _ClienteSubirVideoSinRed(ClienteTienda):
         self.medios_existentes = medios_existentes or []
         self.solicitudes = []
 
-    def _solicitar(self, ruta, datos=None, cabeceras_extra=None, metodo=None):
+    def _solicitar(self, ruta, datos=None, cabeceras_extra=None, metodo=None,
+                   timeout_segundos=None):
         self.solicitudes.append({
             "ruta": ruta, "datos": datos, "cabeceras": cabeceras_extra,
+            "timeout_segundos": timeout_segundos,
         })
         if "media?search=" in ruta:
             return self.medios_existentes
@@ -174,6 +176,12 @@ class PruebasSubirVideo(unittest.TestCase):
             )
             self.assertEqual(subida["ruta"], "/wp-json/wp/v2/media?post=9001")
             self.assertEqual(subida["cabeceras"]["Content-Type"], "video/mp4")
+            # El binario pesado usa el margen largo (ver TIMEOUT_VIDEO_SEGUNDOS
+            # en cliente_tienda.py) -- encontrado en vivo el 18-ago-2026: 30s
+            # se quedaba corto subiendo videos reales de hasta ~45MB.
+            self.assertEqual(
+                subida["timeout_segundos"], cliente_tienda.TIMEOUT_VIDEO_SEGUNDOS,
+            )
 
     def test_idempotente_por_titulo_no_sube_de_nuevo(self):
         cliente = _ClienteSubirVideoSinRed(
