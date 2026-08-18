@@ -54,12 +54,26 @@ FRASE_FIJA = (
 # confident/powerful/energetic en espanol) y eligio esta ("Enthusiastic,
 # Assertive") para que las 3 alternen y den variedad, no para reemplazar a
 # Carlos o Gonzalo.
+# "adberto"/"el_faraon"/"fernando" sumadas el 18-ago-2026: Angie pidio mas
+# variedad para intercalar entre videos. Se buscaron voces en espanol de la
+# libreria de ElevenLabs (client.voices.get_shared, filtro gender=male,
+# descriptivos confident/powerful/persuasive), se generaron 4 muestras reales
+# con la FRASE_FIJA real a VELOCIDAD_VOZ=0.85 (mismas condiciones que un
+# video real) y Angie eligio 3 de las 4 escuchadas -- descarto "Antonio"
+# (htFfPSZGJwjBv1CL0aMD, Confident/Gentle/Clear). AD-berto y El Faraon tienen
+# acento colombiano (biblioteca de ElevenLabs los categoriza asi); Fernando
+# es latinoamericano generico.
 VOCES = {
     "carlos": "4PN5DHmrfIgZksvIrawS",
     "gonzalo": "UUj9OsNVMEpYEFSA8ZI8",
     "santiago": "w7IU2bIH6xHcyfkUUWi3",
+    "adberto": "M64I64ENmO2dliUo0xY7",
+    "el_faraon": "W1hAcdh0RNsPYUA7fkJh",
+    "fernando": "dlGxemPxFMTY7iXagmOj",
 }
-_ORDEN_VOCES = ["carlos", "gonzalo", "santiago"]
+_ORDEN_VOCES = [
+    "carlos", "gonzalo", "santiago", "adberto", "el_faraon", "fernando",
+]
 
 MODEL_ID = "eleven_multilingual_v2"
 OUTPUT_FORMAT = "mp3_44100_128"
@@ -497,7 +511,7 @@ def main() -> None:
 
     parser = argparse.ArgumentParser(
         description="Genera la voz en off (ElevenLabs) de un producto a "
-        "partir de su ficha, alternando entre las voces carlos/gonzalo segun "
+        "partir de su ficha, alternando entre las voces de VOCES segun "
         "el indice del producto en el lote."
     )
     parser.add_argument("ruta_ficha", help="ruta al .json de la ficha")

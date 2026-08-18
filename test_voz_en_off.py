@@ -18,24 +18,36 @@ import voz_en_off as vo
 class PruebasElegirVoz(unittest.TestCase):
     def test_indice_0_devuelve_carlos(self):
         self.assertEqual(vo.elegir_voz(0), "carlos")
-        self.assertEqual(vo.elegir_voz(3), "carlos")
-        self.assertEqual(vo.elegir_voz(9), "carlos")
+        self.assertEqual(vo.elegir_voz(6), "carlos")
+        self.assertEqual(vo.elegir_voz(12), "carlos")
 
     def test_indice_1_devuelve_gonzalo(self):
         self.assertEqual(vo.elegir_voz(1), "gonzalo")
-        self.assertEqual(vo.elegir_voz(4), "gonzalo")
-        self.assertEqual(vo.elegir_voz(10), "gonzalo")
+        self.assertEqual(vo.elegir_voz(7), "gonzalo")
+        self.assertEqual(vo.elegir_voz(13), "gonzalo")
 
     def test_indice_2_devuelve_santiago(self):
         self.assertEqual(vo.elegir_voz(2), "santiago")
-        self.assertEqual(vo.elegir_voz(5), "santiago")
-        self.assertEqual(vo.elegir_voz(11), "santiago")
+        self.assertEqual(vo.elegir_voz(8), "santiago")
+        self.assertEqual(vo.elegir_voz(14), "santiago")
+
+    def test_indice_3_devuelve_adberto(self):
+        self.assertEqual(vo.elegir_voz(3), "adberto")
+        self.assertEqual(vo.elegir_voz(9), "adberto")
+
+    def test_indice_4_devuelve_el_faraon(self):
+        self.assertEqual(vo.elegir_voz(4), "el_faraon")
+        self.assertEqual(vo.elegir_voz(10), "el_faraon")
+
+    def test_indice_5_devuelve_fernando(self):
+        self.assertEqual(vo.elegir_voz(5), "fernando")
+        self.assertEqual(vo.elegir_voz(11), "fernando")
 
     def test_alterna_en_secuencia(self):
         voces = [vo.elegir_voz(i) for i in range(6)]
         self.assertEqual(
             voces,
-            ["carlos", "gonzalo", "santiago", "carlos", "gonzalo", "santiago"],
+            ["carlos", "gonzalo", "santiago", "adberto", "el_faraon", "fernando"],
         )
 
 
