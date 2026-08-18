@@ -150,6 +150,16 @@ def resolver_categoria(categorias: list, nombre_buscado: str):
     for categoria in categorias:
         if str(categoria.get("name", "")).strip().casefold() == objetivo:
             return categoria, []
+    # La ficha puede proponer una rama completa ("Padre > Hijo" — el
+    # Investigador la arma asi, SKILL.md: "propone una rama real"), pero
+    # WooCommerce solo guarda el nombre de la hoja en 'name', nunca la ruta
+    # completa. Sin este segundo intento, cualquier categoria propuesta con
+    # ">" queda marcada "no existe" aunque la hoja SI este en la tienda.
+    if ">" in nombre_buscado:
+        hoja = nombre_buscado.rsplit(">", 1)[-1].strip().casefold()
+        for categoria in categorias:
+            if str(categoria.get("name", "")).strip().casefold() == hoja:
+                return categoria, []
     nombres = [str(c.get("name", "")) for c in categorias]
     sugerencias = difflib.get_close_matches(nombre_buscado, nombres, n=5, cutoff=0.4)
     return None, sugerencias

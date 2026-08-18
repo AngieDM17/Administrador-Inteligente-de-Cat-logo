@@ -428,6 +428,22 @@ class PruebasFuncionesPuras(unittest.TestCase):
         self.assertIsNone(categoria)
         self.assertIn("Compresores", sugerencias)
 
+    def test_resolver_categoria_con_rama_completa_matchea_la_hoja(self):
+        categorias = [{"id": 9, "name": "Escritorios"}]
+        categoria, sugerencias = resolver_categoria(
+            categorias, "Oficina > Escritorios"
+        )
+        self.assertEqual(categoria["id"], 9)
+        self.assertEqual(sugerencias, [])
+
+    def test_resolver_categoria_con_rama_de_varios_niveles_matchea_la_hoja(self):
+        categorias = [{"id": 5, "name": "Molinos"}]
+        categoria, sugerencias = resolver_categoria(
+            categorias, "Industria > Maquinaria para alimentos > Molinos"
+        )
+        self.assertEqual(categoria["id"], 5)
+        self.assertEqual(sugerencias, [])
+
 
 class PruebasRegistro(unittest.TestCase):
     def setUp(self):
