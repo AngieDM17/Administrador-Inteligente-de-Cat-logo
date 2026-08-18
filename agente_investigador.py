@@ -404,7 +404,10 @@ async def _correr_agente(link: str, carpeta_destino: Path,
         "descargar_imagen",
         "Descarga una imagen real (por su URL) a un archivo dentro de la "
         "carpeta del producto. nombre_archivo va SIN ruta, solo el nombre "
-        "(ej. '9060C_foto_1.jpg').",
+        "y SIN extension o con cualquiera (ej. '9060C_foto_1') -- la "
+        "herramienta siempre la guarda como .webp de verdad, sin importar "
+        "que formato tenia la fuente. Usa el nombre que devuelve el "
+        "resultado (no el que pediste) para anotarla en la ficha.",
         {"url_imagen": str, "nombre_archivo": str},
     )
     async def _tool_descargar_imagen(args: dict) -> dict:
@@ -418,13 +421,20 @@ async def _correr_agente(link: str, carpeta_destino: Path,
             }
         destino = carpeta_destino / nombre
         try:
-            await asyncio.to_thread(fuente.descargar_imagen, args["url_imagen"], destino)
+            # descargar_imagen() SIEMPRE devuelve .webp real (convierte el
+            # contenido, no solo renombra) -- ver su docstring, bug real
+            # 14-ago-2026 de un .jpg que en realidad era PNG. La ruta final
+            # puede diferir de `destino` si nombre_archivo no terminaba en
+            # .webp; se reporta la real para que el agente la use en la ficha.
+            ruta_final = await asyncio.to_thread(
+                fuente.descargar_imagen, args["url_imagen"], destino
+            )
         except nav.ErrorRecurso as error:
             return {
                 "content": [{"type": "text", "text": f"ERROR: {error}"}],
                 "is_error": True,
             }
-        return {"content": [{"type": "text", "text": f"Guardada como {destino.name}"}]}
+        return {"content": [{"type": "text", "text": f"Guardada como {ruta_final.name}"}]}
 
     @tool(
         "extraer_video",

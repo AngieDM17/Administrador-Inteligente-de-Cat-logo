@@ -17,11 +17,23 @@ externos). Se prueba:
   (TIMEOUT_DESCARGA_VIDEO_SEGUNDOS), distinto al de foto.
 """
 
+import io
 import unittest
 from pathlib import Path
 from unittest import mock
 
+from PIL import Image
+
 import herramientas_navegador as nav
+
+
+def _bytes_de_imagen_real(formato: str = "PNG") -> bytes:
+    """Un PNG/JPEG real de 2x2 pixeles, en memoria -- para probar la
+    conversion a WEBP con una imagen de verdad, no bytes inventados (que
+    Pillow ya no puede abrir desde el bug de 14-ago-2026)."""
+    buffer = io.BytesIO()
+    Image.new("RGB", (2, 2), color=(255, 0, 0)).save(buffer, formato)
+    return buffer.getvalue()
 
 
 class PruebasEsImagenDeProducto(unittest.TestCase):
@@ -48,23 +60,50 @@ class PruebasEsImagenDeProducto(unittest.TestCase):
 
 
 class PruebasDescargarImagen(unittest.TestCase):
-    def test_guarda_el_contenido_en_ruta_destino(self):
+    """14-ago-2026: descargar_imagen ahora SIEMPRE convierte a WEBP real
+    (bug real encontrado en vivo: un archivo nombrado .jpg que en realidad
+    era PNG hacia que WordPress rechazara la subida por Content-Type
+    mentiroso) -- las pruebas usan bytes de imagen REALES (PNG y JPEG de
+    2x2, generados con Pillow), no binario inventado, porque ahora Pillow
+    abre el archivo de verdad."""
+
+    def test_convierte_a_webp_real_y_devuelve_la_ruta_final(self):
         respuesta_falsa = mock.Mock()
-        respuesta_falsa.content = b"contenido-binario-falso"
+        respuesta_falsa.content = _bytes_de_imagen_real("PNG")
         respuesta_falsa.raise_for_status = mock.Mock()
 
         with mock.patch.object(nav.httpx, "get", return_value=respuesta_falsa) as get_falso:
             import tempfile
             with tempfile.TemporaryDirectory() as tmp:
                 destino = Path(tmp) / "sub" / "4212_foto_1.jpg"
+                resultado = nav.descargar_imagen("https://x.com/foto.png", destino)
+
+                # La extension real siempre es .webp, aunque se haya pedido
+                # ".jpg" -- este es justo el bug que se corrigio.
+                self.assertEqual(resultado, destino.with_suffix(".webp"))
+                self.assertTrue(resultado.is_file())
+                self.assertFalse(destino.is_file())  # el .jpg crudo no queda
+                with Image.open(resultado) as imagen:
+                    self.assertEqual(imagen.format, "WEBP")
+                # No debe quedar ningun temporal colgado.
+                self.assertFalse((destino.with_name(destino.name + ".tmp")).exists())
+        get_falso.assert_called_once()
+
+    def test_nombre_ya_terminado_en_webp_no_deja_archivo_duplicado(self):
+        respuesta_falsa = mock.Mock()
+        respuesta_falsa.content = _bytes_de_imagen_real("JPEG")
+        respuesta_falsa.raise_for_status = mock.Mock()
+
+        with mock.patch.object(nav.httpx, "get", return_value=respuesta_falsa):
+            import tempfile
+            with tempfile.TemporaryDirectory() as tmp:
+                destino = Path(tmp) / "4212_foto_1.webp"
                 resultado = nav.descargar_imagen("https://x.com/foto.jpg", destino)
 
                 self.assertEqual(resultado, destino)
                 self.assertTrue(destino.is_file())
-                self.assertEqual(destino.read_bytes(), b"contenido-binario-falso")
-                # No debe quedar el temporal colgado.
-                self.assertFalse((destino.with_name(destino.name + ".tmp")).exists())
-        get_falso.assert_called_once()
+                with Image.open(resultado) as imagen:
+                    self.assertEqual(imagen.format, "WEBP")
 
     def test_error_http_se_traduce_a_error_recurso(self):
         with mock.patch.object(

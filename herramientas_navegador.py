@@ -42,6 +42,7 @@ from pathlib import Path
 from urllib.parse import urljoin, urlparse
 
 import httpx
+from PIL import Image
 
 # Tiempo maximo (ms) para que una pagina termine de cargar el DOM antes de
 # darla por caida. 30s alcanza para una pagina de producto normal sin ser
@@ -298,15 +299,35 @@ def descargar_archivo(url_archivo: str, ruta_destino: Path, *,
 
 
 def descargar_imagen(url_imagen: str, ruta_destino: Path) -> Path:
-    """Descarga una imagen real a `ruta_destino`. Wrapper fino sobre
-    descargar_archivo con el timeout de foto (TIMEOUT_DESCARGA_SEGUNDOS) --
-    se mantiene como funcion propia para no romper nada que ya la llame por
-    este nombre.
+    """Descarga una imagen real y la deja guardada como WEBP de verdad,
+    sin importar que extension haya pedido `ruta_destino` -- regla fija de
+    la tienda (reglas_negocio.md, regla 9: "Formato de imagenes de la
+    tienda: WebP"), y de paso corrige un bug real (14-ago-2026): el agente
+    investigador nombraba los archivos ".jpg" sin fijarse en el formato
+    REAL que bajaba de la fuente; cuando la fuente servia PNG, WordPress
+    rechazaba la subida (el Content-Type que arma cliente_tienda.py sale de
+    la extension del archivo, y no coincidia con el contenido real).
+    Convertir siempre aca, en la descarga, elimina esa clase entera de bug
+    en la raiz -- no hace falta que quien pida el nombre le acierte al
+    formato -- y de paso deja las imagenes mas livianas para la pagina.
 
-    Lanza ErrorRecurso si la descarga falla (red, 404, timeout)."""
-    return descargar_archivo(
-        url_imagen, ruta_destino, timeout_segundos=TIMEOUT_DESCARGA_SEGUNDOS
+    Devuelve la ruta REAL donde quedo guardada (con extension .webp,
+    aunque `ruta_destino` haya pedido otra) -- quien llama tiene que usar
+    el valor de retorno, nunca asumir que coincide con `ruta_destino`.
+
+    Lanza ErrorRecurso si la descarga falla (red, 404, timeout). Si el
+    archivo descargado no es una imagen valida (pagina de error disfrazada
+    de imagen, etc.), Pillow lanza su propia excepcion -- se deja propagar
+    tal cual, es un fallo real que hay que ver, no ocultar."""
+    ruta_cruda = descargar_archivo(
+        url_imagen, Path(ruta_destino), timeout_segundos=TIMEOUT_DESCARGA_SEGUNDOS
     )
+    ruta_webp = ruta_cruda.with_suffix(".webp")
+    with Image.open(ruta_cruda) as imagen:
+        imagen.convert("RGB").save(ruta_webp, "WEBP", quality=90)
+    if ruta_webp != ruta_cruda:
+        ruta_cruda.unlink(missing_ok=True)
+    return ruta_webp
 
 
 def descargar_video(url_video: str, ruta_destino: Path) -> Path:
