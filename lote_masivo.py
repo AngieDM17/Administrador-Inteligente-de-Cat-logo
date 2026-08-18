@@ -142,7 +142,8 @@ def _guardar_libro(libro, ruta_excel: Path) -> None:
 def _procesar_producto(link: str, carpeta_investigaciones: Path,
                         publicar_notificacion: Notificador,
                         evento_continuar: threading.Event,
-                        sesion_alibaba, produccion: bool = False) -> dict:
+                        sesion_alibaba, produccion: bool = False,
+                        indice_producto: int = 0) -> dict:
     """Corre investigar_producto() -> ejecutar_pipeline() para UN link,
     exactamente el mismo orden que _correr_pipeline de app.py para el
     camino de un solo link. Si la investigacion no produce una ficha, no se
@@ -152,7 +153,13 @@ def _procesar_producto(link: str, carpeta_investigaciones: Path,
 
     `produccion`: ver orquestador.ejecutar_pipeline -- se pasa tal cual,
     mismo valor para TODO el lote (no se elige tienda producto por
-    producto)."""
+    producto).
+
+    `indice_producto`: posicion de este producto en el lote (0-based) --
+    se pasa a ejecutar_pipeline para que la voz alterne de verdad entre
+    productos (ver elegir_voz en voz_en_off.py). Bug real, 18-ago-2026:
+    antes NO se pasaba en absoluto, asi que todo el lote sonaba con la
+    misma voz."""
     carpeta_temporal = carpeta_investigaciones / uuid.uuid4().hex
     try:
         resultado_investigacion = agente_investigador.investigar_producto(
@@ -176,6 +183,7 @@ def _procesar_producto(link: str, carpeta_investigaciones: Path,
 
         return orquestador.ejecutar_pipeline(
             ruta_ficha, publicar_notificacion, produccion=produccion,
+            indice_producto=indice_producto,
         )
     except Exception as error:
         motivo = f"Error inesperado procesando '{link}': {error}"
@@ -243,6 +251,7 @@ def procesar_lote(ruta_excel: Path, carpeta_investigaciones: Path,
             resultado = _procesar_producto(
                 link, carpeta_investigaciones, publicar_notificacion,
                 evento_continuar, sesion_alibaba, produccion=produccion,
+                indice_producto=numero - 1,
             )
             texto_estado = _texto_estado(resultado)
 
