@@ -38,6 +38,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+from typing import Callable
 
 from cliente_tienda import cargar_env
 
@@ -237,10 +238,18 @@ def _clave_api() -> str:
     return clave
 
 
-def _sintetizar_voz(guion: str, voz: str) -> bytes:
+def _sintetizar_voz(guion: str, voz: str,
+                    notificar: Callable[[str], None] | None = None) -> bytes:
     """Llama a ElevenLabs (text_to_speech.convert) y devuelve el mp3
     resultante como bytes. Lanza ErrorRecurso si falta la clave o la API
     devuelve error.
+
+    Reintenta sola (ver resolucion_dns.reintentar_en_fallo_de_red) si el
+    fallo es un hipo de RED transitorio -- mismo hipo intermitente que ya
+    afecta a la tienda, encontrado en vivo el 19-ago-2026 perdiendo el video
+    de un producto por un DNS que a los pocos segundos volvia a funcionar
+    solo. Un error real de la API (clave invalida, cuota agotada) NO se
+    reintenta: se relanza de una.
 
     NO se prueba con la API real en unit tests (llamada de red paga): se
     verifica a mano/CLI contra una ficha real, igual que el resto de los
@@ -251,15 +260,19 @@ def _sintetizar_voz(guion: str, voz: str) -> bytes:
         from elevenlabs.client import ElevenLabs
         from elevenlabs.types import VoiceSettings
 
-        from resolucion_dns import forzar_ipv4
+        from resolucion_dns import forzar_ipv4, reintentar_en_fallo_de_red
         cliente = ElevenLabs(api_key=clave)
-        with forzar_ipv4():
-            trozos = cliente.text_to_speech.convert(
-                voice_id=voice_id, text=guion, model_id=MODEL_ID,
-                output_format=OUTPUT_FORMAT,
-                voice_settings=VoiceSettings(speed=VELOCIDAD_VOZ),
-            )
-            return b"".join(trozos)
+
+        def _llamar() -> bytes:
+            with forzar_ipv4():
+                trozos = cliente.text_to_speech.convert(
+                    voice_id=voice_id, text=guion, model_id=MODEL_ID,
+                    output_format=OUTPUT_FORMAT,
+                    voice_settings=VoiceSettings(speed=VELOCIDAD_VOZ),
+                )
+                return b"".join(trozos)
+
+        return reintentar_en_fallo_de_red(_llamar, notificar=notificar)
     except ErrorRecurso:
         raise
     except Exception as error:  # el SDK de ElevenLabs lanza distintos tipos
@@ -270,7 +283,8 @@ def _sintetizar_voz(guion: str, voz: str) -> bytes:
 
 def generar_a_archivo(datos: dict, ruta_salida: Path,
                       indice_producto: int = 0,
-                      cuerpo_manual: str | None = None) -> Path:
+                      cuerpo_manual: str | None = None,
+                      notificar: Callable[[str], None] | None = None) -> Path:
     """Arma el guion, genera la voz con ElevenLabs (alternando voz segun
     indice_producto) y la guarda en ruta_salida (mp3). Devuelve ruta_salida.
     Guardado atomico (temporal + os.replace).
@@ -280,12 +294,16 @@ def generar_a_archivo(datos: dict, ruta_salida: Path,
     pasa, cae al recorte automatico de la descripcion de la ficha (ver
     armar_guion). Camino preferido: pasar siempre `cuerpo_manual`.
 
+    `notificar` (opcional): recibe un aviso de texto si hace falta
+    reintentar por un hipo de red (ver _sintetizar_voz). None (default) no
+    cambia nada para quien no lo pasa.
+
     Lanza ErrorRecurso si falta la clave en .env o ElevenLabs devuelve error.
 
     NO se prueba con la API real en unit tests; se verifica a mano/CLI."""
     voz = elegir_voz(indice_producto)
     guion = armar_guion(datos, PRESUPUESTO_CARACTERES_DEFECTO, cuerpo_manual)
-    audio_bytes = _sintetizar_voz(guion, voz)
+    audio_bytes = _sintetizar_voz(guion, voz, notificar=notificar)
 
     ruta_salida = Path(ruta_salida)
     temporal = ruta_salida.with_name(

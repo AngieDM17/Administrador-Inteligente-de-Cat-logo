@@ -281,6 +281,7 @@ def _producir_video(ficha: dict, carpeta_ficha: Path, codigo: str,
         "Generando la voz en off...",
         voz_en_off.generar_a_archivo, ficha, ruta_voz,
         indice_producto=indice_producto, cuerpo_manual=cuerpo_guion,
+        notificar=publicar_notificacion,
     )
 
     ruta_clip_con_voz = carpeta_trabajo / "clip_con_voz.mp4"
@@ -306,6 +307,7 @@ def _producir_video(ficha: dict, carpeta_ficha: Path, codigo: str,
         "Agregando musica de fondo...",
         musica.mezclar_musica_de_fondo,
         ruta_clip_con_voz, prompt_musica, ruta_clip_con_musica,
+        notificar=publicar_notificacion,
     )
 
     ruta_clip_con_subtitulos = carpeta_trabajo / "clip_con_subtitulos.mp4"

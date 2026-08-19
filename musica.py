@@ -33,6 +33,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+from typing import Callable
 
 from cliente_tienda import cargar_env
 
@@ -157,7 +158,8 @@ def calcular_duracion_generacion_ms(duracion_video_segundos: float) -> int:
     return max(DURACION_MINIMA_MS, min(DURACION_MAXIMA_MS, solicitados))
 
 
-def generar_musica(prompt: str, duracion_ms: int) -> bytes:
+def generar_musica(prompt: str, duracion_ms: int,
+                   notificar: Callable[[str], None] | None = None) -> bytes:
     """Llama a cliente.music.compose() de ElevenLabs y devuelve el audio
     (mp3) generado como bytes.
 
@@ -165,6 +167,10 @@ def generar_musica(prompt: str, duracion_ms: int) -> bytes:
     contra la API, no supuesto de memoria) es un GENERADOR de trozos de bytes
     -- mismo patron que text_to_speech.convert() en voz_en_off.py -- asi que
     se unen igual con b"".join().
+
+    Reintenta sola (ver resolucion_dns.reintentar_en_fallo_de_red) si el
+    fallo es un hipo de RED transitorio -- mismo criterio que voz_en_off.py.
+    Un error real de la API no se reintenta.
 
     Lanza ErrorRecurso si falta la clave o la API devuelve error.
 
@@ -175,15 +181,19 @@ def generar_musica(prompt: str, duracion_ms: int) -> bytes:
     try:
         from elevenlabs.client import ElevenLabs
 
-        from resolucion_dns import forzar_ipv4
+        from resolucion_dns import forzar_ipv4, reintentar_en_fallo_de_red
         cliente = ElevenLabs(api_key=clave)
-        with forzar_ipv4():
-            trozos = cliente.music.compose(
-                prompt=prompt,
-                music_length_ms=duracion_ms,
-                output_format=OUTPUT_FORMAT,
-            )
-            return b"".join(trozos)
+
+        def _llamar() -> bytes:
+            with forzar_ipv4():
+                trozos = cliente.music.compose(
+                    prompt=prompt,
+                    music_length_ms=duracion_ms,
+                    output_format=OUTPUT_FORMAT,
+                )
+                return b"".join(trozos)
+
+        return reintentar_en_fallo_de_red(_llamar, notificar=notificar)
     except ErrorRecurso:
         raise
     except Exception as error:  # el SDK de ElevenLabs lanza distintos tipos
@@ -194,7 +204,8 @@ def generar_musica(prompt: str, duracion_ms: int) -> bytes:
 
 def mezclar_musica_de_fondo(ruta_video_con_voz: Path, prompt_musica: str,
                             ruta_salida: Path,
-                            loudnorm_musica_i: float = LOUDNORM_MUSICA_I) -> Path:
+                            loudnorm_musica_i: float = LOUDNORM_MUSICA_I,
+                            notificar: Callable[[str], None] | None = None) -> Path:
     """Genera musica real a partir de prompt_musica (duracion = la del video
     de entrada + margen) y la mezcla como capa de FONDO sobre el audio YA
     EXISTENTE de ruta_video_con_voz (voz + ambiente ya mezclados por
@@ -219,7 +230,9 @@ def mezclar_musica_de_fondo(ruta_video_con_voz: Path, prompt_musica: str,
 
     duracion_video = _duracion_segundos(ruta_video_con_voz)
     duracion_generacion_ms = calcular_duracion_generacion_ms(duracion_video)
-    audio_musica = generar_musica(prompt_musica, duracion_generacion_ms)
+    audio_musica = generar_musica(
+        prompt_musica, duracion_generacion_ms, notificar=notificar,
+    )
 
     ruta_salida = Path(ruta_salida)
     temporal = ruta_salida.with_name(
