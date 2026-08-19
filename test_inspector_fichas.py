@@ -57,8 +57,15 @@ class PruebasReglasDeNegocio(unittest.TestCase):
         with self.assertRaises(ValidationError):
             FichaEkipon.model_validate(FICHA_NBC250)
 
-    def test_nombre_en_minusculas_falla(self):
+    def test_nombre_en_minusculas_se_normaliza(self):
+        # Ya no rechaza la ficha entera por casing (bug real, 19-ago-2026):
+        # el casing es mecanico, se corrige solo en vez de tumbar el trabajo.
         datos = con_cambio(["producto", "nombre_propuesto"], "Compresor de aire")
+        ficha = FichaEkipon.model_validate(datos)
+        self.assertEqual(ficha.producto.nombre_propuesto, "COMPRESOR DE AIRE")
+
+    def test_nombre_vacio_falla(self):
+        datos = con_cambio(["producto", "nombre_propuesto"], "   ")
         with self.assertRaises(ValidationError):
             FichaEkipon.model_validate(datos)
 

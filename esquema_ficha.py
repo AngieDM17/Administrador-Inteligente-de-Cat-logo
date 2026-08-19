@@ -4,7 +4,10 @@ Este modulo define QUE debe cumplir una ficha para considerarse valida.
 La herramienta de linea de comandos que lo usa es validar_ficha.py.
 
 Reglas de negocio FIJAS (errores, bloquean):
-- producto.nombre_propuesto: no vacio y completamente en MAYUSCULAS.
+- producto.nombre_propuesto: no vacio. Se normaliza a MAYUSCULAS automaticamente
+  (no bloquea la ficha por una letra en minuscula -- bug real, 19-ago-2026: el
+  Investigador escribio "90 x 37,5 CM" con la x en minuscula y tumbo la ficha
+  entera por eso).
 - producto.sku: debe comenzar con el literal AUTOMATICO (WooCommerce asigna el real).
 - precios.precio: entero en COP (se rechazan decimales y textos). Puede ser
   null o 0 SOLO si precio_origen indica PENDIENTE_ANGIE (el precio siempre
@@ -188,16 +191,17 @@ class Producto(ModeloBase):
     @field_validator("nombre_propuesto")
     @classmethod
     def _nombre_en_mayusculas(cls, valor: str) -> str:
-        if not valor.strip():
+        # Se normaliza en vez de rechazar: el casing es 100% mecanico (no
+        # requiere criterio), asi que corregirlo aca es mas seguro que
+        # confiar en que el Investigador (un LLM, no determinista) lo
+        # escriba perfecto siempre. Bug real, 19-ago-2026: escribio
+        # "90 x 37,5 CM" con la x en minuscula y tumbo la ficha entera.
+        valor = valor.strip()
+        if not valor:
             raise ValueError(
                 "no puede estar vacio. Esperado: nombre comercial en MAYUSCULAS."
             )
-        if valor != valor.upper():
-            raise ValueError(
-                f"'{valor[:80]}' tiene letras minusculas. "
-                "Esperado: el nombre completo en MAYUSCULAS (regla fija de la tienda)."
-            )
-        return valor
+        return valor.upper()
 
     @field_validator("sku")
     @classmethod
