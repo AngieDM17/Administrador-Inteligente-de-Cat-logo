@@ -658,7 +658,14 @@ def buscar_existente(cliente, codigo: str, slug: str, ruta_db) -> dict | None:
     """Idempotencia: devuelve el producto si ya existe, o None.
 
     Revisa primero la libreta local (y confirma contra la tienda que el
-    producto siga existiendo) y luego busca el slug en la tienda.
+    producto siga existiendo) y luego busca el slug en la tienda. Un
+    producto en la PAPELERA (status='trash') NO cuenta como "ya existe":
+    bug real, 19-ago-2026 -- HG520 se creo, alguien/algo lo mando a la
+    papelera, y una corrida posterior lo encontraba por este chequeo y
+    reportaba "publicado" sin haber creado nada visible para Angie (no
+    aparece en la lista normal de productos). Un producto en papelera se
+    trata igual que uno que ya no existe: se sigue de largo y se crea uno
+    nuevo.
     """
     anotado = registro.obtener_publicacion(codigo, ruta_db)
     if anotado and anotado.get("product_id"):
@@ -666,8 +673,14 @@ def buscar_existente(cliente, codigo: str, slug: str, ruta_db) -> dict | None:
             producto = cliente.obtener(
                 f"/wp-json/wc/v3/products/{anotado['product_id']}"
             )
-            if producto and producto.get("id"):
+            if producto and producto.get("id") and producto.get("status") != "trash":
                 return producto
+            if producto and producto.get("status") == "trash":
+                print(
+                    f"Aviso: la libreta anotaba el producto {anotado['product_id']}, "
+                    "pero esta en la papelera de la tienda. Se continua "
+                    "como si no existiera."
+                )
         except ErrorTienda as error:
             if error.codigo_http != 404:
                 raise
@@ -676,8 +689,10 @@ def buscar_existente(cliente, codigo: str, slug: str, ruta_db) -> dict | None:
                 "pero ya no existe en la tienda. Se continua."
             )
     encontrados = cliente.obtener(f"/wp-json/wc/v3/products?slug={slug}&status=any")
-    if isinstance(encontrados, list) and encontrados:
-        return encontrados[0]
+    if isinstance(encontrados, list):
+        for encontrado in encontrados:
+            if encontrado.get("status") != "trash":
+                return encontrado
     return None
 
 

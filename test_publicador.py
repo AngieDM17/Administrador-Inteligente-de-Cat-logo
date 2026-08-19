@@ -942,6 +942,28 @@ class PruebasCorreccionesReview(unittest.TestCase):
             self.assertEqual(cliente.creaciones, [])
             self.assertIn("/wp-json/wc/v3/products/555", cliente.llamadas_obtener)
 
+    def test_producto_en_papelera_no_cuenta_como_existente(self):
+        # Bug real, 19-ago-2026: HG520 se creo, algo lo mando a la papelera
+        # (status='trash'), y una corrida posterior lo encontraba por la
+        # libreta/slug y reportaba "publicado" sin crear nada visible para
+        # Angie -- un producto en papelera no aparece en la lista normal.
+        # Ahora se trata igual que "ya no existe": se crea uno nuevo.
+        with tempfile.TemporaryDirectory() as carpeta:
+            ruta_db = Path(carpeta) / "prueba.db"
+            slug = generar_slug("4212", FICHA_4212["producto"]["nombre_propuesto"])
+            registro.registrar_publicacion("4212", 555, slug, "borrador_creado", ruta_db)
+            cliente = ClienteFalso(
+                categorias=[{"id": 428, "name": "Compresores"}],
+                respuestas_obtener={
+                    "/wp-json/wc/v3/products/555": {"id": 555, "status": "trash"},
+                    f"/wp-json/wc/v3/products?slug={slug}&status=any": [],
+                },
+            )
+            codigo_salida = publicar(FICHA_4212, "4212", slug, RAIZ, cliente, ruta_db)
+            self.assertEqual(codigo_salida, 0)
+            # Se creo un producto NUEVO en vez de reutilizar el de la papelera.
+            self.assertEqual(len(cliente.creaciones), 1)
+
     def test_slug_vacio_termina_con_1_sin_traceback(self):
         # Una ficha valida por esquema pero con nombre/codigo solo de simbolos
         # NO debe reventar con traceback: el flujo lo traduce a salida 1.
