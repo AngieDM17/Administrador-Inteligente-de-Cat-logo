@@ -1,14 +1,25 @@
 """Normalizador de clips de video de producto al formato YouTube 1920x1080
 (etapa Imagenes/Video).
 
-Los clips que llegan de Alibaba suelen venir verticales (720x1280 es el caso
-tipico) y hay que adaptarlos al horizontal 1920x1080 antes de armar el video
-final. Si el clip YA viene en 1920x1080 no se toca: se copia tal cual, sin
-re-codificar de mas. Si no, se aplica la formula confirmada contra el ajuste
-manual real que hace Angie en CapCut: escalar por ANCHO a 1920 manteniendo la
-proporcion, y recortar el sobrante de alto CENTRADO
-(`scale=1920:-1,crop=1920:1080`; el crop sin x/y explicitos ya centra solo).
-No hay mas casos: es una regla de dos ramas, no un detector de aspect ratios.
+Los clips que llegan de Alibaba pueden venir en cualquier proporcion --
+verticales (720x1280 es el caso mas comun) o mas anchos que 16:9 -- y hay que
+adaptarlos al horizontal 1920x1080 antes de armar el video final. Si el clip
+YA viene en 1920x1080 no se toca: se copia tal cual, sin re-codificar de mas.
+Si no, se escala para CUBRIR 1920x1080 preservando la proporcion
+(`scale=1920:1080:force_original_aspect_ratio=increase`) y se recorta el
+sobrante centrado (`crop=1920:1080`).
+
+Bug real, 19-ago-2026: la formula vieja (`scale=1920:-1,crop=1920:1080`,
+escalar SIEMPRE por ancho) daba por hecho que el resultado siempre iba a
+medir 1080 de alto o mas -- cierto para clips angostos (verticales o mas
+"cuadrados" que 16:9), pero falso para un clip MAS ANCHO que 16:9 (caso real:
+1290x720, ratio 1.79 contra 1.778 de 16:9): escalado por ancho a 1920 quedaba
+en ~1072 de alto, y crop=1920:1080 fallaba ("Error reinitializing filters!")
+porque pedia recortar mas alto de lo que el frame tenia. force_original_
+aspect_ratio=increase (la misma tecnica que ya usaba _filtro_fondo_difuminado
+para su capa de fondo) elige la escala mas chica que CUBRE 1920x1080 en
+cualquiera de los dos sentidos, asi que el crop despues siempre tiene de
+donde recortar.
 
 Uso:  python preparar_video_producto.py <entrada.mp4> [--salida salida.mp4]
 
@@ -167,8 +178,9 @@ def generar_a_archivo(ruta_entrada: Path, ruta_salida: Path,
     Si el clip YA esta en 1920x1080 y zoom_extra es 0 se copia tal cual (no
     se re-codifica de mas). Si hace falta reescalar a 1920x1080, o si
     zoom_extra > 0 (incluso con un clip que ya esta en 1920x1080), se corre
-    ffmpeg con el filtro `scale=1920:-1,crop=1920:1080` (o con el zoom extra
-    aplicado, ver _filtro_zoom_extra) y se preserva el audio sin recodificar
+    ffmpeg con el filtro `scale=1920:1080:force_original_aspect_ratio=increase,
+    crop=1920:1080` (o con el zoom extra aplicado, ver _filtro_zoom_extra) y
+    se preserva el audio sin recodificar
     (`-c:a copy`).
 
     zoom_extra es una fraccion adicional de recorte centrado MAS ALLA del
@@ -219,7 +231,10 @@ def generar_a_archivo(ruta_entrada: Path, ruta_salida: Path,
 
         filtros = []
         if necesita_reescalar(ancho, alto):
-            filtros.append("scale=1920:-1,crop=1920:1080")
+            filtros.append(
+                "scale=1920:1080:force_original_aspect_ratio=increase,"
+                "crop=1920:1080"
+            )
         if zoom_extra > 0:
             filtros.append(_filtro_zoom_extra(zoom_extra))
         if filtros:
