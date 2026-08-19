@@ -65,8 +65,11 @@ PROMPT_MUSICA_GENERICO = (
 # categoria real de la ficha puede no calzar exacto con ninguna fila, y ahi es
 # donde el modelo adapta el tono en vez de un match rigido de substring.
 _ESTILOS_POR_CATEGORIA = (
-    ("gimnasio", "energetic powerful gym workout music, motivational, no vocals"),
-    ("fitness", "energetic powerful gym workout music, motivational, no vocals"),
+    # Suavizado (19-ago-2026): "energetic powerful... motivational" sonaba
+    # "extravagante" para Angie en un producto real (id 50644) -- pidio algo
+    # mas suave, solo para esta categoria (las demas quedan igual).
+    ("gimnasio", "light motivational gym background music, gentle upbeat energy, no vocals"),
+    ("fitness", "light motivational gym background music, gentle upbeat energy, no vocals"),
     ("construccion", "serious industrial construction background music, steady, no vocals"),
     ("obra", "serious industrial construction background music, steady, no vocals"),
     ("agro", "upbeat rural agricultural background music, warm, no vocals"),
