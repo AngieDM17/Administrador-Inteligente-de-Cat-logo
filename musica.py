@@ -65,10 +65,13 @@ MARGEN_EXTRA_MS = 2000
 # 18-ago-2026 ("a veces casi no se escucha"), mismo problema que ya se habia
 # resuelto para la voz (Carlos a -33dB crudo, Gonzalo a -17dB, mismo factor
 # fijo sonaba parejo en uno y saturaba en el otro).
-# Angie pidio un balance de "musica al 4%, voz al 7%" (~5dB de diferencia,
-# 20*log10(0.07/0.04)): LOUDNORM_VOZ_I ya esta en -12 LUFS, asi que la
-# musica se deja 5 LU mas floja para guardar esa misma relacion.
-LOUDNORM_MUSICA_I = -17
+# Bajado de -17 a -22 (19-ago-2026): con -17 (el primer intento, "musica al
+# 4%, voz al 7%" que pidio Angie) un producto real (id 50635) salio con la
+# musica tapando la voz -- "no se alcanza a escuchar la voz del chico". -17
+# ya era 5 LU mas floja que la voz (-12), pero no alcanzo: se widening a
+# 10 LU de diferencia. Sigue siendo ajustable por producto via el parametro
+# loudnorm_musica_i de mezclar_musica_de_fondo, este es solo el default.
+LOUDNORM_MUSICA_I = -22
 LOUDNORM_MUSICA_TP = -1.5
 
 
