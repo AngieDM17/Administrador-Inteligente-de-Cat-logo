@@ -766,34 +766,53 @@ def resolver_categoria_en_vivo(cliente, datos: dict,
                                resultado: dict | None = None) -> dict | None:
     """Lee el arbol de categorias de la tienda y resuelve la propuesta.
 
-    Devuelve la categoria, o None (con el error ya impreso) si no existe.
+    Decision de Angie (20-ago-2026): esto YA NO frena la publicacion --
+    "que monte el producto sin frenarse por nada", mismo principio que ya
+    se aplicaba al colador de calidad (ver CHECKPOINT 1 en orquestador.py,
+    11-ago-2026). Si el nombre propuesto no matchea ninguna categoria real,
+    se usa la mas parecida (la primera sugerencia de resolver_categoria,
+    ya ordenada por similitud); si no hay ninguna parecida, se usa la
+    primera categoria de la tienda como ultimo recurso -- nunca devuelve
+    None. El desajuste no se pierde: queda anotado en `resultado` para que
+    orquestador.py lo sume a 'motivos_revision' y Angie lo corrija desde
+    el borrador ya armado, en vez de bloquear la corrida.
 
-    `resultado`, si se pasa, es un dict de salida (mutado in-place) donde se
-    anota 'categoria_buscada' y 'categoria_sugerencias' cuando NO hay match.
-    Es aditivo a proposito (parametro opcional, default None, nada cambia
-    para quien no lo pasa — CLI y tests existentes intactos): lo usa
-    orquestador.py para distinguir el CHECKPOINT 2 (categoria sin match) de
-    cualquier otro motivo por el que publicar() devuelva 1, algo que el
-    codigo original no exponia de forma programatica (solo imprimia a
-    stdout). Ver mismatch documentado en el reporte final del orquestador.
+    `resultado`, si se pasa, es un dict de salida (mutado in-place) donde
+    se anota 'categoria_buscada' y 'categoria_sugerencias' cuando el
+    nombre propuesto NO matcheaba una categoria real. Es aditivo a
+    proposito (parametro opcional, default None, nada cambia para quien no
+    lo pasa — CLI y tests existentes intactos).
+
+    Solo devuelve None si la tienda no tiene NINGUNA categoria (arbol
+    vacio): ahi no hay nada razonable que usar de respaldo.
     """
     print("Leyendo el arbol de categorias en vivo...")
     categorias = cliente.obtener_paginado(
         "/wp-json/wc/v3/products/categories?orderby=name"
     )
+    if not categorias:
+        print("\nERROR: la tienda no tiene ninguna categoria creada.")
+        return None
     nombre_categoria = (datos.get("producto") or {}).get("categoria_propuesta") or ""
     categoria, sugerencias = resolver_categoria(categorias, nombre_categoria)
     if categoria is None:
+        if sugerencias:
+            categoria = next(
+                c for c in categorias
+                if str(c.get("name", "")) == sugerencias[0]
+            )
+        else:
+            categoria = categorias[0]
         print(
-            f"\nERROR: la categoria propuesta '{nombre_categoria}' no existe "
-            "en la tienda."
+            f"\nAVISO: la categoria propuesta '{nombre_categoria}' no existe "
+            f"en la tienda -- se usa '{categoria['name']}' de respaldo. "
+            "Confirmar en el borrador."
         )
         if sugerencias:
             imprimir_lista("Nombres mas parecidas en la tienda:", sugerencias)
         if resultado is not None:
             resultado["categoria_buscada"] = nombre_categoria
             resultado["categoria_sugerencias"] = sugerencias
-        return None
     print(f"Categoria resuelta: {categoria['name']} (id {categoria['id']})")
     return categoria
 

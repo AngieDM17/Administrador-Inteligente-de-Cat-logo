@@ -564,15 +564,17 @@ class PruebasIdempotencia(unittest.TestCase):
         with self.assertRaises(ErrorTienda):
             generar_y_subir_banner(FICHA_4212, "4212", "un-slug", RAIZ, cliente)
 
-    def test_categoria_inexistente_termina_con_1_sin_crear(self):
+    def test_categoria_inexistente_crea_igual_con_la_unica_disponible(self):
+        # Decision de Angie (20-ago-2026): categoria sin match ya no
+        # bloquea -- se crea igual con la unica categoria de la tienda.
         slug = generar_slug("4212", FICHA_4212["producto"]["nombre_propuesto"])
         cliente = ClienteFalso(categorias=[{"id": 1, "name": "Taladros"}])
         codigo_salida = publicar(
             FICHA_4212, "4212", slug, RAIZ, cliente, self.ruta_db
         )
-        self.assertEqual(codigo_salida, 1)
-        self.assertEqual(cliente.creaciones, [])
-        self.assertEqual(cliente.subidas, [])
+        self.assertEqual(codigo_salida, 0)
+        self.assertEqual(len(cliente.creaciones), 1)
+        self.assertTrue(cliente.subidas)
 
 
 class PruebasActualizacion(unittest.TestCase):
@@ -630,7 +632,9 @@ class PruebasActualizacion(unittest.TestCase):
         self.assertEqual(cliente.creaciones, [])
         self.assertEqual(cliente.subidas, [])
 
-    def test_categoria_inexistente_termina_con_1_sin_put(self):
+    def test_categoria_inexistente_actualiza_igual_con_la_unica_disponible(self):
+        # Decision de Angie (20-ago-2026): categoria sin match ya no
+        # bloquea -- actualiza igual con la unica categoria de la tienda.
         cliente = ClienteFalso(
             respuestas_obtener={
                 f"/wp-json/wc/v3/products?slug={self.slug}&status=any": [
@@ -643,8 +647,8 @@ class PruebasActualizacion(unittest.TestCase):
             FICHA_4212, "4212", self.slug, RAIZ, cliente, self.ruta_db,
             actualizar=True,
         )
-        self.assertEqual(codigo_salida, 1)
-        self.assertEqual(cliente.actualizaciones, [])
+        self.assertEqual(codigo_salida, 0)
+        self.assertEqual(len(cliente.actualizaciones), 1)
 
     def test_sin_refrescar_galeria_la_actualizacion_no_manda_images(self):
         # Pin del comportamiento por defecto: una actualizacion no puede
@@ -673,8 +677,10 @@ class PruebasActualizacion(unittest.TestCase):
         # Las imagenes viajan con su texto alt, igual que al crear.
         self.assertTrue(all(img["alt"] for img in payload["images"]))
 
-    def test_refrescar_galeria_con_categoria_inexistente_no_sube_nada(self):
-        # La galeria no se toca si la actualizacion ni siquiera va a ocurrir.
+    def test_refrescar_galeria_con_categoria_inexistente_sube_igual(self):
+        # Decision de Angie (20-ago-2026): categoria sin match ya no
+        # bloquea -- la galeria se refresca igual con la unica categoria
+        # disponible en la tienda.
         cliente = ClienteFalso(
             respuestas_obtener={
                 f"/wp-json/wc/v3/products?slug={self.slug}&status=any": [
@@ -687,9 +693,9 @@ class PruebasActualizacion(unittest.TestCase):
             FICHA_4212, "4212", self.slug, RAIZ, cliente, self.ruta_db,
             actualizar=True, refrescar_galeria=True,
         )
-        self.assertEqual(codigo_salida, 1)
-        self.assertEqual(cliente.actualizaciones, [])
-        self.assertEqual(cliente.subidas, [])
+        self.assertEqual(codigo_salida, 0)
+        self.assertEqual(len(cliente.actualizaciones), 1)
+        self.assertTrue(cliente.subidas)
 
     def test_refrescar_galeria_sin_imagenes_no_borra_la_galeria_viva(self):
         # "No hay nada que subir" y "borra todo" no pueden ser la misma orden.
@@ -1007,7 +1013,10 @@ class PruebasResultadoYVideo(unittest.TestCase):
     def tearDown(self):
         self._carpeta.cleanup()
 
-    def test_categoria_sin_match_anota_sugerencias_en_resultado(self):
+    def test_categoria_sin_match_publica_igual_con_la_mas_parecida(self):
+        # Decision de Angie (20-ago-2026): la categoria sin match ya no
+        # frena la publicacion -- se usa la mas parecida y queda anotada
+        # para revisar, pero el producto SI se crea.
         slug = generar_slug("4212", FICHA_4212["producto"]["nombre_propuesto"])
         cliente = ClienteFalso(categorias=[{"id": 1, "name": "Compresores usados"}])
         resultado = {}
@@ -1015,11 +1024,24 @@ class PruebasResultadoYVideo(unittest.TestCase):
             FICHA_4212, "4212", slug, RAIZ, cliente, self.ruta_db,
             resultado=resultado,
         )
-        self.assertEqual(codigo_salida, 1)
+        self.assertEqual(codigo_salida, 0)
         self.assertEqual(resultado["categoria_buscada"], "Compresores")
         self.assertIn("Compresores usados", resultado["categoria_sugerencias"])
-        # Checkpoint de categoria: nunca se creo el producto.
-        self.assertNotIn("producto_id", resultado)
+        self.assertIn("producto_id", resultado)
+
+    def test_categoria_sin_ninguna_parecida_usa_la_primera_de_la_tienda(self):
+        # Ni siquiera hay una categoria parecida en la tienda: ultimo
+        # recurso, se usa la primera de la lista -- nunca se bloquea.
+        slug = generar_slug("4212", FICHA_4212["producto"]["nombre_propuesto"])
+        cliente = ClienteFalso(categorias=[{"id": 99, "name": "Zapatos"}])
+        resultado = {}
+        codigo_salida = publicar(
+            FICHA_4212, "4212", slug, RAIZ, cliente, self.ruta_db,
+            resultado=resultado,
+        )
+        self.assertEqual(codigo_salida, 0)
+        self.assertEqual(resultado["categoria_sugerencias"], [])
+        self.assertIn("producto_id", resultado)
 
     def test_creacion_completa_anota_producto_id_en_resultado(self):
         slug = generar_slug("4212", FICHA_4212["producto"]["nombre_propuesto"])

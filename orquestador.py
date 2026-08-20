@@ -341,8 +341,12 @@ def ejecutar_pipeline(ruta_ficha: Path, publicar_notificacion: Notificador,
     """Corre el pipeline completo para una ficha ya investigada. Devuelve un
     dict con 'estado':
 
-      'revisar' -> un checkpoint disparo (colador o categoria); 'motivos'
-                   trae la lista de motivos en español, listos para Angie.
+      'revisar' -> ya no se usa en la practica: ni el colador de calidad
+                   (11-ago-2026) ni la categoria sin match (20-ago-2026)
+                   frenan la publicacion -- decision explicita de Angie de
+                   montar el producto siempre y dejar lo dudoso anotado en
+                   'motivos_revision' del estado 'publicado'. Queda el
+                   estado por si algun checkpoint nuevo lo necesita.
       'error'   -> un paso real fallo; 'motivo' trae el mensaje.
       'publicado' -> borrador creado/actualizado con el video adjunto;
                      'producto_id' y 'url_revisar' traen donde revisarlo.
@@ -576,6 +580,22 @@ def ejecutar_pipeline(ruta_ficha: Path, publicar_notificacion: Notificador,
         for motivo in resultado_final.get("motivos") or [resultado_final.get("motivo", "")]:
             publicar_notificacion(f"  • {motivo}")
         return resultado_final
+
+    # Decision de Angie (20-ago-2026): la categoria sin match en la tienda
+    # YA NO frena la publicacion -- "que monte el producto sin frenarse por
+    # nada", mismo principio que el colador de calidad (CHECKPOINT 1, mas
+    # arriba). resolver_categoria_en_vivo publica igual con la categoria
+    # mas parecida, pero deja la anotacion en resultado_publicacion para
+    # que Angie la vea y la corrija desde el borrador ya armado.
+    if "categoria_sugerencias" in resultado_publicacion:
+        motivo = (
+            "La categoria propuesta "
+            f"('{resultado_publicacion.get('categoria_buscada', '')}') "
+            "no existe en la tienda; se publico con la mas parecida. "
+            "Confirmar la categoria correcta en el borrador."
+        )
+        motivos_colador.append(motivo)
+        publicar_notificacion(f"  • {motivo}")
 
     producto_id = resultado_publicacion.get("producto_id")
     url_revisar = None
