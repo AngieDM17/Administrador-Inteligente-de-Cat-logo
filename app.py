@@ -108,10 +108,13 @@ _JOBS_LOCK = threading.Lock()
 
 class PeticionGenerar(BaseModel):
     ruta_ficha: str
-    # Decision explicita de quien dispara la corrida (checkbox en la pagina,
-    # sin marcar por defecto): False = tienda de pruebas (.env, de siempre),
-    # True = tienda real (.env.produccion). Ver orquestador.ejecutar_pipeline.
-    produccion: bool = False
+    # Decision de Angie, 24-ago-2026 (tras cerrar la prueba de escala de
+    # 20/20 sin bugs): la tienda real es el destino por defecto. El
+    # checkbox de la pagina ahora es para OPTAR por la tienda de pruebas,
+    # sin marcar por defecto: True = tienda real (.env.produccion, de
+    # siempre), False = tienda de pruebas (.env). Ver
+    # orquestador.ejecutar_pipeline.
+    produccion: bool = True
 
 
 app = FastAPI(
@@ -125,7 +128,7 @@ app = FastAPI(
 app.mount("/assets", StaticFiles(directory=RUTA_ASSETS), name="assets")
 
 
-def _correr_pipeline(job_id: str, entrada: str, produccion: bool = False) -> None:
+def _correr_pipeline(job_id: str, entrada: str, produccion: bool = True) -> None:
     """Corre el flujo completo para `entrada`: si es un link, primero
     investiga (Fase 2a) y SOLO si produce una ficha valida encadena hacia
     el pipeline de Fase 1; si es una ruta de archivo, va directo al
@@ -240,7 +243,7 @@ def generar(peticion: PeticionGenerar) -> dict:
     return {"job_id": job_id}
 
 
-def _correr_lote(job_id: str, ruta_excel: Path, produccion: bool = False) -> None:
+def _correr_lote(job_id: str, ruta_excel: Path, produccion: bool = True) -> None:
     """Corre lote_masivo.procesar_lote en el hilo de fondo del job -- mismo
     patron que _correr_pipeline (arriba), notificar() traduce el prefijo de
     Alibaba al mismo evento SSE "necesita_confirmacion" (una unica sesion
@@ -278,7 +281,7 @@ def _correr_lote(job_id: str, ruta_excel: Path, produccion: bool = False) -> Non
 
 @app.post("/generar-lote")
 async def generar_lote(
-    archivo: UploadFile = File(...), produccion: bool = Form(False),
+    archivo: UploadFile = File(...), produccion: bool = Form(True),
 ) -> dict:
     """Recibe el .xlsx del lote nocturno (columnas Link / Nota opcional /
     Estado), lo guarda en lotes/ (gitignored, igual que investigaciones/) y
@@ -286,8 +289,8 @@ async def generar_lote(
     hilo + _Job + SSE que /generar, reusando el mismo job_id para
     /eventos/{job_id} y /continuar/{job_id}.
 
-    `produccion`: campo de formulario (checkbox de la pagina), False por
-    defecto -- ver orquestador.ejecutar_pipeline."""
+    `produccion`: campo de formulario (checkbox de la pagina), True por
+    defecto desde el 24-ago-2026 -- ver orquestador.ejecutar_pipeline."""
     nombre = Path(archivo.filename or "lote.xlsx").name
     if not nombre.lower().endswith(".xlsx"):
         raise HTTPException(

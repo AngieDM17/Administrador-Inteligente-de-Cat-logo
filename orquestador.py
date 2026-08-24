@@ -336,7 +336,7 @@ def _producir_video(ficha: dict, carpeta_ficha: Path, codigo: str,
 
 
 def ejecutar_pipeline(ruta_ficha: Path, publicar_notificacion: Notificador,
-                       produccion: bool = False,
+                       produccion: bool = True,
                        indice_producto: int = 0) -> dict:
     """Corre el pipeline completo para una ficha ya investigada. Devuelve un
     dict con 'estado':
@@ -351,11 +351,16 @@ def ejecutar_pipeline(ruta_ficha: Path, publicar_notificacion: Notificador,
       'publicado' -> borrador creado/actualizado con el video adjunto;
                      'producto_id' y 'url_revisar' traen donde revisarlo.
 
-    `produccion` (default False, decision explicita de quien dispara la
-    corrida -- nunca implicita): False usa las credenciales de siempre
-    (.env, tienda de pruebas); True usa cliente_tienda.RUTA_ENV_PRODUCCION
-    (tienda real, ekipon.co). El candado de seguridad (TIENDAS_PERMITIDAS)
-    sigue validando el dominio en cualquiera de los dos casos.
+    `produccion` (default True desde el 24-ago-2026, decision explicita de
+    Angie tras cerrar la prueba de escala de 20/20 sin bugs: "ya no quiero
+    mas clones de tiendas, que trabaje en la tienda real" -- el pipeline
+    apunta a la tienda real por defecto, y el checkbox de la pagina ahora
+    es para OPTAR por la tienda de pruebas, no al reves): True usa
+    cliente_tienda.RUTA_ENV_PRODUCCION (tienda real, ekipon.co); False usa
+    las credenciales de pruebas (.env). El candado de seguridad
+    (TIENDAS_PERMITIDAS) sigue validando el dominio en cualquiera de los
+    dos casos. Todo sigue saliendo como BORRADOR (nunca 'publish' directo)
+    -- es Angie quien decide manualmente si publica cada producto.
 
     `indice_producto` (default 0): posicion de ESTE producto dentro del lote
     (0-based) -- se pasa tal cual a voz_en_off.generar_a_archivo para que la

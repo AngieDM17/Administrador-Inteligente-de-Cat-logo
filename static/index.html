@@ -382,28 +382,32 @@
     margin: 12px 0 0;
     line-height: 1.5;
   }
-  /* Interruptor de tienda real: apagado por defecto en el HTML (checkbox
-     sin "checked") y en cada carga de la pagina -- no se recuerda entre
-     sesiones a proposito, para que nunca quede prendido "sin querer". */
-  label.interruptor-produccion {
+  /* Interruptor de tienda de pruebas (invertido el 24-ago-2026, decision
+     de Angie tras cerrar la prueba de escala de 20/20 sin bugs: la tienda
+     REAL es el destino por defecto, este checkbox es para OPTAR por la
+     tienda de pruebas en vez de al reves). Apagado por defecto en el HTML
+     (sin "checked") y en cada carga de la pagina -- no se recuerda entre
+     sesiones a proposito, para que nunca quede prendido "sin querer" y
+     una corrida real termine sin querer en la tienda de pruebas. */
+  label.interruptor-pruebas {
     display: flex;
     align-items: center;
     gap: 8px;
     margin: 12px 0 0;
     padding: 10px 14px;
-    background: var(--rojo-suave);
-    border: 1.5px solid var(--rojo);
+    background: transparent;
+    border: 1.5px solid var(--gris-borde);
     border-radius: 10px;
     font-size: .84rem;
     font-weight: 600;
-    color: var(--rojo);
+    color: var(--gris-texto);
     cursor: pointer;
     width: fit-content;
   }
-  label.interruptor-produccion input[type="checkbox"] {
+  label.interruptor-pruebas input[type="checkbox"] {
     width: 16px;
     height: 16px;
-    accent-color: var(--rojo);
+    accent-color: var(--gris-texto);
     cursor: pointer;
     flex-shrink: 0;
   }
@@ -941,9 +945,9 @@
       Investigador: la "ficha técnica" digital del equipo, con sus fotos y
       datos.
     </p>
-    <label class="interruptor-produccion">
-      <input type="checkbox" id="chk-produccion">
-      ⚠️ Publicar en la tienda REAL (ekipon.co), no en la de pruebas
+    <label class="interruptor-pruebas">
+      <input type="checkbox" id="chk-pruebas">
+      Usar la tienda de PRUEBAS en vez de la real (ekipon.co es el destino por defecto)
     </label>
     </div>
   </div>
@@ -972,9 +976,9 @@
       <code>Estado</code> de cada fila a medida que termina — pensado para dejarlo
       corriendo mientras hacés otra cosa durante tu jornada.
     </p>
-    <label class="interruptor-produccion">
-      <input type="checkbox" id="chk-produccion-lote">
-      ⚠️ Publicar TODO el lote en la tienda REAL (ekipon.co), no en la de pruebas
+    <label class="interruptor-pruebas">
+      <input type="checkbox" id="chk-pruebas-lote">
+      Usar la tienda de PRUEBAS para TODO el lote en vez de la real (ekipon.co es el destino por defecto)
     </label>
     </div>
   </div>
@@ -1261,7 +1265,9 @@ async function generar() {
 
   let respuesta;
   try {
-    const produccion = document.getElementById('chk-produccion').checked;
+    // 24-ago-2026: checkbox invertido -- ahora marca OPTAR por la tienda
+    // de pruebas, asi que produccion es lo contrario de "checked".
+    const produccion = !document.getElementById('chk-pruebas').checked;
     respuesta = await fetch('/generar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1401,7 +1407,9 @@ async function generarLote() {
 
   const datosFormulario = new FormData();
   datosFormulario.append('archivo', archivo);
-  const produccionLote = document.getElementById('chk-produccion-lote').checked;
+  // 24-ago-2026: checkbox invertido -- ahora marca OPTAR por la tienda
+  // de pruebas, asi que produccion es lo contrario de "checked".
+  const produccionLote = !document.getElementById('chk-pruebas-lote').checked;
   datosFormulario.append('produccion', produccionLote);
 
   let respuesta;

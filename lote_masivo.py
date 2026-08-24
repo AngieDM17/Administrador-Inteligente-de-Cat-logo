@@ -142,7 +142,7 @@ def _guardar_libro(libro, ruta_excel: Path) -> None:
 def _procesar_producto(link: str, carpeta_investigaciones: Path,
                         publicar_notificacion: Notificador,
                         evento_continuar: threading.Event,
-                        sesion_alibaba, produccion: bool = False,
+                        sesion_alibaba, produccion: bool = True,
                         indice_producto: int = 0) -> dict:
     """Corre investigar_producto() -> ejecutar_pipeline() para UN link,
     exactamente el mismo orden que _correr_pipeline de app.py para el
@@ -194,7 +194,7 @@ def _procesar_producto(link: str, carpeta_investigaciones: Path,
 def procesar_lote(ruta_excel: Path, carpeta_investigaciones: Path,
                    publicar_notificacion: Notificador,
                    evento_continuar: threading.Event | None = None,
-                   produccion: bool = False) -> dict:
+                   produccion: bool = True) -> dict:
     """Punto de entrada del lote nocturno. Lee `ruta_excel` (columnas Link /
     Nota opcional / Estado) y procesa cada fila con un link, encadenando
     investigar_producto() -> ejecutar_pipeline() (ver _procesar_producto),
@@ -202,9 +202,9 @@ def procesar_lote(ruta_excel: Path, carpeta_investigaciones: Path,
     Alibaba, que solo ocurre una vez por lote). Reescribe el Excel en disco
     despues de CADA producto.
 
-    `produccion` (default False): igual para todas las filas del lote --
-    ver orquestador.ejecutar_pipeline. Decision explicita de quien dispara
-    el lote, nunca implicita.
+    `produccion` (default True desde el 24-ago-2026): igual para todas las
+    filas del lote -- ver orquestador.ejecutar_pipeline. El checkbox de la
+    pagina ahora es para OPTAR por la tienda de pruebas, no al reves.
 
     `evento_continuar` es el mismo `threading.Event` que ya usa el camino
     de un solo link (app.py, `_Job.evento_continuar`) para la pausa de
